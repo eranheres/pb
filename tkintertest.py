@@ -12,52 +12,60 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(("localhost", 9999))
 s.listen(10)
 
-top = None
+root = None
 panel = None
-windows = {FIRST: {}}
+windows = {}
+
+request_queue = Queue.Queue()
+result_queue = Queue.Queue()
 
 
 def submit_to_tkinter(callable, *args, **kwargs):
-    windows[FIRST]['request_queue'].put((callable, args, kwargs))
-    return windows[FIRST]['result_queue'].get()
+    request_queue.put((callable, args, kwargs))
+    return result_queue.get()
 
 
 def threadmain():
     global windows
-
-    win = windows[FIRST]
+    global root
 
     def timertick():
+        print 'timer elapsed.'
         try:
-            callable, args, kwargs = win['request_queue'].get_nowait()
+            callable, args, kwargs = request_queue.get_nowait()
         except Queue.Empty:
             pass
         else:
             print "something in queue"
             retval = callable(*args, **kwargs)
-            win['result_queue'].put(retval)
-        win['top'].after(500, timertick)
+            result_queue.put(retval)
+        root.after(500, timertick)
 
-    win['top'] = Tkinter.Tk()
-
-    win['request_queue'] = Queue.Queue()
-    win['result_queue'] = Queue.Queue()
-
-    img = ImageTk.PhotoImage(Image.open(TEMP_FILENAME))
-    win['panel'] = Tkinter.Label(top, image=img)
-    win['panel'].pack(side="bottom", fill="both", expand="yes")
-
+    print 'initializing tk'
+    root = Tkinter.Tk()
     timertick()
-    # Code to add widgets will go here...
-    win['top'].mainloop()
+    root.mainloop()
 
 
-def show_image():
+def new_window(name):
+    print 'putting new window'
+    top = Tkinter.Toplevel(root)
+    frame = Tkinter.Frame(top)
+    top.title(name)
+    label = Tkinter.Label(frame)
+    label.pack(side="bottom", fill="both", expand="yes")
+    frame.pack()
+    windows[name] = {}
+    windows[name]['frame'] = frame
+    windows[name]['label'] = label
+
+
+def show_image(name):
     print "in show image"
-    windows[FIRST]['top'].title("hello wolrd")
-    img2 = ImageTk.PhotoImage(Image.open(TEMP_FILENAME))
-    windows[FIRST]['panel'].configure(image=img2)
-    windows[FIRST]['panel'].image = img2
+    img = ImageTk.PhotoImage(Image.open(TEMP_FILENAME))
+    label = windows[name]['label']
+    label.configure(image=img)
+    label.image = img
 
 
 def receive_image():
@@ -71,7 +79,6 @@ def receive_image():
         f.write(l)
         l = sc.recv(1024)
         i = i+1
-        print i
     print 'done reading'
     f.close()
     sc.close()
@@ -79,7 +86,10 @@ def receive_image():
 
 if __name__ == '__main__':
     thread.start_new_thread(threadmain, ())
-
     while (1):
+        print 'ready to receive next'
         receive_image()
-        submit_to_tkinter(show_image)
+        if FIRST not in windows:
+            print 'open new window'
+            submit_to_tkinter(new_window, FIRST)
+        submit_to_tkinter(show_image, FIRST)
