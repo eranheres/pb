@@ -1,32 +1,35 @@
 import socket
 import sys
-from PIL import Image, ImageGrab
+from PIL import ImageGrab
 import win32gui
-import cPickle
-import copy_reg
-import StringIO
+import struct
 
-TEMP_FILENAME = 'temp.bmp'
-TEMP_FILEFORMAT = "BMP"
 PORT = 9999
+PATTERN = 'command'
+
 
 def capture_image():
     toplist, winlist = [], []
+
     def enum_cb(hwnd, results):
         winlist.append((hwnd, win32gui.GetWindowText(hwnd)))
     win32gui.EnumWindows(enum_cb, toplist)
 
-    firefox = [(hwnd, title) for hwnd, title in winlist if 'command' in title.lower()]
-    # just grab the hwnd for first window matching firefox
-    firefox = firefox[0]
-    hwnd = firefox[0]
+    for win in winlist:
+        title = win[1]
+        hwnd = win[0]
+        if PATTERN.lower() not in title.lower():
+            continue
+        # just grab the hwnd for first window matching firefox
+        win32gui.SetForegroundWindow(hwnd)
+        bbox = win32gui.GetWindowRect(hwnd)
+        img = ImageGrab.grab(bbox)
+        filename = title + '.tmp.bmp'
+        img.save(filename, "BMP")
+        send_image(title)
 
-    win32gui.SetForegroundWindow(hwnd)
-    bbox = win32gui.GetWindowRect(hwnd)
-    img = ImageGrab.grab(bbox)
-    img.save(TEMP_FILENAME, TEMP_FILEFORMAT)
 
-def send_image():
+def send_image(title):
     # Create a TCP/IP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -35,7 +38,11 @@ def send_image():
     print >>sys.stderr, 'connecting to %s port %s' % server_address
     sock.connect(server_address)
 
-    inputfile=open (TEMP_FILENAME, "rb") 
+    filename = title + '.tmp.bmp'
+    length = len(title)
+    sock.send(struct.pack("I", length))
+    sock.send(title)
+    inputfile = open(filename, "rb")
     data = inputfile.read(1024)
     while (data):
         sock.send(data)
@@ -44,5 +51,4 @@ def send_image():
     sock.close()
 
 capture_image()
-send_image()
 print 'done'

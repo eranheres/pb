@@ -4,9 +4,7 @@ import ImageTk
 import thread
 import socket
 import Queue
-
-TEMP_FILENAME = 'file.bmp'
-FIRST = 'first'
+import struct
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(("localhost", 9999))
@@ -30,7 +28,6 @@ def threadmain():
     global root
 
     def timertick():
-        print 'timer elapsed.'
         try:
             callable, args, kwargs = request_queue.get_nowait()
         except Queue.Empty:
@@ -46,12 +43,16 @@ def threadmain():
     timertick()
     root.mainloop()
 
+title_number = 0
+
 
 def new_window(name):
+    global title_number
     print 'putting new window'
     top = Tkinter.Toplevel(root)
     frame = Tkinter.Frame(top)
-    top.title(name)
+    title_number = title_number + 1
+    top.title(title_number)
     label = Tkinter.Label(frame)
     label.pack(side="bottom", fill="both", expand="yes")
     frame.pack()
@@ -62,7 +63,7 @@ def new_window(name):
 
 def show_image(name):
     print "in show image"
-    img = ImageTk.PhotoImage(Image.open(TEMP_FILENAME))
+    img = ImageTk.PhotoImage(Image.open(name))
     label = windows[name]['label']
     label.configure(image=img)
     label.image = img
@@ -72,9 +73,13 @@ def receive_image():
     sc, address = s.accept()
     print 'peer connected'
     print address
-    f = open(TEMP_FILENAME, 'wb')  # open in binary
     i = 0
+    size = struct.unpack("I", sc.recv(4))
+    print 'received size'
+    name = sc.recv(size[0])
+    print 'received name ' + name
     l = sc.recv(1024)
+    f = open(name, 'wb')  # open in binary
     while (l):
         f.write(l)
         l = sc.recv(1024)
@@ -83,13 +88,14 @@ def receive_image():
     f.close()
     sc.close()
     print 'done'
+    return name
 
 if __name__ == '__main__':
     thread.start_new_thread(threadmain, ())
     while (1):
         print 'ready to receive next'
-        receive_image()
-        if FIRST not in windows:
+        image_name = receive_image()
+        if image_name not in windows:
             print 'open new window'
-            submit_to_tkinter(new_window, FIRST)
-        submit_to_tkinter(show_image, FIRST)
+            submit_to_tkinter(new_window, image_name)
+        submit_to_tkinter(show_image, image_name)
