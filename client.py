@@ -6,6 +6,7 @@ import win32gui
 import struct
 import json
 from pprint import pprint
+import re
 
 
 def capture_image(config):
@@ -21,7 +22,7 @@ def capture_image(config):
     for win in winlist:
         title = win[1]
         hwnd = win[0]
-        if pattern.lower() not in title.lower():
+        if not re.match(pattern, title, re.I):
             continue
         # just grab the hwnd for first window matching firefox
         win32gui.SetForegroundWindow(hwnd)
@@ -40,15 +41,15 @@ def send_image(title, host, port):
     server_address = (host, port)
     print >>sys.stderr, 'connecting to %s port %s' % server_address
     sock.connect(server_address)
-
+    ssl_sock = socket.ssl(sock)
     filename = title + '.tmp.bmp'
     length = len(title)
-    sock.send(struct.pack("I", length))
-    sock.send(title)
+    ssl_sock.write(struct.pack("I", length))
+    ssl_sock.write(title)
     inputfile = open(filename, "rb")
     data = inputfile.read(1024)
     while (data):
-        sock.send(data)
+        ssl_sock.write(data)
         data = inputfile.read(1024)
     sock.shutdown(socket.SHUT_RDWR)
     sock.close()

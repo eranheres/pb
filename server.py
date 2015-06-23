@@ -5,8 +5,13 @@ import thread
 import socket
 import Queue
 import struct
+from OpenSSL import SSL
 
+context = SSL.Context(SSL.SSLv23_METHOD)
+context.use_privatekey_file('key')
+context.use_certificate_file('cert')
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = SSL.Connection(context, s)
 s.bind(("localhost", 9999))
 s.listen(10)
 
@@ -82,6 +87,8 @@ def receive_image():
     f = open(name, 'wb')  # open in binary
     while (l):
         f.write(l)
+        if len(l) != 1024:
+            break
         l = sc.recv(1024)
         i = i+1
     print 'done reading'
