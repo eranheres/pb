@@ -1,6 +1,5 @@
 import sys
 import socket
-import sys
 from PIL import ImageGrab
 import win32gui
 import struct
@@ -25,7 +24,7 @@ def capture_image(config):
         if not re.match(pattern, title, re.I):
             continue
         # just grab the hwnd for first window matching firefox
-        win32gui.SetForegroundWindow(hwnd)
+        # win32gui.SetForegroundWindow(hwnd)
         bbox = win32gui.GetWindowRect(hwnd)
         img = ImageGrab.grab(bbox)
         filename = title + '.tmp.bmp'
