@@ -12,7 +12,7 @@ context.use_privatekey_file('key')
 context.use_certificate_file('cert')
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s = SSL.Connection(context, s)
-s.bind(("localhost", 9999))
+s.bind(("0.0.0.0", 9999))
 s.listen(10)
 
 root = None

@@ -67,7 +67,10 @@ def main():
     print 'configuration received from '+config_filename+':'
     config = read_config(config_filename)
     pprint(config)
-    capture_image(config)
+    while 1:
+        capture_image(config)
+        if (config['runonce'] == 'true'):
+            break
     print 'done'
 
 
