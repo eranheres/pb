@@ -56,8 +56,7 @@ def new_window(name):
     print 'putting new window'
     top = Tkinter.Toplevel(root)
     frame = Tkinter.Frame(top)
-    title_number = title_number + 1
-    top.title(title_number)
+    top.title(name)
     label = Tkinter.Label(frame)
     label.pack(side="bottom", fill="both", expand="yes")
     frame.pack()
@@ -66,25 +65,25 @@ def new_window(name):
     windows[name]['label'] = label
 
 
-def show_image(name):
+def show_image(name, temp_filename):
     print "in show image"
-    img = ImageTk.PhotoImage(Image.open(name))
+    img = ImageTk.PhotoImage(Image.open(temp_filename))
     label = windows[name]['label']
     label.configure(image=img)
     label.image = img
 
 
-def receive_image():
+def receive_image(temp_filename):
     sc, address = s.accept()
     print 'peer connected'
     print address
     i = 0
     size = struct.unpack("I", sc.recv(4))
     print 'received size'
-    name = sc.recv(size[0])
-    print 'received name ' + name
+    title = sc.recv(size[0])
+    print 'received name ' + title
     l = sc.recv(1024)
-    f = open(name, 'wb')  # open in binary
+    f = open(temp_filename, 'wb')  # open in binary
     while (l):
         f.write(l)
         if len(l) != 1024:
@@ -95,14 +94,17 @@ def receive_image():
     f.close()
     sc.close()
     print 'done'
-    return name
+    return title
 
 if __name__ == '__main__':
     thread.start_new_thread(threadmain, ())
+    count = 0
     while (1):
         print 'ready to receive next'
-        image_name = receive_image()
-        if image_name not in windows:
+        count = (count + 1) % 10
+        temp_filename = str(count) + '.bmp'
+        title = receive_image(temp_filename)
+        if title not in windows:
             print 'open new window'
-            submit_to_tkinter(new_window, image_name)
-        submit_to_tkinter(show_image, image_name)
+            submit_to_tkinter(new_window, title)
+        submit_to_tkinter(show_image, title, temp_filename)
