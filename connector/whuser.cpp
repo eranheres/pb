@@ -4,6 +4,7 @@
 
 #include <windows.h>
 #include <process.h>
+#include <vector>
 
 #include "whuser.h"
 
@@ -21,7 +22,7 @@ string symbol_name;
 double symbol_value;
 int chair;
 
-vector<string> subscribed_symbols;
+std::vector<std::string> subscribed_symbols;
 
 /*
  * Show messagebox.
@@ -164,7 +165,7 @@ void DLL_LOAD()
 void DLL_START()
 {
 	bool dupa;
-	dll_listening_port = m_pget_winholdem_symbol(0, "f$dll_listening_port", dupa);
+	dll_listening_port = int(m_pget_winholdem_symbol(0, "f$dll_listening_port", dupa));
 	int client_listening_port = int(m_pget_winholdem_symbol(0, "f$client_listening_port", dupa));
 
 	if(client_listening_port)
