@@ -1,0 +1,7 @@
+test/Release/
+test/Debug
+*.swp
+connector/Release
+*.vcxproj.user
+connector/test
+*.suo

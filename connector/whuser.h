@@ -1,13 +1,15 @@
 #ifndef _whuser_h_
 #define _whuser_h_
 
+#ifdef WHUSER_STATIC
+#define WHUSER_API
+#else
 #ifdef WHUSER_EXPORTS
 #define WHUSER_API __declspec(dllexport)
 #else
 #define WHUSER_API __declspec(dllimport)
 #endif
-
-bool LOADED = false;
+#endif
 
 void DLL_LOAD(); // loading dll
 void DLL_UNLOAD(); // unloading dll
@@ -37,7 +39,7 @@ struct holdem_state
 
     unsigned char   m_is_playing    : 1 ;	//0=sitting-out, 1=sitting-in
     unsigned char   m_is_posting    : 1 ;	//0=autopost-off, 1=autopost-on
-    unsigned char   m_fillerbits    : 6 ;	//filler bits
+   unsigned char   m_fillerbits    : 6 ;	//filler bits
 
     unsigned char   m_fillerbyte        ;	//filler byte
     unsigned char   m_dealer_chair      ;	//0-9
