@@ -25,6 +25,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
+    compile "org.projectlombok:lombok:1.16.4"
     compile("org.springframework.boot:spring-boot-starter-web")
     testCompile("junit:junit")
 }
