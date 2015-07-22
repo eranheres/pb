@@ -149,7 +149,7 @@ string holdem_state_to_json(holdem_state* state) {
 	json_object_set_new(main, "title", json_string((char*)state->m_title));
 	json_object_set_new(main, "is_playing", json_integer(state->m_is_playing));
 	json_object_set_new(main, "is_posting", json_integer(state->m_is_posting));
-	json_object_set_new(main, "m_fillerbits", json_integer(state->m_fillerbits));
+	json_object_set_new(main, "fillerbits", json_integer(state->m_fillerbits));
 	json_object_set_new(main, "dealer_chair", json_integer(state->m_dealer_chair));
 	json_object_set_new(main, "pots", pots);
     json_object_set_new(main, "players", players);
