@@ -5,3 +5,8 @@ connector/Release
 *.vcxproj.user
 connector/test
 *.suo
+*.iml
+*.ipr
+*.iws
+.idea
+.gradle
