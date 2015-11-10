@@ -1,0 +1,191 @@
+##2015-08-26 13:42:46##
+
+##notes##
+ 
+
+##dll##
+ 
+
+##f$alli##
+ 
+
+##f$betpot_2_1##
+ 
+
+##f$betpot_1_1##
+ 
+
+##f$betpot_3_4##
+ 
+
+##f$betpot_2_3##
+ 
+
+##f$betpot_1_2##
+ 
+
+##f$betpot_1_3##
+ 
+
+##f$betpot_1_4##
+ 
+
+##f$betsize##
+// Betsize in dollars, raise-to semantics.
+// OpenHoldem will auto-adapt the betsize to the casinos input-requirements.
+// Please define your tablemaps "betsizeinterpretationmethod"
+// to configure this feature.
+
+
+##f$rais##
+ 
+
+##f$call##
+ 
+
+##f$check##
+// Check whenever it is free to call
+(call == 0) 
+
+##f$fold##
+// f$fold should always evaluate to true per default
+// for auto-check-folding instead of time-outs.
+1 
+
+##f$sitin##
+ 
+
+##f$sitout##
+ 
+
+##f$leave##
+ 
+
+##f$rematch##
+ 
+
+##f$autopost##
+ 
+
+##f$close##
+ 
+
+##f$rebuy##
+// f$rebuy should evaluate to the target-amount in dollars.
+// This value will be passed to the rebuy-script as a parameter.
+0
+
+
+##f$prefold##
+    Call
+ 
+##f$flop##
+​    Call
+
+
+##f$turn##
+​    Fold   
+
+
+
+##f$river##
+    WHEN dll$river Fold FORCE
+​
+
+##f$chat##
+ 
+
+##f$delay##
+// Autoplayer-delay in milli-seconds
+0
+
+
+##f$allin_on_betsize_balance_ratio##
+// Allin if betsize is more than X% of our total balance (including currentbet).
+// This affects f$betsize and all f$betpot_X_Y_ functions.
+//  0.00 =  0% = disabled
+//  0.50 = 50%
+0.00
+
+
+##f$ini_function_on_startup##
+// Ini-functions are meant for
+//   * Initialization of memory-symbols at well-defined times
+//   * Triggering calculations, e.g. in a DLL
+
+
+##f$ini_function_on_connection##
+ 
+
+##f$ini_function_on_handreset##
+ 
+
+##f$ini_function_on_new_round##
+ 
+
+##f$ini_function_on_my_turn##
+ 
+
+##f$ini_function_on_heartbeat##
+ 
+
+##f$prwin_number_of_opponents##
+// "Reasonable" default to get standard PrWin running for beginners,
+// Works even with "no opponents".
+nopponentsplaying + 1 
+
+##f$prwin_number_of_iterations##
+// "Reasonable" default to get PrWin running for beginners.
+// Large enough to get usable results,
+// small enough to save CPU-time.
+1000 
+
+##f$prwin_topclip##
+ 
+
+##f$prwin_mustplay##
+ 
+
+##f$prwin_willplay##
+ 
+
+##f$prwin_wontplay##
+ 
+
+##f$icm_prize1##
+// f$icm_prizeX functions are used to configure the payout-structure in tournaments.
+// The sum of all f$icm_prizeX functions should be 1.00 (= 100%).
+// Default to get things going: the winner takes it all.
+1.00
+
+
+##f$icm_prize2##
+ 
+
+##f$icm_prize3##
+ 
+
+##f$icm_prize4##
+ 
+
+##f$icm_prize5##
+ 
+
+##f$icm_prize6##
+ 
+
+##f$icm_prize7##
+ 
+
+##f$icm_prize8##
+ 
+
+##f$icm_prize9##
+ 
+
+##f$test##
+ 
+
+##f$debug##
+ 
+

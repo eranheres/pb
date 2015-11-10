@@ -1,3 +1,6 @@
+#define USER_DLL
+
+#include "user.h"
 #include <string>
 #include <string.h>
 #include <sstream>
@@ -9,12 +12,16 @@
 #include <fstream>
 #include <bitset>
 #include "jansson.h"
-#include "whuser.h"
+#include "curl/curl.h"
+#include "AllSymbols.h"
+#include "AllPPLSymbols.h"
 
 using namespace std;
-
-pfgws_t m_pget_winholdem_symbol = NULL;
-bool LOADED = false;
+#define Log printf
+//#define Log WriteLog
+void init_curl();
+void clean_curl();
+int request(const char *url, char* buffer, unsigned int buffer_size);
 
 HANDLE symbol_need, symbol_ready, have_result;
 
@@ -25,8 +32,22 @@ int dll_listening_port = 0;
 string symbol_name;
 double symbol_value;
 int chair;
+static CURL* curl = NULL;
+static const int BUFFER_SIZE = (1024 * 256);
 
-std::vector<std::string> subscribed_symbols;
+struct configuration_st {
+	string server_url;
+} configuration;
+
+/*
+void Log(char* fmt,...) {
+	va_list args;
+    va_start(args, fmt);
+	vfprintf(stdout, fmt, args);
+	WriteLog(fmt, args);
+	va_end(args);
+}
+*/
 
 /*
  * Show messagebox.
@@ -35,8 +56,8 @@ void msg(const wchar_t* m, const wchar_t* t)
 {
     int msgboxID = MessageBox(
             NULL,
-            (LPCWSTR)m,
-            (LPCWSTR)t,
+            (LPCSTR)m,
+            (LPCSTR)t,
             MB_OK);
 }
 
@@ -107,6 +128,7 @@ string holdem_state_to_string(holdem_state* state)
     return os.str();
 }
 
+
 json_t* json_holdem_player(holdem_player* player) {
 	// build hand card array
 	json_t *cards = json_array();
@@ -127,7 +149,7 @@ json_t* json_holdem_player(holdem_player* player) {
 	return main;
 }
 
-string holdem_state_to_json(holdem_state* state) {
+json_t* holdem_state_to_json(holdem_state* state) {
 	// build the pots array
 	json_t *pots = json_array();
 	for (int i=0; i<10; i++) 
@@ -144,6 +166,22 @@ string holdem_state_to_json(holdem_state* state) {
 	for (int i=0; i<10; i++)
 		json_array_append_new(players, json_holdem_player(&state->m_player[i]));
 
+	// add symbols
+    json_t *symbols = json_object();
+	const char* sym = 0;
+	int idx = 0;
+	while (*(sym = all_symbol_names[idx++]) != '\0') {
+	    double val = GetSymbol(sym);
+	    json_object_set_new(symbols, sym, json_real(val));
+	}
+
+	json_t *ppl_symbols = json_object();
+	idx = 0;
+	while (*(sym = all_ppl_symbol_names[idx++]) != '\0') {
+		double val = GetSymbol(sym);
+		json_object_set_new(symbols, sym, json_real(val));
+	}
+	
 	// build the main object
     json_t *main = json_object();
 	json_object_set_new(main, "title", json_string((char*)state->m_title));
@@ -151,185 +189,88 @@ string holdem_state_to_json(holdem_state* state) {
 	json_object_set_new(main, "is_posting", json_integer(state->m_is_posting));
 	json_object_set_new(main, "fillerbits", json_integer(state->m_fillerbits));
 	json_object_set_new(main, "dealer_chair", json_integer(state->m_dealer_chair));
+	json_object_set_new(main, "cards", cards);
 	json_object_set_new(main, "pots", pots);
     json_object_set_new(main, "players", players);
-	
-    return json_dumps(main, JSON_INDENT(4));
+	json_object_set_new(main, "symbols", symbols);
+	json_object_set_new(main, "ppl_symbols", ppl_symbols);
+
+    return main;
 }
 
-void Log(const char* szString)
+string holdem_state_to_json_string(holdem_state* state)
 {
-    FILE* pFile = fopen("logFile.txt", "a");
-    fprintf(pFile, "%s",szString);
-    fclose(pFile);
+	return json_dumps(holdem_state_to_json(state), JSON_INDENT(4));
 }
 
-/*
- * Thread responsible for handling OpenHoldem symbol requests.
- */
-void xServerThread(void* dummy)
+double process_constant_query_values(const char* pquery, double& ret)
 {
+	ret = 0;
+	return 0;
 }
-
-struct ClientData
-{
-    char* format;
-    char* type;
-    void* data;
-};
-
-/*
- * Thread responsible for sending information to OH.
- */
-void xClientThread(void* client_data)
-{
-}
-
-/*
- * Send subscrived symbols to client.
- */
 
 /*
  * Handler for OH query message.
  */
+#define STATE_INDEX (state_index==0?255:state_index-1)
 double process_query(const char* pquery)
 {
-    ostringstream os;
-    os << "query:" << pquery << "\n";
-    Log(os.str().c_str());
+    Log("query:%s\n", pquery);
+	double ret;
+	if (process_constant_query_values(pquery, ret) == 1)
+		return ret;
+	
+	int pstate = STATE_INDEX;
+	typedef holdem_state jj[256];
+	jj* phstate = (jj*)&state[0];
+	holdem_state* current = &state[pstate];
+	Log("state:%s\n", holdem_state_to_json_string(&state[STATE_INDEX]).c_str());
     return 0;
 }
 
 /*
  * Handler for OH state message.
  */
-void process_state(holdem_state* pstate)
+double process_state(holdem_state* pstate)
 {
+	static char* buffer = NULL;
+	if (buffer == NULL)
+		buffer = (char*)malloc(BUFFER_SIZE);
     ostringstream os;
-    os << "state:" << holdem_state_to_string(pstate);
-    //Log(os.str().c_str());
+    Log("state :%s\n", holdem_state_to_string(pstate).c_str());
+//	request(configuration.server_url.c_str(), buffer, BUFFER_SIZE);
+    int val = 0; 
+	val = (int)GetSymbol("rand");
+	Log("dll symbol:%d\n",val);
+	return 0;
 }
 
-/*
- * Handler for OH messages.
- */
-WHUSER_API double process_message(const char* pmessage,	const void* param)
+void read_config() 
 {
-    if (pmessage == NULL || param == NULL)
-        return 0;
+	json_t *json;
+	json_error_t error;
 
-    ostringstream os;
-    os << "message; "<< pmessage << "\n";
-    Log(os.str().c_str());
-
-    if (strcmp(pmessage, "event") == 0)
-    {
-        if(!LOADED)
-        {
-            LOADED = true;
-            DLL_LOAD();
-        }
-        else
-        {
-            DLL_UNLOAD();
-        }
-    }
-
-    else if (strcmp(pmessage, "state") == 0)
-        process_state((holdem_state*)param);
-
-    else if (strcmp(pmessage, "query") == 0)
-    {
-        double ret = process_query((const char*)param);
-		ostringstream string;
-		string<<"query return" << ret;
-        Log(string.str().c_str());
-        return ret;
-    }
-    else if (strcmp(pmessage, "pfgws") == 0)
-    {
-        m_pget_winholdem_symbol = (pfgws_t)param;
-        DLL_START();
-        return 0;
-    }
-    else if (strcmp(pmessage, "phl1k") == 0)
-        return 0;
-
-    else if (strcmp(pmessage, "prw1326") == 0)
-        return 0;
-
-    else if (strcmp(pmessage, "p_send_chat_message") == 0)
-        return 0;
-
-    return client_result;
+	json = json_load_file("pb_config.json", 0, &error);
+	if(!json) {
+		Log("failed to load config file\n");
+		return;
+	}
+    Log("config file loaded\n");	
+	
+    json_t* url = json_object_get(json,"server_url");
+	if (json_is_string(url)) {
+    	configuration.server_url = json_string_value(url);
+		Log("Server URL:%s\n",configuration.server_url.c_str());
+	}
 }
 
-void handle_xClient()
+void init_connector()
 {
-    DWORD wait_result;
-    bool dupa;
-    while(true)
-    {
-        wait_result = WaitForSingleObject(have_result, 100);
-        if(WAIT_OBJECT_0 == wait_result)
-        {
-            break;
-        }
-        wait_result = WaitForSingleObject(symbol_need, 100);
-        if(WAIT_OBJECT_0 == wait_result)
-        {
-            symbol_value = m_pget_winholdem_symbol(chair, symbol_name.c_str(), dupa);
-            SetEvent(symbol_ready);
-        }
-    }
+	init_curl();
+	read_config();
 }
 
-/*
- * DLL loaded to OH.
- */
-void DLL_LOAD()
+void clean_connector()
 {
-    Log("Loading DLL...\n");
-    symbol_need = CreateEvent(NULL, FALSE, FALSE, NULL);
-    symbol_ready = CreateEvent(NULL, FALSE, FALSE, NULL);
-    have_result = CreateEvent(NULL, FALSE, FALSE, NULL);
-    Log("DLL loaded\n");
-}
-
-/*
- * Create XMLRPC Client and Server.
- */
-void DLL_START()
-{
-    bool dupa;
-    dll_listening_port = int(m_pget_winholdem_symbol(0, "f$dll_listening_port", dupa));
-    int client_listening_port = int(m_pget_winholdem_symbol(0, "f$client_listening_port", dupa));
-
-}
-
-/*
- * DLL unloaded from OH.
- */
-void DLL_UNLOAD()
-{
-    Log("Unloading DLL\n");
-    ClientData* cd = (ClientData*)malloc(sizeof(ClientData));
- 
-    cd->format = "sn";
-    cd->type = "event";
-    cd->data = NULL;
-
-}
-
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-    switch (ul_reason_for_call)
-    {
-        case DLL_PROCESS_ATTACH:
-        case DLL_THREAD_ATTACH:
-        case DLL_THREAD_DETACH:
-        case DLL_PROCESS_DETACH:
-            break;
-    }
-    return TRUE;
+	clean_curl();
 }

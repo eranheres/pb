@@ -1,0 +1,9 @@
+#ifndef __ALL_PPL_SYMBOL_NAMES_H__
+#define __ALL_PPL_SYMBOL_NAMES_H__
+
+static const char* all_ppl_symbol_names[] = {
+"<<SYMBOLS>>",
+"" //to recognize end
+};
+
+#endif // ALL_PPL_SYMBOLS

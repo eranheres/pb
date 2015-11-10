@@ -6,11 +6,17 @@ import win32api
 import win32con
 import os
 
+OPEN_HOLDEM_PATH = "c:\\MyProjects\\OpenHoldem\\OpenHoldem.exe"
+BASH_PATH = "c:\\cygwin\\bin\\bash.exe"
+OPEN_LOGS = "/cygdrive/c/MyProjects/pb/automation/openlogs.sh"
+DD_POCKER_PATH = "c:\\Program Files\\ddpoker3\\ddpoker.exe"
+
 
 def clean_state():
     print 'killing apps'
     os.system('taskkill /F /IM ddpoker.exe')
     os.system('taskkill /F /IM OpenHoldem.exe')
+    os.system('taskkill /F /IM tail.exe')
 
 
 def click(x, y):
@@ -19,10 +25,15 @@ def click(x, y):
     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
 
 
+def open_windows():
+    # subprocess.Popen([BASH_PATH, "--login", OPEN_LOGS])
+    subprocess.Popen([OPEN_HOLDEM_PATH])
+    subprocess.Popen([DD_POCKER_PATH])
+
+
 clean_state()
 print 'started'
-subprocess.Popen(["c:\\MyProjects\\OpenHoldem_7.7.3\OpenHoldem.exe"])
-subprocess.Popen(["c:\\Program Files\\ddpoker3\\ddpoker.exe"])
+open_windows()
 print 'loaded ddpoker, waiting for 2 seconds'
 time.sleep(2)
 print 'relocating screen'

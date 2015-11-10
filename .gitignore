@@ -10,3 +10,6 @@ connector/test
 *.iws
 .idea
 .gradle
+.ropeproject
+Release
+user.vcxproj.filters
