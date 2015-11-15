@@ -237,6 +237,7 @@ double process_query(const char* pquery)
 	typedef holdem_state jj[256];
 	jj* phstate = (jj*)&state[0];
 	holdem_state* current = &state[pstate];
+	Log("state:%s\n", holdem_state_to_string(&state[STATE_INDEX]).c_str());
 	if (!query_should_be_treated(pquery))
 		return 0;
 	Log("state:%s\n", holdem_state_to_json_string(&state[STATE_INDEX]).c_str());
