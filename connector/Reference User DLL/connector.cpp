@@ -17,8 +17,9 @@
 #include "AllPPLSymbols.h"
 
 using namespace std;
-#define Log printf
+//#define Log printf
 //#define Log WriteLog
+#define Log pblog
 void init_curl();
 void clean_curl();
 int request(const char *url, char* buffer, unsigned int buffer_size);
@@ -39,15 +40,16 @@ struct configuration_st {
 	string server_url;
 } configuration;
 
-/*
-void Log(char* fmt,...) {
+#define BUF_SIZE (256*1024)
+void pblog(char* fmt,...) {
+	char buffer[BUF_SIZE];
 	va_list args;
     va_start(args, fmt);
-	vfprintf(stdout, fmt, args);
-	WriteLog(fmt, args);
+	vsprintf_s(buffer, BUF_SIZE, fmt, args);
 	va_end(args);
+	WriteLog(buffer);
+	printf(buffer);
 }
-*/
 
 /*
  * Show messagebox.
@@ -209,6 +211,17 @@ double process_constant_query_values(const char* pquery, double& ret)
 	return 0;
 }
 
+int query_should_be_treated(const char* query) {
+	const char* symbols[] = {"dll$preflop_", "dll$flop_", "dll$turn_", "dll$river_", 0};
+	int index = 0;
+	while (symbols[index]) {
+	    if (memcmp(symbols[index], query, strlen(symbols[index])) == 0)
+		    return true;
+		index++;
+	}
+	return false;
+}
+
 /*
  * Handler for OH query message.
  */
@@ -224,6 +237,8 @@ double process_query(const char* pquery)
 	typedef holdem_state jj[256];
 	jj* phstate = (jj*)&state[0];
 	holdem_state* current = &state[pstate];
+	if (!query_should_be_treated(pquery))
+		return 0;
 	Log("state:%s\n", holdem_state_to_json_string(&state[STATE_INDEX]).c_str());
     return 0;
 }
@@ -255,6 +270,7 @@ void read_config()
 		Log("failed to load config file\n");
 		return;
 	}
+	WriteLog("test %s:\n","This is a test 123");
     Log("config file loaded\n");	
 	
     json_t* url = json_object_get(json,"server_url");
