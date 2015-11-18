@@ -56,25 +56,12 @@ double loopback_debug(const char* pquery) {
 DLL_IMPLEMENTS double __stdcall ProcessQuery(const char* pquery) {
 	if (pquery==NULL)
 		return 0;
-	std::cout << "query:" << pquery << std::endl;
-	WriteLog("[user.dll] - query:%s\n",pquery);
 	if (strncmp(pquery,"dll$test",8)==0) {
 		return GetSymbol("random");
-    }
-	if (strncmp(pquery,"dll$spend",9)==0) {
-		return GetSymbol("f$spend");
-    }
-	if (strncmp(pquery,"dll$recurse",11)==0) {
-		return GetSymbol("dll$mynumber");
-    }
-	if (strncmp(pquery,"dll$mynumber",12)==0) {
-		return 22345.67;
     }
 	if (GetSymbol("f$loopback_debug") == 1) {
 		return loopback_debug(pquery);
 	}
-	double v = GetSymbol("OpponentsLeftSittingOut");
-    v = GetSymbol("ConstBetRoundTurn");
 	return process_query(pquery);
 }
 

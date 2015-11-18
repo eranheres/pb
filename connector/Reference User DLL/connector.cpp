@@ -28,6 +28,8 @@ HANDLE symbol_need, symbol_ready, have_result;
 
 double client_result;
 
+int hand_count = 0;
+const char* hand_turn = 0;
 int dll_listening_port = 0;
 
 string symbol_name;
@@ -35,6 +37,9 @@ double symbol_value;
 int chair;
 static CURL* curl = NULL;
 static const int BUFFER_SIZE = (1024 * 256);
+
+#define STATE_INDEX (state_index==0?255:state_index-1)
+#define CARD_VALID(card) (card<0xFE)
 
 struct configuration_st {
 	string server_url;
@@ -65,7 +70,7 @@ void msg(const wchar_t* m, const wchar_t* t)
 
 string num_to_card(unsigned char num) 
 {
-    if (num==0xFE) return "";
+    if (!CARD_VALID(num)) return "";
     int card = (num%13)+2;
     char cs, cn;
     switch (card){
@@ -152,6 +157,15 @@ json_t* json_holdem_player(holdem_player* player) {
 }
 
 json_t* holdem_state_to_json(holdem_state* state) {
+	char *hand_number = GetHandnumber();
+
+	// build hand matadata
+	json_t *matadata = json_object();
+	json_object_set_new(matadata, "room", json_string("DDPoker"));
+	json_object_set_new(matadata, "table", 0);
+	json_object_set_new(matadata, "hand", json_integer(hand_count));
+	json_object_set_new(matadata, "turn", json_string(hand_turn));
+
 	// build the pots array
 	json_t *pots = json_array();
 	for (int i=0; i<10; i++) 
@@ -205,42 +219,164 @@ string holdem_state_to_json_string(holdem_state* state)
 	return json_dumps(holdem_state_to_json(state), JSON_INDENT(4));
 }
 
-double process_constant_query_values(const char* pquery, double& ret)
-{
-	ret = 0;
-	return 0;
-}
+int is_showdown() {
+	int idx = state_index;
+    holdem_state* cstate = &state[STATE_INDEX];
+	for (int i=0; i<5; i++) {
+		if (!CARD_VALID(cstate->m_cards[i]))
+			return false;
+	}
 
-int query_should_be_treated(const char* query) {
-	const char* symbols[] = {"dll$preflop_", "dll$flop_", "dll$turn_", "dll$river_", 0};
-	int index = 0;
-	while (symbols[index]) {
-	    if (memcmp(symbols[index], query, strlen(symbols[index])) == 0)
-		    return true;
-		index++;
+	holdem_player* player = 0;
+	int show_count = 0;
+	for (int i=0; i<10; i++) {
+		player = &cstate->m_player[i];
+		if ((player->m_name_known) && (CARD_VALID(player->m_cards[0])) && (CARD_VALID(player->m_cards[1])))
+		    show_count++;
+		if (show_count == 2)
+			return true;
 	}
 	return false;
 }
 
-/*
- * Handler for OH query message.
- */
-#define STATE_INDEX (state_index==0?255:state_index-1)
-double process_query(const char* pquery)
+int do_showdown()
 {
-    Log("query:%s\n", pquery);
-	double ret;
-	if (process_constant_query_values(pquery, ret) == 1)
-		return ret;
+	Log("Showdown. handnumber:%d\n",hand_count); 
+	return 0;
+}
+
+int is_openppl_command(const char* pquery) {
+
+	if (string(pquery).find("dll$preflop_") == 0) {
+		hand_turn = "preflop";
+		return true;
+	}
+
+	if (string(pquery).find("dll$flop") == 0) {
+		hand_turn = "flop";
+		return true;
+	}
 	
+	if (string(pquery).find("dll$turn") == 0) {
+		hand_turn = "turn";
+		return true;
+	}
+
+	if (string(pquery).find("dll$river") == 0) {
+		hand_turn = "river";
+		return true;
+	}
+
+	return false;
+}
+
+int do_openppl_command(const char* pquery)
+{
 	int pstate = STATE_INDEX;
 	typedef holdem_state jj[256];
 	jj* phstate = (jj*)&state[0];
 	holdem_state* current = &state[pstate];
-	Log("state:%s\n", holdem_state_to_string(&state[STATE_INDEX]).c_str());
-	if (!query_should_be_treated(pquery))
+	
+	Log("query: %s, event: hand=%d,turn=%s\n", pquery, hand_count, hand_turn);
+	//Log("state:%s\n", holdem_state_to_json_string(&state[STATE_INDEX]).c_str());
+    //Log("query:%s\n", pquery);
+
+	// call everything
+	if (string(pquery).find("_call") != string::npos)
+		return 1;
+	return 0;
+}
+
+int is_heartbeat(const char* pquery) 
+{
+	if (string(pquery) == "dll$ini_function_on_heartbeat") 
+		return 1;
+	return 0;
+}
+
+int do_heartbeat()
+{
+	//Log("heartbeat...\n");
+	return 0;
+}
+
+int is_playing()
+{
+    holdem_state* cstate = &state[STATE_INDEX];
+	return (cstate->m_is_playing);
+}
+
+void do_not_playing()
+{
+	Log("not playing\n");
+}
+
+int is_hand_reset(const char* pquery) 
+{
+    if (string(pquery) != "dll$ini_function_on_handreset")
+	    return 0;	
+	Log("Handreset:%d\n",hand_count);
+	hand_count++;
+	return 1;
+}
+
+int do_hand_reset() 
+{
+	hand_count++;
+	return 0;
+}
+
+int is_new_round(const char* pquery)
+{
+	if (string(pquery) == "dll$ini_function_on_new_round")
+	{
+		Log("On new round\n");
+		return 1;
+	}
+	return 0;
+}
+
+int do_new_round()
+{
+    Log("state :%s\n", holdem_state_to_json_string(&state[STATE_INDEX]).c_str());
+	return 0;
+}
+
+int is_my_turn(const char* pquery) 
+{
+    return (string(pquery) == "dll$ini_function_on_my_turn")
+}
+
+int do_my_turn(const char* pquery)
+{
+	Log("Do my turn\n");
+}
+/*
+ * Handler for OH query message.
+ */
+double process_query(const char* pquery)
+{
+	if (is_hand_reset(pquery)) 
+		return do_hand_reset();
+
+	if (is_new_round(pquery))
+		return do_new_round();
+
+	if (is_heartbeat(pquery)) {
+		do_heartbeat();
+		if (!is_playing())
+			do_not_playing(); 
+		if (is_showdown()) 
+			do_showdown();
 		return 0;
-	Log("state:%s\n", holdem_state_to_json_string(&state[STATE_INDEX]).c_str());
+	}
+
+	if (is_my_turn())
+		return do_my_turn();
+
+	if (is_openppl_command(pquery))
+		return do_openppl_command(pquery);
+
     return 0;
 }
 
@@ -249,15 +385,6 @@ double process_query(const char* pquery)
  */
 double process_state(holdem_state* pstate)
 {
-	static char* buffer = NULL;
-	if (buffer == NULL)
-		buffer = (char*)malloc(BUFFER_SIZE);
-    ostringstream os;
-    Log("state :%s\n", holdem_state_to_string(pstate).c_str());
-//	request(configuration.server_url.c_str(), buffer, BUFFER_SIZE);
-    int val = 0; 
-	val = (int)GetSymbol("rand");
-	Log("dll symbol:%d\n",val);
 	return 0;
 }
 

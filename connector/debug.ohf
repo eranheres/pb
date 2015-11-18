@@ -11,35 +11,20 @@ dll$f_alli
  
 
 ##f$betpot_2_1##
-dll$f_betpot_2_1 
  
-
 ##f$betpot_1_1##
-dll$f_betpot_1_1 
- 
 
 ##f$betpot_3_4##
-dll$betpot_3_4 
- 
 
 ##f$betpot_2_3##
-dll$betpot_2_3 
- 
 
 ##f$betpot_1_2##
-dll$betpot_1_2 
- 
 
 ##f$betpot_1_3##
-dll$xbetpot_1_3 
- 
 
 ##f$betpot_1_4##
-dll$betpot_1_4 
- 
 
 ##f$betsize##
-dll$betsize 
 // Betsize in dollars, raise-to semantics.
 // OpenHoldem will auto-adapt the betsize to the casinos input-requirements.
 // Please define your tablemaps "betsizeinterpretationmethod"
@@ -47,53 +32,34 @@ dll$betsize
 
 
 ##f$rais##
-dll$rais
- 
 
 ##f$call##
-dll$call 
- 
 
 ##f$check##
-dll$check 
 // Check whenever it is free to call
 //(call == 0) 
 
 ##f$fold##
-dll$fold
 // f$fold should always evaluate to true per default
 // for auto-check-folding instead of time-outs.
-//1 
+1 
 
 ##f$sitin##
-dll$sitin 
- 
 
 ##f$sitout##
-dll$sitout 
- 
 
 ##f$leave##
-dll$leave 
- 
 
 ##f$rematch##
-dll$rematch 
- 
 
 ##f$autopost##
-dll$autopost 
- 
 
 ##f$close##
-dll$close
- 
 
 ##f$rebuy##
-dll$rebuy
 // f$rebuy should evaluate to the target-amount in dollars.
 // This value will be passed to the rebuy-script as a parameter.
-//0
+0
 
 
 ##f$prefold##
@@ -101,13 +67,12 @@ dll$prefold
  
 
 ##f$chat##
-dll$chat
+//dll$chat
  
 
 ##f$delay##
-dll$delay
 // Autoplayer-delay in milli-seconds
-
+1
 
 ##f$allin_on_betsize_balance_ratio##
 dll$allin_on_betsize_balance_ratio
@@ -146,17 +111,17 @@ dll$ini_function_on_heartbeat
 //0
 
 ##f$prwin_number_of_opponents##
-dll$prwin_number_of_opponents
+//dll$prwin_number_of_opponents
 // "Reasonable" default to get standard PrWin running for beginners,
 // Works even with "no opponents".
-//nopponentsplaying + 1 
+nopponentsplaying + 1 
 
 ##f$prwin_number_of_iterations##
-dll$prwin_number_of_iterations
+//dll$prwin_number_of_iterations
 // "Reasonable" default to get PrWin running for beginners.
 // Large enough to get usable results,
 // small enough to save CPU-time.
-//1000 
+1000 
 
 ##f$prwin_topclip##
 dll$prwin_topclip
@@ -175,43 +140,27 @@ dll$prwin_wontplay
  
 
 ##f$icm_prize1##
-dll$icm_prize1
 // f$icm_prizeX functions are used to configure the payout-structure in tournaments.
 // The sum of all f$icm_prizeX functions should be 1.00 (= 100%).
 // Default to get things going: the winner takes it all.
-//1.00
+1.00
 
 
 ##f$icm_prize2##
-dll$icm_prize1
- 
 
 ##f$icm_prize3##
-dll$icm_prize1
- 
 
 ##f$icm_prize4##
-dll$icm_prize1
- 
 
 ##f$icm_prize5##
-dll$icm_prize1
- 
 
 ##f$icm_prize6##
-dll$icm_prize1
- 
 
 ##f$icm_prize7##
-dll$icm_prize1
- 
 
 ##f$icm_prize8##
-dll$icm_prize1
- 
 
 ##f$icm_prize9##
-dll$icm_prize1
  
 
 ##f$test##
