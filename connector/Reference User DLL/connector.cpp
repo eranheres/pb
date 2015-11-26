@@ -4,6 +4,7 @@
 #include <string>
 #include <string.h>
 #include <sstream>
+#include <iomanip>
 #include "stdio.h"
 
 #include <windows.h>
@@ -12,9 +13,12 @@
 #include <fstream>
 #include <bitset>
 #include "jansson.h"
-#include "curl/curl.h"
+#include "http.h"
 #include "AllSymbols.h"
 #include "AllPPLSymbols.h"
+#include "boost/uuid/uuid.hpp"
+#include "boost/uuid/random_generator.hpp"
+#include "boost/uuid/uuid_io.hpp"
 
 using namespace std;
 //#define Log printf
@@ -26,19 +30,34 @@ int request(const char *url, char* buffer, unsigned int buffer_size);
 
 HANDLE symbol_need, symbol_ready, have_result;
 
+struct ext_holdem_player {
+	bool playing;
+	bool active;
+	bool dealt;
+	bool blind;
+	bool cards_shows;
+};
+
+struct ext_holdem_state {
+	const char* datatype;
+	int current;
+    int hand_count;
+	int snapshot_count;
+	std::string hand_uuid;
+    int dll_listening_port;
+	std::string betround;
+    ext_holdem_player   player[10]        ;       //player records
+	std::string current_query;
+};
+struct ext_holdem_state ext_state;
+
 double client_result;
 
-int hand_count = 0;
-const char* hand_turn = 0;
-int dll_listening_port = 0;
+boost::uuids::random_generator uuid_generator;
 
-string symbol_name;
-double symbol_value;
-int chair;
-static CURL* curl = NULL;
-static const int BUFFER_SIZE = (1024 * 256);
-
-#define STATE_INDEX (state_index==0?255:state_index-1)
+#define STATE_INDEX ((state_index-1)&0xFF)
+#define CURRENT_STATE (state[STATE_INDEX])
+#define CURRENT_EXT_STATE ext_state
 #define CARD_VALID(card) (card<0xFE)
 
 struct configuration_st {
@@ -46,7 +65,7 @@ struct configuration_st {
 } configuration;
 
 #define BUF_SIZE (256*1024)
-void pblog(char* fmt,...) {
+void pblog(const char* fmt,...) {
 	char buffer[BUF_SIZE];
 	va_list args;
     va_start(args, fmt);
@@ -56,21 +75,9 @@ void pblog(char* fmt,...) {
 	printf(buffer);
 }
 
-/*
- * Show messagebox.
- */
-void msg(const wchar_t* m, const wchar_t* t)
-{
-    int msgboxID = MessageBox(
-            NULL,
-            (LPCSTR)m,
-            (LPCSTR)t,
-            MB_OK);
-}
-
 string num_to_card(unsigned char num) 
 {
-    if (!CARD_VALID(num)) return "";
+    if (!CARD_VALID(num)) return "--";
     int card = (num%13)+2;
     char cs, cn;
     switch (card){
@@ -94,27 +101,33 @@ string num_to_card(unsigned char num)
     return os.str();
 }
 
-string holdem_player_to_string(holdem_player* player)
+string holdem_player_to_string(int num)
 {
+	holdem_player* player = &CURRENT_STATE.m_player[num];
+	ext_holdem_player* ext_player = &(CURRENT_EXT_STATE.player[num]);
     ostringstream os;
-    os  << "name:" 
-        << (player->m_name_known ? (char*)player->m_name : "unkown") 
-        << "|balance:" 
-        << (player->m_balance_known ? (int)player->m_balance : -1)
-        << "$|bet:" << player->m_currentbet 
-        << "|cards:" << num_to_card(player->m_cards[0])  
-        << num_to_card(player->m_cards[1])
-        << "|fillerbits:"<< bitset<6>((int)player->m_fillerbits).to_string()
-        << "|fillerbyte:"<< (int)player->m_fillerbyte; 
+	os  
+		<< "#" << std::to_string((long double)num) 
+        << "|stt:"
+		<< (ext_player->blind?"B":"-")
+		<< (ext_player->active?"A":"-")
+		<< (ext_player->dealt?"D":"-")
+		<< (ext_player->playing?"P":"-")
+        << "|bal:" << std::setw(4) << std::setfill(' ') << (player->m_balance_known ? (int)player->m_balance : -1)
+        << "|bet:" << std::setw(4) << std::setfill(' ') << player->m_currentbet 
+        << "|cards:" << num_to_card(player->m_cards[0]) << num_to_card(player->m_cards[1])
+        << "|name:" << (player->m_name_known ? (char*)player->m_name : "unkown");
     return os.str();
 }
 
-string holdem_state_to_string(holdem_state* state)
+string holdem_state_to_string()
 {
     ostringstream os;
-    os << (char*)state->m_title << "|board:";
+    os << ext_state.hand_uuid 
+		<< "|betround:" << CURRENT_EXT_STATE.betround
+		<< "|board:";
     for (int i=0; i<5; i++) {
-        os << num_to_card(state->m_cards[i]);
+        os << num_to_card(CURRENT_STATE.m_cards[i]);
         if (i!=4) os << ",";
     }
     os << "|pot:";
@@ -124,19 +137,21 @@ string holdem_state_to_string(holdem_state* state)
     }
     os << (state->m_is_playing?"|play":"|not play")
        << (state->m_is_posting?"|post":"|not post") 
-       << "|fill:" << bitset<6>((int)state->m_fillerbits).to_string()
-       << "|deal:" << (int)state->m_dealer_chair
-       << "\n";
+	   << "|sttidx:" << std::to_string((long double)STATE_INDEX)
+       << "|deal:" << (int)CURRENT_STATE.m_dealer_chair;
+	os << "|query:" << CURRENT_EXT_STATE.current_query;
+    os << "\n";
     for (int i=0; i<10; i++) {
         if (state->m_player[i].m_name_known == 0)
             continue;
-        os << "    " << holdem_player_to_string(&state->m_player[i]) << "\n";
+        os << "    " << holdem_player_to_string(i) << "\n";
     }
+
+
     return os.str();
 }
 
-
-json_t* json_holdem_player(holdem_player* player) {
+json_t* json_holdem_player(holdem_player* player, ext_holdem_player* ext_player) {
 	// build hand card array
 	json_t *cards = json_array();
 	for (int i=0; i<2; i++)
@@ -153,18 +168,40 @@ json_t* json_holdem_player(holdem_player* player) {
 	json_object_set_new(main, "fillerbits", json_integer(player->m_fillerbits));
 	json_object_set_new(main, "fillerbytes", json_integer(player->m_fillerbyte));
 
+	json_object_set_new(main, "playing", json_integer(ext_player->playing));
+	json_object_set_new(main, "blind", json_integer(ext_player->blind));
+	json_object_set_new(main, "active", json_integer(ext_player->active));
+	json_object_set_new(main, "dealt", json_integer(ext_player->dealt));
+	json_object_set_new(main, "cards_shows", json_integer(ext_player->cards_shows));
+
 	return main;
 }
 
-json_t* holdem_state_to_json(holdem_state* state) {
-	char *hand_number = GetHandnumber();
+string get_current_betround() {
+	double betround = GetSymbol("betround");
+	switch ((int)betround) {
+	case 1 : return "preflop";
+	case 2 : return "flop";
+	case 3 : return "turn";
+	case 4 : return "river";
+	default : return "unknown";
+	}
+}
 
+json_t* holdem_state_to_json(holdem_state* state) {
 	// build hand matadata
-	json_t *matadata = json_object();
-	json_object_set_new(matadata, "room", json_string("DDPoker"));
-	json_object_set_new(matadata, "table", 0);
-	json_object_set_new(matadata, "hand", json_integer(hand_count));
-	json_object_set_new(matadata, "turn", json_string(hand_turn));
+	json_t *jstate = json_object();
+	json_object_set_new(jstate, "datatype",     json_string(ext_state.datatype));
+	json_object_set_new(jstate, "room",			json_string(state->m_title));
+	json_object_set_new(jstate, "table",		0);
+	json_object_set_new(jstate, "handcount",	json_integer(ext_state.hand_count));
+	json_object_set_new(jstate, "uuid",			json_string(ext_state.hand_uuid.c_str()));
+	json_object_set_new(jstate, "betround",		json_string(ext_state.betround.c_str()));
+	json_object_set_new(jstate, "title",		json_string((char*)state->m_title));
+	json_object_set_new(jstate, "is_playing",	json_integer(state->m_is_playing));
+	json_object_set_new(jstate, "is_posting",	json_integer(state->m_is_posting));
+	json_object_set_new(jstate, "fillerbits",	json_integer(state->m_fillerbits));
+	json_object_set_new(jstate, "dealer_chair", json_integer(state->m_dealer_chair));
 
 	// build the pots array
 	json_t *pots = json_array();
@@ -180,13 +217,16 @@ json_t* holdem_state_to_json(holdem_state* state) {
 	// add players
 	json_t *players = json_array();
 	for (int i=0; i<10; i++)
-		json_array_append_new(players, json_holdem_player(&state->m_player[i]));
+		json_array_append_new(players, json_holdem_player(&state->m_player[i], &ext_state.player[i]));
 
 	// add symbols
     json_t *symbols = json_object();
 	const char* sym = 0;
 	int idx = 0;
 	while (*(sym = all_symbol_names[idx++]) != '\0') {
+		// excluded symbols (TODOs)
+		if (sym == "icm_allilose1") // crashes
+			continue;
 	    double val = GetSymbol(sym);
 	    json_object_set_new(symbols, sym, json_real(val));
 	}
@@ -195,16 +235,12 @@ json_t* holdem_state_to_json(holdem_state* state) {
 	idx = 0;
 	while (*(sym = all_ppl_symbol_names[idx++]) != '\0') {
 		double val = GetSymbol(sym);
-		json_object_set_new(symbols, sym, json_real(val));
+		json_object_set_new(ppl_symbols, sym, json_real(val));
 	}
 	
 	// build the main object
     json_t *main = json_object();
-	json_object_set_new(main, "title", json_string((char*)state->m_title));
-	json_object_set_new(main, "is_playing", json_integer(state->m_is_playing));
-	json_object_set_new(main, "is_posting", json_integer(state->m_is_posting));
-	json_object_set_new(main, "fillerbits", json_integer(state->m_fillerbits));
-	json_object_set_new(main, "dealer_chair", json_integer(state->m_dealer_chair));
+	json_object_set_new(main, "state", jstate);
 	json_object_set_new(main, "cards", cards);
 	json_object_set_new(main, "pots", pots);
     json_object_set_new(main, "players", players);
@@ -219,71 +255,47 @@ string holdem_state_to_json_string(holdem_state* state)
 	return json_dumps(holdem_state_to_json(state), JSON_INDENT(4));
 }
 
+void send_table_state() {
+    Log("sending:%s, handnumber:%d, betround:%s\n", 
+		ext_state.datatype, 
+		ext_state.hand_count,
+		ext_state.betround.c_str());
+	string data = holdem_state_to_json_string(&state[STATE_INDEX]);
+	string url = configuration.server_url
+					+ ext_state.hand_uuid
+					+ '/'
+					+ ext_state.datatype;
+//	char response[1024];
+	//post(url.c_str(), data.c_str(), response, 1024); 
+}
+
 int is_showdown() {
-	int idx = state_index;
-    holdem_state* cstate = &state[STATE_INDEX];
-	for (int i=0; i<5; i++) {
-		if (!CARD_VALID(cstate->m_cards[i]))
-			return false;
-	}
+	holdem_state* cstate = &state[STATE_INDEX];
+	// Check first if river
+    if (string(CURRENT_EXT_STATE.betround) != "river")
+		return 0;
 
-	holdem_player* player = 0;
-	int show_count = 0;
+	// Check that players other than me are showing cards
+	int user_chair = (int)GetSymbol("userchair");
+	ext_holdem_player* player = 0;
+	bool found_one = false;
 	for (int i=0; i<10; i++) {
-		player = &cstate->m_player[i];
-		if ((player->m_name_known) && (CARD_VALID(player->m_cards[0])) && (CARD_VALID(player->m_cards[1])))
-		    show_count++;
-		if (show_count == 2)
-			return true;
+		if (i==user_chair)
+			continue;
+		if (!CURRENT_EXT_STATE.player[i].playing)
+			continue;
+		if (CURRENT_EXT_STATE.player[i].cards_shows)
+			continue;
+		return false;
 	}
-	return false;
+	return true;
 }
 
-int do_showdown()
+int do_showdown() 
 {
-	Log("Showdown. handnumber:%d\n",hand_count); 
-	return 0;
-}
-
-int is_openppl_command(const char* pquery) {
-
-	if (string(pquery).find("dll$preflop_") == 0) {
-		hand_turn = "preflop";
-		return true;
-	}
-
-	if (string(pquery).find("dll$flop") == 0) {
-		hand_turn = "flop";
-		return true;
-	}
-	
-	if (string(pquery).find("dll$turn") == 0) {
-		hand_turn = "turn";
-		return true;
-	}
-
-	if (string(pquery).find("dll$river") == 0) {
-		hand_turn = "river";
-		return true;
-	}
-
-	return false;
-}
-
-int do_openppl_command(const char* pquery)
-{
-	int pstate = STATE_INDEX;
-	typedef holdem_state jj[256];
-	jj* phstate = (jj*)&state[0];
-	holdem_state* current = &state[pstate];
-	
-	Log("query: %s, event: hand=%d,turn=%s\n", pquery, hand_count, hand_turn);
-	//Log("state:%s\n", holdem_state_to_json_string(&state[STATE_INDEX]).c_str());
-    //Log("query:%s\n", pquery);
-
-	// call everything
-	if (string(pquery).find("_call") != string::npos)
-		return 1;
+	ext_state.datatype = "showdown";
+	Log("showdown\n");
+    send_table_state();
 	return 0;
 }
 
@@ -296,7 +308,8 @@ int is_heartbeat(const char* pquery)
 
 int do_heartbeat()
 {
-	//Log("heartbeat...\n");
+	ext_state.datatype = "heartbeat";
+	send_table_state();
 	return 0;
 }
 
@@ -315,14 +328,18 @@ int is_hand_reset(const char* pquery)
 {
     if (string(pquery) != "dll$ini_function_on_handreset")
 	    return 0;	
-	Log("Handreset:%d\n",hand_count);
-	hand_count++;
 	return 1;
 }
 
 int do_hand_reset() 
 {
-	hand_count++;
+	ext_state.hand_uuid = boost::uuids::to_string(uuid_generator());
+	ext_state.hand_count++;
+	ext_state.snapshot_count = 0;
+	ext_state.datatype = "handreset";
+	Log("Handreset:%d, UUID:%s\n", ext_state.hand_count, ext_state.hand_uuid.c_str());
+	send_table_state();
+
 	return 0;
 }
 
@@ -330,7 +347,7 @@ int is_new_round(const char* pquery)
 {
 	if (string(pquery) == "dll$ini_function_on_new_round")
 	{
-		Log("On new round\n");
+		Log("On new round : %s\n",ext_state.betround.c_str());
 		return 1;
 	}
 	return 0;
@@ -338,24 +355,101 @@ int is_new_round(const char* pquery)
 
 int do_new_round()
 {
-    Log("state :%s\n", holdem_state_to_json_string(&state[STATE_INDEX]).c_str());
+	ext_state.datatype = "new_round";
+	send_table_state();
 	return 0;
 }
 
 int is_my_turn(const char* pquery) 
 {
-    return (string(pquery) == "dll$ini_function_on_my_turn")
+    return (string(pquery) == "dll$ini_function_on_my_turn");
 }
 
-int do_my_turn(const char* pquery)
+int do_my_turn()
 {
-	Log("Do my turn\n");
+	ext_state.datatype = "my_turn";
+	send_table_state();
+	return 0;
 }
+
+int is_openppl_command(const char* pquery) {
+
+	if (string(pquery).find("dll$preflop_") == 0) {
+		return true;
+	}
+
+	if (string(pquery).find("dll$flop") == 0) {
+		return true;
+	}
+	
+	if (string(pquery).find("dll$turn") == 0) {
+		return true;
+	}
+
+	if (string(pquery).find("dll$river") == 0) {
+		return true;
+	}
+
+	return false;
+}
+
+int do_openppl_command(const char* pquery)
+{
+    // return query_openppl_command(pquery);
+
+	// call everything
+	if (string(pquery).find("_call") != string::npos)
+		return 1;
+	return 0;
+}
+
+void fill_extended_table_state(const char* pquery) 
+{
+	int playingbits = (int)GetSymbol("playersplayingbits");
+	int blindbits = (int)GetSymbol("playersblindbits");
+	int activebits = (int)GetSymbol("playersactivebits"); 
+	int dealtbits = (int)GetSymbol("playersdealtbits");
+
+    holdem_state* cstate = &state[STATE_INDEX];
+	ext_state.betround = get_current_betround();
+	ext_state.snapshot_count++;
+	ext_state.current_query = pquery;
+	for (int i=0; i<10; i++) {
+		ext_state.player[i].playing     = (playingbits&(0x1<<i))==0?false:true;
+		ext_state.player[i].blind       = (blindbits&(0x1<<i))==0?false:true;
+		ext_state.player[i].active      = (activebits&(0x1<<i))==0?false:true;
+		ext_state.player[i].dealt       = (dealtbits&(0x1<<i))==0?false:true;
+		ext_state.player[i].cards_shows = 
+					((ext_state.player[i].playing) &&
+					 (CARD_VALID(cstate->m_player[i].m_cards[0])) && 
+					 (CARD_VALID(cstate->m_player[i].m_cards[1])));
+	}
+	Log(holdem_state_to_string().c_str());
+}
+
+int is_table_found() {
+    holdem_state* cstate = &state[STATE_INDEX];
+	return (strlen(cstate->m_title) !=0 );
+}
+
+int CaptureAnImage(HWND hWnd, std::string filename);
+void save_snapshot_image() 
+{
+	std::string filename = "captures\\"+ext_state.hand_uuid+"--"+std::to_string((long double)ext_state.snapshot_count)+".bmp";
+	int int_hwnd =(int)GetSymbol("attached_hwnd"); 
+	HWND hwnd = (HWND)int_hwnd;
+	CaptureAnImage(hwnd, filename);
+}
+
 /*
  * Handler for OH query message.
  */
 double process_query(const char* pquery)
 {
+	if (!is_table_found())
+		return 0;
+	fill_extended_table_state(pquery);
+	//save_snapshot_image();
 	if (is_hand_reset(pquery)) 
 		return do_hand_reset();
 
@@ -371,7 +465,7 @@ double process_query(const char* pquery)
 		return 0;
 	}
 
-	if (is_my_turn())
+	if (is_my_turn(pquery))
 		return do_my_turn();
 
 	if (is_openppl_command(pquery))

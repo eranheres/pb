@@ -59,7 +59,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;USERDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;USERDLL_EXPORTS;_SCL_SECURE_NO_WARNINGS;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -151,6 +151,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="capture.cpp" />
     <ClCompile Include="connector.cpp" />
     <ClCompile Include="http.cpp" />
     <ClCompile Include="user.cpp">
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="AllPPLSymbols.h.template" />
     <ClInclude Include="connector.h" />
+    <ClInclude Include="http.h" />
     <ClInclude Include="user.h" />
   </ItemGroup>
   <ItemGroup>

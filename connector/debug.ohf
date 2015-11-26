@@ -7,8 +7,6 @@ dll$f_notes
 user.dll
 
 ##f$alli##
-dll$f_alli 
- 
 
 ##f$betpot_2_1##
  
@@ -124,20 +122,12 @@ nopponentsplaying + 1
 1000 
 
 ##f$prwin_topclip##
-dll$prwin_topclip
- 
 
 ##f$prwin_mustplay##
-dll$prwin_mustplay
- 
 
 ##f$prwin_willplay##
-dll$prwin_willplay
- 
 
 ##f$prwin_wontplay##
-dll$prwin_wontplay
- 
 
 ##f$icm_prize1##
 // f$icm_prizeX functions are used to configure the payout-structure in tournaments.

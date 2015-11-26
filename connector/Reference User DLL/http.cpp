@@ -5,6 +5,8 @@
  * it under the terms of the MIT license. See LICENSE for details.
  */
 
+#include "http.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -69,7 +71,7 @@ void clean_curl()
     curl_global_cleanup();
 }
 
-int request(const char *url, char* data, unsigned int data_size)
+int post(const char *url, const char* data, char* res_data, unsigned int res_data_size)
 {
     CURLcode status;
     struct curl_slist *headers = NULL;
@@ -79,11 +81,11 @@ int request(const char *url, char* data, unsigned int data_size)
         return -1;
 
     struct write_result write_res;
-	write_res.data = data;
+	write_res.data = res_data;
 	write_res.pos = 0;
 
     curl_easy_setopt(curl, CURLOPT_URL, url);
-  //  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_response);
+    // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_response);
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(data));
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
@@ -104,7 +106,7 @@ int request(const char *url, char* data, unsigned int data_size)
     }
 
     /* zero-terminate the result */
-    data[write_res.pos] = '\0';
+    res_data[write_res.pos] = '\0';
 
     return 0;
 }
