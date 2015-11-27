@@ -1,0 +1,89 @@
+[
+  {
+    // handreset should come first
+    "snapshots" : [
+      {
+        "state": {
+          "datatype": "heartbeat",
+          "betround": "preflop"
+        }
+      },
+      {
+        "state": {
+          "datatype": "handreset",
+          "betround": "preflop"
+        }
+      }
+    ]
+  },
+  {
+    // handreset can be only once
+    "snapshots" : [
+      {
+        "state": {
+          "datatype": "handreset",
+          "betround": "preflop"
+        }
+      },
+      {
+        "state": {
+          "datatype": "handreset",
+          "betround": "preflop"
+        }
+      },
+      {
+        "state": {
+          "datatype": "showdown",
+          "betround": "preflop"
+        }
+      }
+    ]
+  },
+  {
+    // flop before preflop
+    "snapshots": [
+      {
+        "state": {
+          "datatype": "handreset",
+          "betround": "preflop"
+        }
+      },
+      {
+        "state": {
+          "datatype": "myturn",
+          "betround": "flop"
+        }
+      },
+      {
+        "state": {
+          "datatype": "myturn",
+          "betround": "preflop"
+        }
+      }
+    ]
+  },
+  {
+    // dbd
+    "snapshots" : [
+      {
+        "state": {
+          "datatype": "handreset",
+          "betround": "preflop"
+        }
+      },
+      {
+        "state": {
+          "datatype": "myturn"
+        }
+      },
+      {
+        "state": {
+          "datatype": "myturn",
+          "betround": "preflop"
+        }
+      }
+    ]
+  }
+]
+
+

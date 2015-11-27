@@ -1,0 +1,12 @@
+[
+    // Error values
+    { "state" : { "datatype" : "eartbeat" }},
+    { "state" :
+        {
+            "datatype" : "myturn",
+            "myturn"   : ""
+        }
+    }
+
+]
+

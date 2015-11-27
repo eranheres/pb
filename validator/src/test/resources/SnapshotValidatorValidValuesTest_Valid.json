@@ -1,0 +1,27 @@
+[
+    // Acceptable values
+    { "state" : { "datatype" : "heartbeat" }},
+    { "state" : { "datatype" : "handreset" }},
+    { "state" : { "datatype" : "showdown"}},
+    { "state" :
+      {
+          "datatype" : "myturn",
+          "betround" : "preflop"
+      }},
+      { "state" :
+      {
+          "datatype" : "myturn",
+          "betround" : "flop"
+      }},
+      { "state" :
+      {
+          "datatype" : "myturn",
+          "betround" : "river"
+      }},
+      { "state" :
+      {
+          "datatype" : "myturn",
+          "betround" : "turn"
+      }}
+]
+
