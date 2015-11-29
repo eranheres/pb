@@ -13,6 +13,12 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 // Validate game state (flop, river etc) against the community cards numbers in a snapshot
 // Validate OpenPPL Error symbols
 
+// TODO: Next steps
+// Complete parsing of Hand json
+// Build validator as a server and connect to gateway
+// Return error code and upload (or keep localy) images upon errors
+// Add more testings (see above)
+
 
 @SpringBootApplication
 public class ValidatorApplication {

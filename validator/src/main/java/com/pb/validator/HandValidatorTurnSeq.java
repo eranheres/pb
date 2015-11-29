@@ -1,16 +1,18 @@
 package com.pb.validator;
 
 import com.google.common.collect.ImmutableMap;
-import com.pb.validator.model.Hand;
-import com.pb.validator.model.Snapshot;
+import com.pb.validator.dao.Hand;
+import com.pb.validator.dao.Snapshot;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Validate that the sequence of the hand is correct. i.e. reset->preflop->flop->turn->river->showdown
  */
 @RequiredArgsConstructor
-public class HandValidatorTurnSeq implements HandValidator {
+@Component
+public class HandValidatorTurnSeq extends HandValidator {
     @NonNull private Hand hand;
 
     public final static ValidatorStatus TOO_FEW_SNAPSHOTS       = new ValidatorStatus("dd");

@@ -2,7 +2,7 @@ package com.pb.validator;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pb.validator.model.Hand;
+import com.pb.validator.dao.Hand;
 import org.junit.Test;
 
 import java.io.File;

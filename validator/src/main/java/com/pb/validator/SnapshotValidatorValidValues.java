@@ -1,16 +1,19 @@
 package com.pb.validator;
 
-import com.pb.validator.model.Snapshot;
+import com.pb.validator.dao.Snapshot;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by eranh on 11/22/15.
+ *  Validates trivial values legality in a single snapshot
  */
-@lombok.AllArgsConstructor
-public class SnapshotValidatorValidValues implements SnapshotValidator {
-    private Snapshot snapshot;
+@Component
+public class SnapshotValidatorValidValues extends SnapshotValidator {
+
+    public final static ValidatorStatus INVALID_FIELD_DATATYPE = new ValidatorStatus("Datatype field is invalid");
+    public final static ValidatorStatus INVALID_FIELD_ACTION   = new ValidatorStatus("Action field is invalid");
 
     private static final List<String> VALID_DATATYPE_VALUES = Arrays.asList(
             Snapshot.VALUES.HANDRESET,
@@ -26,22 +29,20 @@ public class SnapshotValidatorValidValues implements SnapshotValidator {
             Snapshot.VALUES.RIVER
     );
 
+    public SnapshotValidatorValidValues(Snapshot snapshot) {
+        super(snapshot);
+    }
     @Override
-    public boolean isValid() {
+    public ValidatorStatus isValid() {
         // Check that datatype value is valid
         if (!VALID_DATATYPE_VALUES.contains(snapshot.getState().getDatatype())) {
-            return false;
+            return INVALID_FIELD_DATATYPE;
         }
         // Check that if myturn then action is valid
         if ((snapshot.getState().getDatatype().equals(Snapshot.VALUES.MYTURN) &&
             (!VALID_ACTION_VALUES.contains(snapshot.getState().getBetround())))) {
-            return false;
+            return INVALID_FIELD_ACTION;
         }
-        return true;
-    }
-
-    @Override
-    public String reason() {
-        return null;
+        return ValidatorStatus.OK;
     }
 }
