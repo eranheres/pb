@@ -1,8 +1,9 @@
 package com.pb.validator;
 
-import com.pb.validator.dao.Snapshot;
+import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -10,8 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@AllArgsConstructor
+@NoArgsConstructor
 public abstract class SnapshotValidator {
-    protected Snapshot snapshot;
-    public abstract ValidatorStatus isValid();
+    public abstract ValidatorStatus isValid(Snapshot snapshot);
 }

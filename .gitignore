@@ -13,3 +13,6 @@ connector/test
 .ropeproject
 Release
 user.vcxproj.filters
+gateway/build
+validator/build
+validator/gradle

@@ -1,6 +1,7 @@
 package com.pb.validator;
 
-import com.pb.validator.dao.Snapshot;
+import com.pb.dao.Snapshot;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.List;
  *  Validates trivial values legality in a single snapshot
  */
 @Component
+@NoArgsConstructor
 public class SnapshotValidatorValidValues extends SnapshotValidator {
 
     public final static ValidatorStatus INVALID_FIELD_DATATYPE = new ValidatorStatus("Datatype field is invalid");
@@ -29,11 +31,8 @@ public class SnapshotValidatorValidValues extends SnapshotValidator {
             Snapshot.VALUES.RIVER
     );
 
-    public SnapshotValidatorValidValues(Snapshot snapshot) {
-        super(snapshot);
-    }
     @Override
-    public ValidatorStatus isValid() {
+    public ValidatorStatus isValid(Snapshot snapshot) {
         // Check that datatype value is valid
         if (!VALID_DATATYPE_VALUES.contains(snapshot.getState().getDatatype())) {
             return INVALID_FIELD_DATATYPE;

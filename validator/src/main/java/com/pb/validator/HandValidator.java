@@ -1,6 +1,6 @@
 package com.pb.validator;
 
-import com.pb.validator.dao.Hand;
+import com.pb.dao.Hand;
 import lombok.Getter;
 import lombok.Setter;
 

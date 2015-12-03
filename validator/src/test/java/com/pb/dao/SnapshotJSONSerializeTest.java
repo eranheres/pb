@@ -1,5 +1,6 @@
-package com.pb.validator.dao;
+package com.pb.dao;
 
+import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -20,12 +21,12 @@ public class SnapshotJSONSerializeTest {
         String str = new String(Files.readAllBytes(Paths.get(url.getPath())));
         Snapshot snapshot = snapshotSerialize.fromString(str);
 
-        assertEquals("my_turn", snapshot.getState().getDatatype());
-        assertEquals("preflop", snapshot.getState().getBetround());
+        Assert.assertEquals("my_turn", snapshot.getState().getDatatype());
+        Assert.assertEquals("preflop", snapshot.getState().getBetround());
 
-        assertEquals(10, snapshot.getPots().length);
-        assertEquals(5, snapshot.getCards().length);
-        assertEquals(408, snapshot.getSymbols().keySet().size());
-        assertEquals(668, snapshot.getPpl_symbols().keySet().size());
+        Assert.assertEquals(10, snapshot.getPots().length);
+        Assert.assertEquals(5, snapshot.getCards().length);
+        Assert.assertEquals(408, snapshot.getSymbols().keySet().size());
+        Assert.assertEquals(668, snapshot.getPpl_symbols().keySet().size());
     }
 }

@@ -3,7 +3,7 @@ package com.pb.validator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pb.validator.dao.Snapshot;
+import com.pb.dao.Snapshot;
 import org.junit.Test;
 
 import java.io.File;
@@ -25,13 +25,15 @@ public class SnapshotValidatorValidValuesTest {
         assertNotNull(url);
         Snapshot[] lu = mapper.readValue(new File(url.getPath()), Snapshot[].class);
 
-        assertEquals(ValidatorStatus.OK, new SnapshotValidatorValidValues(lu[0]).isValid());
-        assertEquals(ValidatorStatus.OK, new SnapshotValidatorValidValues(lu[1]).isValid());
-        assertEquals(ValidatorStatus.OK, new SnapshotValidatorValidValues(lu[2]).isValid());
-        assertEquals(ValidatorStatus.OK, new SnapshotValidatorValidValues(lu[3]).isValid());
-        assertEquals(ValidatorStatus.OK, new SnapshotValidatorValidValues(lu[4]).isValid());
-        assertEquals(ValidatorStatus.OK, new SnapshotValidatorValidValues(lu[5]).isValid());
-        assertEquals(ValidatorStatus.OK, new SnapshotValidatorValidValues(lu[6]).isValid());
+        SnapshotValidator validator = new SnapshotValidatorValidValues();
+
+        assertEquals(ValidatorStatus.OK, validator.isValid(lu[0]));
+        assertEquals(ValidatorStatus.OK, validator.isValid(lu[1]));
+        assertEquals(ValidatorStatus.OK, validator.isValid(lu[2]));
+        assertEquals(ValidatorStatus.OK, validator.isValid(lu[3]));
+        assertEquals(ValidatorStatus.OK, validator.isValid(lu[4]));
+        assertEquals(ValidatorStatus.OK, validator.isValid(lu[5]));
+        assertEquals(ValidatorStatus.OK, validator.isValid(lu[6]));
         assertEquals(7, lu.length); // Make sure nothing is missed
 
         // Test invalid values
@@ -39,8 +41,8 @@ public class SnapshotValidatorValidValuesTest {
         assertNotNull(url);
         lu = mapper.readValue(new File(url.getPath()), Snapshot[].class);
 
-        assertEquals(SnapshotValidatorValidValues.INVALID_FIELD_DATATYPE, new SnapshotValidatorValidValues(lu[0]).isValid());
-        assertEquals(SnapshotValidatorValidValues.INVALID_FIELD_ACTION, new SnapshotValidatorValidValues(lu[1]).isValid());
+        assertEquals(SnapshotValidatorValidValues.INVALID_FIELD_DATATYPE, validator.isValid(lu[0]));
+        assertEquals(SnapshotValidatorValidValues.INVALID_FIELD_ACTION, validator.isValid(lu[1]));
         assertTrue(lu.length == 2); // Make sure nothing is missed
     }
 }

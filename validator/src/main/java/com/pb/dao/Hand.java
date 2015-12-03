@@ -1,8 +1,9 @@
-package com.pb.validator.dao;
+package com.pb.dao;
 
 import lombok.*;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @EqualsAndHashCode
 public class Hand {

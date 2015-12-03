@@ -1,10 +1,9 @@
-package com.pb.validator.dao;
+package com.pb.dao;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Created by eranh on 11/29/15.

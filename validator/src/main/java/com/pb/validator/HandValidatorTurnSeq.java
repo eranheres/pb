@@ -1,8 +1,9 @@
 package com.pb.validator;
 
 import com.google.common.collect.ImmutableMap;
-import com.pb.validator.dao.Hand;
-import com.pb.validator.dao.Snapshot;
+import com.pb.dao.Hand;
+import com.pb.dao.Snapshot;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
  * Validate that the sequence of the hand is correct. i.e. reset->preflop->flop->turn->river->showdown
  */
 @RequiredArgsConstructor
+@NoArgsConstructor
 @Component
 public class HandValidatorTurnSeq extends HandValidator {
     @NonNull private Hand hand;

@@ -1,4 +1,4 @@
-package com.pb.validator.dao;
+package com.pb.dao;
 
 import org.springframework.stereotype.Component;
 

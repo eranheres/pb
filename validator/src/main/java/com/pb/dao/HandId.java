@@ -1,4 +1,4 @@
-package com.pb.validator.dao;
+package com.pb.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,5 +12,5 @@ public class HandId {
     static HandId of(String id) {
        return new HandId(id);
     }
-    String id;
+    private String id;
 }
