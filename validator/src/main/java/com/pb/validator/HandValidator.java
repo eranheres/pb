@@ -7,9 +7,8 @@ import lombok.Setter;
 /**
  * Validate correctness of a hand
  */
-@Getter
-@Setter
-public abstract class HandValidator {
-    Hand hand;
-    public abstract ValidatorStatus validate();
+public interface HandValidator {
+    ValidatorStatus EMPTY_HAND = new ValidatorStatus("Hand has zero snapshots");
+
+    ValidatorStatus validate(Hand hand);
 }

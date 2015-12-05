@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Component
 @NoArgsConstructor
-public class SnapshotValidatorValidValues extends SnapshotValidator {
+public class SnapshotValidatorValidValues implements SnapshotValidator {
 
     public final static ValidatorStatus INVALID_FIELD_DATATYPE = new ValidatorStatus("Datatype field is invalid");
     public final static ValidatorStatus INVALID_FIELD_ACTION   = new ValidatorStatus("Action field is invalid");
@@ -32,7 +32,7 @@ public class SnapshotValidatorValidValues extends SnapshotValidator {
     );
 
     @Override
-    public ValidatorStatus isValid(Snapshot snapshot) {
+    public ValidatorStatus validate(Snapshot snapshot) {
         // Check that datatype value is valid
         if (!VALID_DATATYPE_VALUES.contains(snapshot.getState().getDatatype())) {
             return INVALID_FIELD_DATATYPE;

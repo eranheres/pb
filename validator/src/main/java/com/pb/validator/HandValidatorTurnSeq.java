@@ -11,11 +11,9 @@ import org.springframework.stereotype.Component;
 /**
  * Validate that the sequence of the hand is correct. i.e. reset->preflop->flop->turn->river->showdown
  */
-@RequiredArgsConstructor
 @NoArgsConstructor
 @Component
-public class HandValidatorTurnSeq extends HandValidator {
-    @NonNull private Hand hand;
+public class HandValidatorTurnSeq implements HandValidator {
 
     public final static ValidatorStatus TOO_FEW_SNAPSHOTS       = new ValidatorStatus("dd");
     public final static ValidatorStatus NO_HANDRESET_ON_FIRST   = new ValidatorStatus("Handreset was not found on first snapshot");
@@ -30,7 +28,7 @@ public class HandValidatorTurnSeq extends HandValidator {
             Snapshot.VALUES.RIVER,     4);
 
     @Override
-    public ValidatorStatus validate() {
+    public ValidatorStatus validate(Hand hand) {
         Snapshot[] snapshots = hand.getSnapshots();
         Integer highestBetRound = 0;
         // Must be at least reset->preflop

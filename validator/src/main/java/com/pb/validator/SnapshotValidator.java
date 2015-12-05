@@ -9,9 +9,8 @@ import lombok.Setter;
 /**
  * Validates a specific snapshot correctness
  */
-@Getter
-@Setter
-@NoArgsConstructor
-public abstract class SnapshotValidator {
-    public abstract ValidatorStatus isValid(Snapshot snapshot);
+public interface SnapshotValidator {
+    ValidatorStatus SNAPSHOT_EMPTY = new ValidatorStatus("Snapshot is empty or null");
+
+    ValidatorStatus validate(Snapshot snapshot);
 }

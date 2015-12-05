@@ -1,22 +1,23 @@
 package com.pb.validator;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
- * Created by eranh on 12/2/15.
+ * Repository of all hand and snapshot validators
  */
 @Repository
 public class ValidatorsFactory {
     @Autowired HandValidator handValidatorTurnSeq;
     @Autowired SnapshotValidator snapshotValidatorValidValues;
 
-    public HandValidator[] handValidators() {
+    public HandValidator[] getHandValidators() {
         return new HandValidator[]{ handValidatorTurnSeq };
     }
 
-    public SnapshotValidator[] snapshotValidators() {
-        return new SnapshotValidator[] {snapshotValidatorValidValues };
+    public SnapshotValidator[] getSnapshotValidators() {
+        return new SnapshotValidator[] { snapshotValidatorValidValues };
     }
 
 }

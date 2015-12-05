@@ -31,8 +31,8 @@ repositories {
 
 dependencies {
     compile('org.springframework.boot:spring-boot-devtools')
-    compile('org.projectlombok:lombok')
     compile('org.springframework.boot:spring-boot-starter-redis')
+    compile('org.projectlombok:lombok')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('com.google.guava:guava:12.0')
     testCompile('org.springframework.boot:spring-boot-starter-test')

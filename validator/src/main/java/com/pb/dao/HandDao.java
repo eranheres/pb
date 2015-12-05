@@ -1,6 +1,8 @@
 package com.pb.dao;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import java.util.List;
  * Hand Data Access Object
  */
 @AllArgsConstructor
+@NoArgsConstructor
+@Service
 public class HandDao {
 
     PBDataSource dataSource;

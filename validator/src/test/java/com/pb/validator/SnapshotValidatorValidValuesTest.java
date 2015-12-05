@@ -27,13 +27,13 @@ public class SnapshotValidatorValidValuesTest {
 
         SnapshotValidator validator = new SnapshotValidatorValidValues();
 
-        assertEquals(ValidatorStatus.OK, validator.isValid(lu[0]));
-        assertEquals(ValidatorStatus.OK, validator.isValid(lu[1]));
-        assertEquals(ValidatorStatus.OK, validator.isValid(lu[2]));
-        assertEquals(ValidatorStatus.OK, validator.isValid(lu[3]));
-        assertEquals(ValidatorStatus.OK, validator.isValid(lu[4]));
-        assertEquals(ValidatorStatus.OK, validator.isValid(lu[5]));
-        assertEquals(ValidatorStatus.OK, validator.isValid(lu[6]));
+        assertEquals(ValidatorStatus.OK, validator.validate(lu[0]));
+        assertEquals(ValidatorStatus.OK, validator.validate(lu[1]));
+        assertEquals(ValidatorStatus.OK, validator.validate(lu[2]));
+        assertEquals(ValidatorStatus.OK, validator.validate(lu[3]));
+        assertEquals(ValidatorStatus.OK, validator.validate(lu[4]));
+        assertEquals(ValidatorStatus.OK, validator.validate(lu[5]));
+        assertEquals(ValidatorStatus.OK, validator.validate(lu[6]));
         assertEquals(7, lu.length); // Make sure nothing is missed
 
         // Test invalid values
@@ -41,8 +41,8 @@ public class SnapshotValidatorValidValuesTest {
         assertNotNull(url);
         lu = mapper.readValue(new File(url.getPath()), Snapshot[].class);
 
-        assertEquals(SnapshotValidatorValidValues.INVALID_FIELD_DATATYPE, validator.isValid(lu[0]));
-        assertEquals(SnapshotValidatorValidValues.INVALID_FIELD_ACTION, validator.isValid(lu[1]));
+        assertEquals(SnapshotValidatorValidValues.INVALID_FIELD_DATATYPE, validator.validate(lu[0]));
+        assertEquals(SnapshotValidatorValidValues.INVALID_FIELD_ACTION, validator.validate(lu[1]));
         assertTrue(lu.length == 2); // Make sure nothing is missed
     }
 }

@@ -1,9 +1,7 @@
-package com.pb.validator;
+package com.pb;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 // TODO: UnitTesting that are missing
 // Validate game sequence from preflop to river

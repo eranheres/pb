@@ -23,11 +23,12 @@ public class HandValidatorTurnSeqTest {
                   getResource("HandValidatorTurnSequenceTest_Invalid.json");
         assertNotNull(url);
         Hand[] hands = mapper.readValue(new File(url.getPath()), Hand[].class);
+        HandValidator validator = new HandValidatorTurnSeq();
 
-        assertEquals(HandValidatorTurnSeq.NO_HANDRESET_ON_FIRST,   new HandValidatorTurnSeq(hands[0]).validate());
-        assertEquals(HandValidatorTurnSeq.HANDRESET_MUST_BE_FIRST, new HandValidatorTurnSeq(hands[1]).validate());
-        assertEquals(HandValidatorTurnSeq.BETROUND_OUT_OF_ORDER,   new HandValidatorTurnSeq(hands[2]).validate());
-        assertEquals(HandValidatorTurnSeq.INVALID_VAL_BETROUND,    new HandValidatorTurnSeq(hands[3]).validate());
+        assertEquals(HandValidatorTurnSeq.NO_HANDRESET_ON_FIRST,   validator.validate(hands[0]));
+        assertEquals(HandValidatorTurnSeq.HANDRESET_MUST_BE_FIRST, validator.validate(hands[1]));
+        assertEquals(HandValidatorTurnSeq.BETROUND_OUT_OF_ORDER,   validator.validate(hands[2]));
+        assertEquals(HandValidatorTurnSeq.INVALID_VAL_BETROUND,    validator.validate(hands[3]));
         assertTrue(hands.length == 4); // Make sure nothing is missed
     }
 

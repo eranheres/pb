@@ -1,6 +1,7 @@
 package com.pb.dao;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
@@ -8,8 +9,9 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class HandId {
-    static HandId of(String id) {
+    static public HandId of(String id) {
        return new HandId(id);
     }
     private String id;

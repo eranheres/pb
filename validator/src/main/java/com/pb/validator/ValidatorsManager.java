@@ -2,29 +2,33 @@ package com.pb.validator;
 
 import com.pb.dao.Hand;
 import com.pb.dao.Snapshot;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
+
+import javax.validation.constraints.NotNull;
 
 /**
  *
  */
 @Component
-public class ValidatorsRepo {
+public class ValidatorsManager {
 
     private HandValidator handValidators[];
     private SnapshotValidator snapshotValidators[];
 
     @Autowired
-    public ValidatorsRepo(ValidatorsFactory validatorsFactory) {
-        handValidators = validatorsFactory.handValidators();
-        snapshotValidators = validatorsFactory.snapshotValidators();
+    public ValidatorsManager(ValidatorsFactory validatorsFactory) {
+        handValidators = validatorsFactory.getHandValidators();
+        snapshotValidators = validatorsFactory.getSnapshotValidators();
     }
 
     public ValidatorStatus validateSnapshot(Snapshot snapshot) {
         ValidatorStatus status;
+        if (snapshot == null)
+            return SnapshotValidator.SNAPSHOT_EMPTY;
         for (SnapshotValidator validator : snapshotValidators) {
-            status = validator.isValid(snapshot);
+            status = validator.validate(snapshot);
             if (!status.equals(ValidatorStatus.OK)) {
                 return status;
             }
@@ -32,8 +36,11 @@ public class ValidatorsRepo {
         return ValidatorStatus.OK;
     }
 
-    public ValidatorStatus validateHand(Hand hand) {
+    @NonNull
+    public ValidatorStatus validateHand(@NotNull Hand hand) {
         ValidatorStatus status;
+        if (hand == null || hand.getSnapshots() == null)
+            return HandValidator.EMPTY_HAND;
         for (Snapshot snapshot : hand.getSnapshots()) {
             status = validateSnapshot(snapshot);
             if (!status.equals(ValidatorStatus.OK)) {
@@ -42,7 +49,7 @@ public class ValidatorsRepo {
         }
 
         for (HandValidator handValidator : handValidators) {
-            status = validateHand(hand);
+            status = handValidator.validate(hand);
             if (!status.equals(ValidatorStatus.OK)) {
                 return status;
             }

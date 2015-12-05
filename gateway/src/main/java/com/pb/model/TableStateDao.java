@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public interface TableStateDao {
-    public void save(TableState state);
+    void save(TableState state);
 }
