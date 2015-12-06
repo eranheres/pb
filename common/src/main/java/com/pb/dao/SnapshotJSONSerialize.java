@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 /**
- * Created by eranh on 11/29/15.
+ * Deserialize snapshot from JSON string
  */
 public class SnapshotJSONSerialize implements SnapshotSerialize {
     @Override

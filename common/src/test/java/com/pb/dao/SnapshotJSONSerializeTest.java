@@ -2,7 +2,6 @@ package com.pb.dao;
 
 import org.junit.Assert;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import java.net.URL;
 import java.nio.file.Files;

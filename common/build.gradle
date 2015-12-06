@@ -16,7 +16,7 @@ apply plugin: 'idea'
 apply plugin: 'spring-boot' 
 
 jar {
-    baseName = 'validator'
+    baseName = 'dao'
     version = '0.0.1-SNAPSHOT'
 }
 sourceCompatibility = 1.8
@@ -30,7 +30,7 @@ repositories {
 
 
 dependencies {
-    compile('org.springframework.boot:spring-boot-devtools')
+    compile('org.projectlombok:lombok')
     compile('org.springframework.boot:spring-boot-starter-redis')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

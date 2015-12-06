@@ -13,5 +13,7 @@ public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
+        Eran eran = new Eran();
+        eran.test();
     }
 }

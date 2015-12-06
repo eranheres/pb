@@ -16,3 +16,5 @@ user.vcxproj.filters
 gateway/build
 validator/build
 validator/gradle
+common/build
+common/gradle
