@@ -22,8 +22,8 @@ public class ValidationQuery {
     @AllArgsConstructor
     @Getter
     public static class Ret {
-        Boolean isOK;
-        String Description;
+        private Boolean isSuccess;
+        private String Description;
     }
     public static final Ret OK = new Ret(true, "OK");
 

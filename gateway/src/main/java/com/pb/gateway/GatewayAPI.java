@@ -1,5 +1,6 @@
 package com.pb.gateway;
 
+import com.pb.api.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.pb.model.TableState;
@@ -12,13 +13,15 @@ import java.io.UnsupportedEncodingException;
  */
 @RestController
 public class GatewayAPI {
-
+    private final static String GATEWAY_TYPE = "gateway";
     @Autowired
     GatewayController controller;
 
     @RequestMapping(value = "/tablestate/{id}/{datatype}", method = RequestMethod.POST)
     public String index(@PathVariable String id, @PathVariable String datatype, @RequestBody String body) {
-        return controller.setSnapshot(id, datatype, body).getDescription();
+        ValidationQuery.Ret validation = controller.setSnapshot(id, datatype, body);
+        ApiResponse res = new ApiResponse(validation.getIsSuccess(), GATEWAY_TYPE, validation.getDescription());
+        return res.toString();
     }
 
 }

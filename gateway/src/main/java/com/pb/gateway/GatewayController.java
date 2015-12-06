@@ -3,6 +3,7 @@ package com.pb.gateway;
 import com.pb.model.TableState;
 import com.pb.model.TableStateDao;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.io.UnsupportedEncodingException;
  * Gateway controller
  */
 @Service
+@NoArgsConstructor
 @AllArgsConstructor
 public class GatewayController {
 
