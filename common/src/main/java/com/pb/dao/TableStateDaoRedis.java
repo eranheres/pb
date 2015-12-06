@@ -1,4 +1,4 @@
-package com.pb.model;
+package com.pb.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;

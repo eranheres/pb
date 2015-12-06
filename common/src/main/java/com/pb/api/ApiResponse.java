@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
+import java.io.IOException;
+
 /**
  * Represents a response
  */
@@ -20,7 +22,6 @@ public class ApiResponse {
     @Override
     public String toString() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
             return mapper.writeValueAsString(this);
@@ -28,4 +29,15 @@ public class ApiResponse {
             return "{ 'success': false, 'type' : 'fatal', 'description': 'failed to create response' }";
         }
     }
+
+    public static ApiResponse fromString(String str) {
+        ObjectMapper mapper = new ObjectMapper();
+        //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        try {
+            return mapper.readValue(str, ApiResponse.class);
+        } catch (IOException e) {
+            return new ApiResponse(false, "API", "failed to parse response:"+str);
+        }
+    }
+
 }

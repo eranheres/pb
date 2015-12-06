@@ -1,5 +1,6 @@
 package com.pb.dao;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import java.util.Map;
  * Representation of a single game snapshot
  */
 @Getter @Setter
+@EqualsAndHashCode
 public class Snapshot {
     public final class VALUES {
         public final static String PREFLOP   = "preflop";
@@ -19,10 +21,11 @@ public class Snapshot {
 
         public final static String HANDRESET = "handreset";
         public final static String HEARTBEAT = "heartbeat";
-        public final static String MYTURN    = "myturn";
+        public final static String MYTURN    = "my_turn";
         public final static String SHOWDOWN  = "showdown";
     }
 
+    @EqualsAndHashCode
     @NoArgsConstructor
     @Getter @Setter
     public static class State {

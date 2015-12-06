@@ -1,7 +1,10 @@
 package com.pb.gateway;
 
-import com.pb.model.TableState;
-import com.pb.model.TableStateDao;
+import com.pb.api.ApiResponse;
+import com.pb.dao.PBDataSource;
+import com.pb.dao.SnapshotJSONSerialize;
+import com.pb.dao.TableState;
+import com.pb.dao.TableStateDao;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,21 +22,19 @@ import java.io.UnsupportedEncodingException;
 public class GatewayController {
 
     @Autowired
-    TableStateDao tableStateDao;
+    PBDataSource dataSource;
 
     @Autowired
     ValidationQuery query;
 
-    public ValidationQuery.Ret setSnapshot(String id, String datatype, String body) {
-        String decodedBody;
+    public ApiResponse setSnapshot(String id, String datatype, String body) {
         try {
-            decodedBody = java.net.URLDecoder.decode(body, "UTF-8");
-            TableState state = new TableState(id, datatype, decodedBody);
-            tableStateDao.save(state);
+            String decodedBody = java.net.URLDecoder.decode(body, "UTF-8");
+            dataSource.saveToList(id, decodedBody);
             return query.validateHand(id);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-            return new ValidationQuery.Ret(false, "Failed to decode body");
+            return new ApiResponse(false, "gateway", "Failed to decode body");
         }
     }
 }

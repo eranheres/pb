@@ -1,5 +1,6 @@
 package com.pb.gateway;
 
+import com.pb.api.ApiResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,20 +17,13 @@ import java.net.URLConnection;
  */
 @Component
 public class ValidationQuery {
-    @Value("${validatorUrl}")
+    @Value("${validator.url}")
     String validatorUrl;
 
-    @AllArgsConstructor
-    @Getter
-    public static class Ret {
-        private Boolean isSuccess;
-        private String Description;
-    }
-    public static final Ret OK = new Ret(true, "OK");
-
-    public Ret validateHand(String handId)  {
+    public ApiResponse validateHand(String handId)  {
         try {
-            URL url = new URL(validatorUrl);
+            String fullUrl = String.format("%s/validate/snapshot/%s",validatorUrl,handId);
+            URL url = new URL(fullUrl);
             URLConnection urlConnection = url.openConnection();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             String response = "";
@@ -37,11 +31,11 @@ public class ValidationQuery {
             while ((line = bufferedReader.readLine()) != null) {
                 response += line;
             }
-            return new Ret(true,response);
+            return ApiResponse.fromString(response);
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
+            return new ApiResponse(false, "gateway", e.getMessage());
         }
-        return OK;
     }
 }

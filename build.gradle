@@ -33,3 +33,10 @@ project(':validator') {
         compile project(':common')
     }
 }
+
+project(':monoapp') {
+    dependencies {
+        compile project(':gateway')
+        compile project(':validator')
+    }
+}

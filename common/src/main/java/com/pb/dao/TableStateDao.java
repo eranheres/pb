@@ -1,4 +1,4 @@
-package com.pb.model;
+package com.pb.dao;
 
 import org.springframework.stereotype.Service;
 

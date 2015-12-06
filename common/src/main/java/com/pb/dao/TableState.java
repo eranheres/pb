@@ -1,4 +1,4 @@
-package com.pb.model;
+package com.pb.dao;
 
 @lombok.Getter
 @lombok.ToString
