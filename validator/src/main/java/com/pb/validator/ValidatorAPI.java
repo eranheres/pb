@@ -1,32 +1,37 @@
 package com.pb.validator;
 
-import com.pb.api.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 
 /**
  * Validator Rest API controller
  */
 @RestController
 public class ValidatorAPI {
-    private final static String API_TYPE = "validator";
     @Autowired
     ValidatorController controller;
 
     @RequestMapping(value = "/validate/snapshot/{id}", method = RequestMethod.GET)
-    public String snapshot(@PathVariable String id) {
+    public ResponseEntity<String> snapshot(@PathVariable String id) throws Exception {
         try {
             ValidatorStatus status = controller.validateSnapshot(id);
-            ApiResponse response = new ApiResponse(
-                    status.equals(ValidatorStatus.OK),
-                    API_TYPE,
-                    status.getDescription());
-            return response.toString();
-        } catch (IOException e) {
+            HttpStatus httpStatus = HttpStatus.OK;
+            if (status.equals(ValidatorStatus.NOT_FOUND))
+                httpStatus = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<String>(responseValue(status), httpStatus);
+
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ApiResponse(false, API_TYPE, e.toString()).toString();
+            throw new Exception(e);
         }
+    }
+
+    private String responseValue(ValidatorStatus status) {
+        return String.format("{\n\"validation\":\"%s\",\n\"reason\":\"%s\"\n}",
+                status.equals(ValidatorStatus.OK)?"ok":"failed",
+                status.getDescription());
     }
 }
