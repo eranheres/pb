@@ -12,6 +12,7 @@
 #include <vector>
 #include <fstream>
 #include <bitset>
+#include <ostream>
 #include "jansson.h"
 #include "http.h"
 #include "AllSymbols.h"
@@ -19,6 +20,9 @@
 #include "boost/uuid/uuid.hpp"
 #include "boost/uuid/random_generator.hpp"
 #include "boost/uuid/uuid_io.hpp"
+#include "boost/filesystem.hpp"
+#include "boost/iostreams/device/file.hpp"
+#include "boost/iostreams/stream.hpp"
 
 using namespace std;
 //#define Log printf
@@ -26,10 +30,15 @@ using namespace std;
 #define Log pblog
 void init_curl();
 void clean_curl();
+
+// Forward declarations
 int request(const char *url, char* buffer, unsigned int buffer_size);
+int is_openppl_command(const char* pquery);
+void clear_hand_images();
 
 HANDLE symbol_need, symbol_ready, have_result;
 
+bool connector_enabled = false;
 struct ext_holdem_player {
 	bool playing;
 	bool active;
@@ -42,6 +51,8 @@ struct ext_holdem_state {
 	const char* datatype;
 	int current;
     int hand_count;
+	int hand_error;
+	int first_hand;
 	int snapshot_count;
 	std::string hand_uuid;
     int dll_listening_port;
@@ -62,6 +73,8 @@ boost::uuids::random_generator uuid_generator;
 
 struct configuration_st {
 	string server_url;
+	string offline;
+	string clear_on_restart;
 } configuration;
 
 #define BUF_SIZE (256*1024)
@@ -255,7 +268,30 @@ string holdem_state_to_json_string(holdem_state* state)
 	return json_dumps(holdem_state_to_json(state), JSON_INDENT(4));
 }
 
+namespace io = boost::iostreams;
+void write_error_to_captures(std::string file, int error_code, std::string error, std::string url, std::string request)
+{
+	std::ofstream outfile(file);
+	if (!outfile.is_open()) {
+		Log("Failed to open file for write %s\n",file.c_str());
+		return;
+	}
+
+    outfile << "code:" << error_code << "\n";
+	outfile << "url:" << url << "\n";
+	outfile << "error:\n" << error << "\n";
+	outfile << "request:\n" << request << "\n";
+	outfile.close();
+}
+
 void send_table_state() {
+	if (ext_state.hand_error) {
+        Log("Hand in error state, avoid sending:%s, handnumber:%d, betround:%s\n", 
+			ext_state.datatype, 
+			ext_state.hand_count,
+			ext_state.betround.c_str());
+		return;
+	}
     Log("sending:%s, handnumber:%d, betround:%s\n", 
 		ext_state.datatype, 
 		ext_state.hand_count,
@@ -265,8 +301,17 @@ void send_table_state() {
 					+ ext_state.hand_uuid
 					+ '/'
 					+ ext_state.datatype;
-//	char response[1024];
-	//post(url.c_str(), data.c_str(), response, 1024); 
+	char response[1024];
+	if (configuration.offline == "yes")
+		return;
+	int rescode = post(url.c_str(), data.c_str(), (char*)response, 1024); 
+	std::string error;
+	if (rescode/100 != 2) { // checks for status 2XX
+		ext_state.hand_error = true;
+	    error="-error";
+	}
+	std::string filename = "captures\\"+ext_state.hand_uuid+"\\"+std::to_string((long double)ext_state.snapshot_count)+error+".txt";
+	write_error_to_captures(filename, rescode, response, url, data);
 }
 
 int is_showdown() {
@@ -324,6 +369,16 @@ void do_not_playing()
 	Log("not playing\n");
 }
 
+int is_hand_error() {
+	return ext_state.hand_error;
+}
+
+int do_hand_error(const char* pquery) {
+	if (is_openppl_command(pquery))
+		return 0; // fold anything
+	return 0;
+}
+
 int is_hand_reset(const char* pquery) 
 {
     if (string(pquery) != "dll$ini_function_on_handreset")
@@ -331,11 +386,20 @@ int is_hand_reset(const char* pquery)
 	return 1;
 }
 
-int do_hand_reset() 
+void init_new_hand()
 {
 	ext_state.hand_uuid = boost::uuids::to_string(uuid_generator());
+	boost::filesystem::create_directory("captures//"+ext_state.hand_uuid);
 	ext_state.hand_count++;
 	ext_state.snapshot_count = 0;
+	ext_state.hand_error = false;
+}
+
+int do_hand_reset() 
+{
+	if (!is_hand_error())
+		clear_hand_images();
+	init_new_hand();
 	ext_state.datatype = "handreset";
 	Log("Handreset:%d, UUID:%s\n", ext_state.hand_count, ext_state.hand_uuid.c_str());
 	send_table_state();
@@ -356,7 +420,7 @@ int is_new_round(const char* pquery)
 int do_new_round()
 {
 	ext_state.datatype = "new_round";
-	send_table_state();
+	send_table_state(); // bug in OH, sometime sends new round preflop before handreset
 	return 0;
 }
 
@@ -424,7 +488,7 @@ void fill_extended_table_state(const char* pquery)
 					 (CARD_VALID(cstate->m_player[i].m_cards[0])) && 
 					 (CARD_VALID(cstate->m_player[i].m_cards[1])));
 	}
-	Log(holdem_state_to_string().c_str());
+	//Log(holdem_state_to_string().c_str());
 }
 
 int is_table_found() {
@@ -433,12 +497,21 @@ int is_table_found() {
 }
 
 int CaptureAnImage(HWND hWnd, std::string filename);
+int ClearImages(std::string folder);
 void save_snapshot_image() 
 {
-	std::string filename = "captures\\"+ext_state.hand_uuid+"--"+std::to_string((long double)ext_state.snapshot_count)+".bmp";
+	std::string filename = "captures\\"+ext_state.hand_uuid+"\\"+std::to_string((long double)ext_state.snapshot_count)+".bmp";
 	int int_hwnd =(int)GetSymbol("attached_hwnd"); 
 	HWND hwnd = (HWND)int_hwnd;
 	CaptureAnImage(hwnd, filename);
+}
+
+void clear_hand_images() 
+{
+	if (ext_state.hand_uuid == "")
+		return;
+	std::string folder = "captures\\"+ext_state.hand_uuid;
+	boost::filesystem::remove_all(folder);
 }
 
 /*
@@ -449,9 +522,12 @@ double process_query(const char* pquery)
 	if (!is_table_found())
 		return 0;
 	fill_extended_table_state(pquery);
-	//save_snapshot_image();
+	save_snapshot_image();
 	if (is_hand_reset(pquery)) 
 		return do_hand_reset();
+
+	if (is_hand_error()) 
+        return do_hand_error(pquery);
 
 	if (is_new_round(pquery))
 		return do_new_round();
@@ -482,7 +558,7 @@ double process_state(holdem_state* pstate)
 	return 0;
 }
 
-void read_config() 
+bool read_config() 
 {
 	json_t *json;
 	json_error_t error;
@@ -490,7 +566,7 @@ void read_config()
 	json = json_load_file("pb_config.json", 0, &error);
 	if(!json) {
 		Log("failed to load config file\n");
-		return;
+	    return false;	
 	}
 	WriteLog("test %s:\n","This is a test 123");
     Log("config file loaded\n");	
@@ -500,15 +576,44 @@ void read_config()
     	configuration.server_url = json_string_value(url);
 		Log("Server URL:%s\n",configuration.server_url.c_str());
 	}
+	json_t* offline = json_object_get(json, "offline");
+	if (json_is_string(offline)) {
+		configuration.offline = json_string_value(offline);
+		Log("Server is offline? - %s\n",configuration.offline.c_str());
+	}
+	json_t* clear_on_restart = json_object_get(json, "clear_on_restart");
+	if (json_is_string(clear_on_restart)) {
+		configuration.clear_on_restart = json_string_value(clear_on_restart);
+		Log("Clear on restart? - %s\n",configuration.clear_on_restart.c_str());
+	}
+	return true;
+}
+
+void clear_on_restart() 
+{
+	if (configuration.clear_on_restart == "yes") {
+		boost::filesystem::remove_all("captures");
+	}
+	boost::filesystem::create_directory("captures");
 }
 
 void init_connector()
 {
 	init_curl();
-	read_config();
+	if (!read_config())
+		return;
+
+	clear_on_restart();
+    init_new_hand();
+	connector_enabled = true;
 }
 
 void clean_connector()
 {
 	clean_curl();
+}
+
+bool is_connector_enabled() 
+{
+	return connector_enabled;
 }
