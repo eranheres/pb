@@ -1,15 +1,13 @@
 package com.pb.gateway;
 
-import com.pb.api.ApiResponse;
 import com.pb.dao.PBDataSource;
-import com.pb.dao.SnapshotJSONSerialize;
-import com.pb.dao.TableState;
-import com.pb.dao.TableStateDao;
+import com.sun.tools.internal.ws.wsdl.framework.ValidationException;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 
@@ -27,14 +25,11 @@ public class GatewayController {
     @Autowired
     ValidationQuery query;
 
-    public ApiResponse setSnapshot(String id, String datatype, String body) {
-        try {
-            String decodedBody = java.net.URLDecoder.decode(body, "UTF-8");
-            dataSource.saveToList(id, decodedBody);
-            return query.validateHand(id);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return new ApiResponse(false, "gateway", "Failed to decode body");
-        }
+    public void setSnapshot(String id, String datatype, String body) throws IOException {
+        String decodedBody = java.net.URLDecoder.decode(body, "UTF-8");
+        dataSource.saveToList(id, decodedBody);
+        ValidationQuery.validatorRes res = query.validateHand(id);
+        if (res.getReason() != "ok")
+            throw new HandValidationException(res.getReason());
     }
 }

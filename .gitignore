@@ -18,3 +18,4 @@ validator/build
 validator/gradle
 common/build
 common/gradle
+monoapp/build
