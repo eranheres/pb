@@ -1,6 +1,7 @@
 package com.pb.gateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +24,7 @@ public class ValidationQuery {
     String validatorUrl;
 
     @NoArgsConstructor
+    @AllArgsConstructor
     @Getter
     @Setter
     public static class validatorRes {

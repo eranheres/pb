@@ -15,11 +15,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class HandValidatorTurnSeq implements HandValidator {
 
-    public final static ValidatorStatus TOO_FEW_SNAPSHOTS       = new ValidatorStatus("dd");
+    public final static ValidatorStatus TOO_FEW_SNAPSHOTS       = new ValidatorStatus("Too few snapshots in hand");
     public final static ValidatorStatus NO_HANDRESET_ON_FIRST   = new ValidatorStatus("Handreset was not found on first snapshot");
     public final static ValidatorStatus HANDRESET_MUST_BE_FIRST = new ValidatorStatus("Handreset not in position 0");
     public final static ValidatorStatus INVALID_VAL_BETROUND    = new ValidatorStatus("invalid value in betround");
     public final static ValidatorStatus BETROUND_OUT_OF_ORDER   = new ValidatorStatus("Betround out of order");
+
     String str;
     private final static ImmutableMap<String, Integer> betRoundOrder = ImmutableMap.of(
             Snapshot.VALUES.PREFLOP,   1,
@@ -31,10 +32,6 @@ public class HandValidatorTurnSeq implements HandValidator {
     public ValidatorStatus validate(Hand hand) {
         Snapshot[] snapshots = hand.getSnapshots();
         Integer highestBetRound = 0;
-        // Must be at least reset->preflop
-        if (snapshots.length < 2) {
-            return TOO_FEW_SNAPSHOTS;
-        }
         for (int i=0; i<snapshots.length; i++) {
             Snapshot snapshot = snapshots[i];
             // Must have reset on hand start
@@ -45,7 +42,10 @@ public class HandValidatorTurnSeq implements HandValidator {
             if ((i!=0) && (snapshot.getState().getDatatype().equals(Snapshot.VALUES.HANDRESET))) {
                 return HANDRESET_MUST_BE_FIRST;
             }
-            // Check that the order of betround is ok
+            if (snapshot.getState().getBetround() == null) {
+                return INVALID_VAL_BETROUND;
+            }
+            // Check that the order of betround is ok (but not for
             Integer current = betRoundOrder.get(snapshot.getState().getBetround());
             if (current == null) {
                 return INVALID_VAL_BETROUND;

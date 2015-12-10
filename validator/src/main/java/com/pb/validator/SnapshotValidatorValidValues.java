@@ -21,7 +21,8 @@ public class SnapshotValidatorValidValues implements SnapshotValidator {
             Snapshot.VALUES.HANDRESET,
             Snapshot.VALUES.HEARTBEAT,
             Snapshot.VALUES.SHOWDOWN,
-            Snapshot.VALUES.MYTURN
+            Snapshot.VALUES.MYTURN,
+            Snapshot.VALUES.NEWROUND
     );
 
     private static final List<String> VALID_ACTION_VALUES = Arrays.asList(

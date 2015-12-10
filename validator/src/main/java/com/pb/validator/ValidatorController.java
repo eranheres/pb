@@ -29,6 +29,14 @@ public class ValidatorController {
         if (hand == null) {
             return ValidatorStatus.NOT_FOUND;
         }
-        return manager.validateHand(hand);
+        return manager.validateHandInProgress(hand);
+    }
+
+    public ValidatorStatus validatorHand(String id) throws IOException {
+        Hand hand = dao.getHand(HandId.of(id));
+        if (hand == null) {
+            return ValidatorStatus.NOT_FOUND;
+        }
+        return manager.validateHandFullHand(hand);
     }
 }

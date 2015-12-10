@@ -20,7 +20,12 @@ public class GatewayAPI {
     public ResponseEntity<String> index(@PathVariable String id,
                                         @PathVariable String datatype,
                                         @RequestBody String body) throws IOException {
-        controller.setSnapshot(id, datatype, body);
+        try {
+            controller.setSnapshot(id, datatype, body);
+        } catch (HandValidationException ex) {
+            String val = "Snapshot failed validation:" + ex.getReason();
+            return new ResponseEntity<String>(val, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 
@@ -29,9 +34,8 @@ public class GatewayAPI {
         response.sendError(HttpStatus.BAD_REQUEST.value());
     }
 
-    @ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="Snapshot is invalid")
+    @ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="Snapshot failed validation")
     @ExceptionHandler(HandValidationException.class)
-    public String invalidSnapshot() {
-        return "bla bla";
+    public void invalidSnapshot() {
     }
 }

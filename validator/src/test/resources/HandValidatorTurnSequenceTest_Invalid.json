@@ -50,13 +50,13 @@
       },
       {
         "state": {
-          "datatype": "myturn",
+          "datatype": "my_turn",
           "betround": "flop"
         }
       },
       {
         "state": {
-          "datatype": "myturn",
+          "datatype": "my_turn",
           "betround": "preflop"
         }
       }
@@ -73,7 +73,7 @@
       },
       {
         "state": {
-          "datatype": "myturn"
+          "datatype": "my_turn"
         }
       },
       {

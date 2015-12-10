@@ -18,6 +18,19 @@ public class GatewayControllerTest {
         ValidationQuery query = mock(ValidationQuery.class);
         GatewayController controller = new GatewayController(dao, query);
 
+        when(query.validateHand("zzz")).thenReturn(new ValidationQuery.validatorRes("ok", ""));
+        controller.setSnapshot("zzz", "type1", "body");
+        verify(query).validateHand("zzz");
+        verify(dao).saveToList("zzz", "body");
+    }
+
+    @Test(expected = HandValidationException.class)
+    public void testSetSnapshotExeption() throws Exception {
+        PBDataSource dao = mock(PBDataSource.class);
+        ValidationQuery query = mock(ValidationQuery.class);
+        GatewayController controller = new GatewayController(dao, query);
+
+        when(query.validateHand("zzz")).thenReturn(new ValidationQuery.validatorRes("not ok", ""));
         controller.setSnapshot("zzz", "type1", "body");
         verify(query).validateHand("zzz");
         verify(dao).saveToList("zzz", "body");

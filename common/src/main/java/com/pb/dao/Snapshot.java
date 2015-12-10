@@ -23,6 +23,7 @@ public class Snapshot {
         public final static String HEARTBEAT = "heartbeat";
         public final static String MYTURN    = "my_turn";
         public final static String SHOWDOWN  = "showdown";
+        public final static String NEWROUND  = "new_round";
     }
 
     @EqualsAndHashCode

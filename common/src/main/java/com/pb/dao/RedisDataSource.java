@@ -24,7 +24,7 @@ public class RedisDataSource implements PBDataSource {
 
     @Override
     public void saveToList(String id, Snapshot value) {
-        redisTemplate.opsForList().leftPush(id, value);
+        redisTemplate.opsForList().rightPush(id, value);
         if ((VALUE_TTL_MIN != null) && (VALUE_TTL_MIN != 0)) {
             redisTemplate.expire(id, VALUE_TTL_MIN, TimeUnit.MINUTES);
         }
