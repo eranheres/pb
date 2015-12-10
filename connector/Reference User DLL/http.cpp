@@ -37,13 +37,14 @@ struct write_result
 {
     char *data;
     int pos;
+	unsigned int buffer_size;
 };
 
 static size_t write_response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     struct write_result *result = (struct write_result *)stream;
 
-    if(result->pos + size * nmemb >= BUFFER_SIZE - 1)
+    if(result->pos + size * nmemb >= result->buffer_size - 1)
     {
         fprintf(stderr, "error: too small buffer\n");
         return 0;
@@ -71,6 +72,7 @@ void clean_curl()
     curl_global_cleanup();
 }
 
+// Post a request to a server. HTTP response code is returned as a value
 int post(const char *url, const char* data, char* res_data, unsigned int res_data_size)
 {
     CURLcode status;
@@ -83,14 +85,17 @@ int post(const char *url, const char* data, char* res_data, unsigned int res_dat
     struct write_result write_res;
 	write_res.data = res_data;
 	write_res.pos = 0;
+	write_res.buffer_size = res_data_size;
 
     curl_easy_setopt(curl, CURLOPT_URL, url);
-    // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_response);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_response);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &write_res); 
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(data));
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
 
     status = curl_easy_perform(curl);
+    res_data[write_res.pos] = '\0';
     if(status != 0)
     {
         fprintf(stderr, "error: unable to request data from %s:\n", url);
@@ -102,11 +107,8 @@ int post(const char *url, const char* data, char* res_data, unsigned int res_dat
     if(code != 200)
     {
         fprintf(stderr, "error: server responded with code %ld\n", code);
-        return -1;
+        return code;
     }
 
-    /* zero-terminate the result */
-    res_data[write_res.pos] = '\0';
-
-    return 0;
+    return code;
 }

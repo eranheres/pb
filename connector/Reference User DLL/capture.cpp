@@ -1,32 +1,7 @@
 #include <string>
 #include <windows.h>
+#include "shlwapi.h"
 
-/*
-void capture() {
-	// get the device context of the screen
-	HDC hScreenDC = CreateDC("DISPLAY", NULL, NULL, NULL);     
-	// and a device context to put it in
-	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
-
-	int x = GetDeviceCaps(hScreenDC, HORZRES);
-	int y = GetDeviceCaps(hScreenDC, VERTRES);
-
-	// maybe worth checking these are positive values
-	HGDIOBJ hBitmap = CreateCompatibleBitmap(hScreenDC, x, y);
-
-	// get a new bitmap
-	HGDIOBJ hOldBitmap = SelectObject(hMemoryDC, hBitmap);
-
-	int width = 100;
-	int height = 100;
-	BitBlt(hMemoryDC, 0, 0, width, height, hScreenDC, 0, 0, SRCCOPY);
-	hBitmap = SelectObject(hMemoryDC, hOldBitmap);
-
-	// clean up
-	DeleteDC(hMemoryDC);
-	DeleteDC(hScreenDC);
-}
-*/
 int CaptureAnImage(HWND hWnd, std::string filename)
 {
     HDC hdcWindow;
@@ -35,8 +10,9 @@ int CaptureAnImage(HWND hWnd, std::string filename)
     BITMAP bmpScreen;
 
 	// Convert string to wstr
-	std::wstring FilePath(filename.length(), L' ');
-    std::copy(filename.begin(), filename.end(), FilePath.begin());	
+	std::wstring Filename(filename.length(), L' ');
+    std::copy(filename.begin(), filename.end(), Filename.begin());	
+	LPCTSTR filePath = Filename.c_str();
 
     // Retrieve the handle to a display device context for the client 
     // area of the window. 
@@ -130,12 +106,17 @@ int CaptureAnImage(HWND hWnd, std::string filename)
         (BITMAPINFO *)&bi, DIB_RGB_COLORS);
 
     // A file is created, this is where we will save the screen capture.
-    HANDLE hFile = CreateFile(FilePath.c_str(),
+    HANDLE hFile = CreateFile(filePath,
         GENERIC_WRITE,
         0,
         NULL,
         CREATE_ALWAYS,
         FILE_ATTRIBUTE_NORMAL, NULL);   
+	if (hFile <=0)
+	{
+		MessageBox(hWnd, L"Failed to create file", L"Failed", MB_OK);
+		goto done;
+	}
     
     // Add the size of the headers to the size of the bitmap to get the total file size
     DWORD dwSizeofDIB = dwBmpSize + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
