@@ -17,6 +17,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // Return error code and upload (or keep localy) images upon errors
 // Add more testings (see above)
 
+// TODO: Major milestones
+// Complete verifications
+// Send "end of hand" notification and save hand statistics to DB (Mongo?)
+// Place some graphs or other means to view statistics
+// Engage very simple game play bot (based on prwin)
+// The real thing...
 
 @SpringBootApplication
 public class ValidatorApplication {

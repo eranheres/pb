@@ -1,8 +1,12 @@
-package com.pb.model;
+package com.pb.dao;
 
 import com.google.common.collect.ImmutableBiMap;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@EqualsAndHashCode
 public class Card {
     public enum Suit {
         Spade,
@@ -12,6 +16,7 @@ public class Card {
     }
     private @Getter Integer number;
     private @Getter Suit suit;
+    private @Getter Boolean empty;
 
     private static final ImmutableBiMap<Character, Integer> numbersMapping =
             new ImmutableBiMap.Builder<Character, Integer>().
@@ -37,20 +42,31 @@ public class Card {
                     put('d', Suit.Diamond).build();
 
     public Card(String card) throws IllegalArgumentException {
+        if (card.isEmpty() || card.equals("--")) {
+            this.empty = true;
+            return;
+        }
         if (card.length() != 2)
             throw new IllegalArgumentException("must be 2 characters exactly");
 
+        this.empty = false;
         this.number = numbersMapping.get(card.charAt(0));
         this.suit   = suitMapping.get(card.charAt(1));
         if (this.number == null || this.suit == null)
             throw new IllegalArgumentException("Invalid card number or suit");
     }
 
+    public Boolean isEmpty() {
+        return getEmpty();
+    }
+
+    @Override
     public String toString() {
+        if (this.empty)
+            return "--";
         Character num = numbersMapping.inverse().get(this.number);
         Character sut = suitMapping.inverse().get(this.suit);
         StringBuilder sb = new StringBuilder(num + sut);
         return sb.append(num).append(sut).toString();
     }
-
 }

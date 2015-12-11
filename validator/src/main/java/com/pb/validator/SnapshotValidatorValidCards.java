@@ -1,26 +1,59 @@
 package com.pb.validator;
 
+import com.pb.dao.Card;
 import com.pb.dao.Snapshot;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Validate the integerty of hand cards
  */
 public class SnapshotValidatorValidCards implements SnapshotValidator {
+    // TODO : Test hand has 0 or 2 cards
+    // TODO : Test that card is unique in table
+    // TODO : Checks that pubilc cards are 0,3,4 or 5
+
+    public final static ValidatorStatus PLAYER_CARDS_INVALID     = new ValidatorStatus("Player card is invalid");
+    public final static ValidatorStatus DUPLICATE_CARDS_IN_TABLE = new ValidatorStatus("Duplicate card in table");
+    public final static ValidatorStatus WRONG_AMOUNT_PUBLIC_CARDS = new ValidatorStatus("Invalid amount of public cards");
+
     @Override
     public ValidatorStatus validate(Snapshot snapshot) {
-        return (previous, current) -> {
-            if (current.cards.size() != 2)
-                return "Hand does not have 2 cards";
-            try {
-                Card c1 = new Card(current.cards.get(0));
-                Card c2 = new Card(current.cards.get(1));
-                if (c1.equals(c2))
-                    return "Hand cards are equal";
-            } catch (IllegalArgumentException ex) {
-                return ex.getMessage();
+        Set<Card> cards = new HashSet<Card>();
+        // Test hand has 2 cards or empty
+        for (Snapshot.Player player : snapshot.getPlayers()) {
+            if (player.getCards().length != 2)
+                return PLAYER_CARDS_INVALID;
+            Card card1 = player.getCards()[0];
+            Card card2 = player.getCards()[1];
+            if ((card1.isEmpty() && !card2.isEmpty()) || (!card1.isEmpty() && card2.isEmpty()))
+                return PLAYER_CARDS_INVALID;
+            if (!card1.isEmpty() && !cards.add(card1)) {
+                return DUPLICATE_CARDS_IN_TABLE;
             }
-            return PbValidator.STATUS_OK;
-        };
-        return null;
+            if (!card2.isEmpty() && !cards.add(card2)) {
+                return DUPLICATE_CARDS_IN_TABLE;
+            }
+        }
+        if ((snapshot.getCards() == null) || (snapshot.getCards().length !=5)) {
+            return WRONG_AMOUNT_PUBLIC_CARDS;
+        }
+        int cardCount = 0;
+        for (Card card : snapshot.getCards()) {
+            if (!card.isEmpty()) {
+                cardCount++;
+            }
+        }
+        if ((cardCount != 0) && (cardCount != 3) && (cardCount !=4) && (cardCount!=5)) {
+            return WRONG_AMOUNT_PUBLIC_CARDS;
+        }
+
+        for (Card card : snapshot.getCards()) {
+            if (!card.isEmpty() && !cards.add(card)) {
+                return DUPLICATE_CARDS_IN_TABLE;
+            }
+        }
+        return ValidatorStatus.OK;
     }
 }

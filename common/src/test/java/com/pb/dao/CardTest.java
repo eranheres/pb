@@ -1,9 +1,13 @@
-package com.pb.model;
+package com.pb.dao;
 
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CardTest {
 
@@ -16,6 +20,11 @@ public class CardTest {
         assertEquals(new Card("Kd").toString(), "Kd");
         assertEquals(new Card("Qd").toString(), "Qd");
         assertEquals(new Card("9c").toString(), "9c");
+        assertTrue(!new Card("9c").getEmpty());
+        assertEquals(new Card("").toString(), "--");
+        assertTrue(new Card("").getEmpty());
+        assertEquals(new Card("--").toString(), "--");
+        assertTrue(new Card("--").getEmpty());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -30,9 +39,14 @@ public class CardTest {
     public void testInvalidConstruction3() { new Card("Gd"); }
 
     @Test(expected = Exception.class)
-    public void testInvalidConstruction4() { new Card(""); }
-
-    @Test(expected = Exception.class)
     public void testInvalidConstruction5() { new Card("Ts0"); }
 
+    @Test
+    public void testJsnoSerialize() throws JsonProcessingException {
+        Card card = new Card("As");
+
+        ObjectMapper mapper = new ObjectMapper();
+        String str = mapper.writeValueAsString(card);
+        assertEquals(str, "{\"number\":14,\"suit\":\"Spade\",\"empty\":false}");
+    }
 }

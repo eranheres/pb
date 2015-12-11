@@ -1,0 +1,28 @@
+[
+  { "players" : [ { "cards" : [ "3s" ] }, { "cards" : [ "7s", "7h" ]} ]},
+  { "players" : [ { "cards" : [ "3s", "9h" ] }, { "cards" : [ "7h" ]} ]},
+  { "players" : [ { "cards" : [ "", "" ] }, { "cards" : []} ]},
+  { "players" : [ { "cards" : [ "As", "Js", "Ah" ] }, { "cards" : [ "", "" ]} ]},
+  { "players" : [ { "cards" : [ "3s", "3s" ] }, { "cards" : [ "7h", "7s" ]} ]},
+  { "players" : [ { "cards" : [ "7s", "9h" ] }, { "cards" : [ "7h", "7s" ]} ]},
+  {
+    "cards"   : ["2s", "3h", "2s", "", ""],
+    "players" : [ { "cards" : [ "8s", "9h" ] }, { "cards" : [ "7h", "7s" ]} ]
+  },
+  {
+    "cards"   : ["2s", "3h", "2h", "", ""],
+    "players" : [ { "cards" : [ "8s", "2h" ] }, { "cards" : [ "7h", "7s" ]} ]
+  },
+  {
+    "cards"   : ["2s", "3h", "2h", "", ""],
+    "players" : [ { "cards" : [ "8s", "6s" ] }, { "cards" : [ "7h", "2s" ]} ]
+  },
+  {
+    "cards"   : ["2h", "", "", "", ""],
+    "players" : [ { "cards" : [ "8s", "6s" ] }, { "cards" : [ "7h", "2s" ]} ]
+  },
+  {
+    "cards"   : ["2c", "2h", "", "", ""],
+    "players" : [ { "cards" : [ "8s", "6s" ] }, { "cards" : [ "7h", "2s" ]} ]
+  }
+]

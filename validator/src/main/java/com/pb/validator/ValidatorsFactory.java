@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 public class ValidatorsFactory {
     @Autowired HandValidator handValidatorTurnSeq;
     @Autowired SnapshotValidator snapshotValidatorValidValues;
+    @Autowired SnapshotValidator snapshotValidatorValidCards;
     @Autowired HandValidator handValidatorFullHand;
 
     public HandValidator[] getHandInProgressValidators() {
@@ -27,7 +28,10 @@ public class ValidatorsFactory {
     }
 
     public SnapshotValidator[] getSnapshotValidators() {
-        return new SnapshotValidator[] { snapshotValidatorValidValues };
+        return new SnapshotValidator[] {
+                snapshotValidatorValidValues,
+                snapshotValidatorValidCards
+        };
     }
 
 }
