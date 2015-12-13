@@ -9,10 +9,7 @@ import java.util.Set;
 /**
  * Validate the integerty of hand cards
  */
-public class SnapshotValidatorValidCards implements SnapshotValidator {
-    // TODO : Test hand has 0 or 2 cards
-    // TODO : Test that card is unique in table
-    // TODO : Checks that pubilc cards are 0,3,4 or 5
+public class SnapshotValidatorCards implements SnapshotValidator {
 
     public final static ValidatorStatus PLAYER_CARDS_INVALID     = new ValidatorStatus("Player card is invalid");
     public final static ValidatorStatus DUPLICATE_CARDS_IN_TABLE = new ValidatorStatus("Duplicate card in table");

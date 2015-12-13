@@ -1,0 +1,55 @@
+[
+  {
+    // player hands changes
+    "snapshots" : [
+      {
+        "players": [
+          { "cards": ["As", "Ah"] },
+          { "cards": ["Js", "Jh"] }
+        ],
+        "cards": ["As", "Ah", "Ks", "Kc", ""]
+      },
+      {
+        "players": [
+          { "cards": ["As", "Ah"] },
+          { "cards": ["Js", "Jh"] }
+        ],
+        "cards": ["As", "Ah", "Ks", "Kc", ""]
+      },
+      {
+        "players": [
+          { "cards": ["Ac", "Ah"] },
+          { "cards": ["Js", "Jh"] }
+        ],
+        "cards": ["As", "Ah", "Ks", "Kc", ""]
+      }
+    ]
+  },
+  {
+    // board hand changes
+    "snapshots" : [
+      {
+        "players": [
+          { "cards": ["Ac", "8h"] },
+          { "cards": ["Js", "Jh"] }
+        ],
+         "cards": ["As", "Ah", "Ks", "Kc", ""]
+      },
+      {
+        "players": [
+          { "cards": ["Ac", "8h"] },
+          { "cards": ["Js", "Jh"] }
+        ],
+        "cards": ["As", "Ah", "Ks", "Kc", ""]
+      },
+      {
+        "players": [
+          { "cards": ["Ac", "8h"] },
+          { "cards": ["Js", "Jh"] }
+        ],
+        "cards": ["As", "2h", "Ks", "Kc", ""]
+      }
+    ]
+  }
+]
+

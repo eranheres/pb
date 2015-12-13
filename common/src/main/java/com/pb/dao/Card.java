@@ -56,7 +56,7 @@ public class Card {
             throw new IllegalArgumentException("Invalid card number or suit");
     }
 
-    public Boolean isEmpty() {
+    public boolean isEmpty() {
         return getEmpty();
     }
 
