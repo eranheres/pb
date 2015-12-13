@@ -14,6 +14,7 @@ public class ValidatorsFactory {
     @Autowired HandValidator handValidatorValuesStable;
     @Autowired SnapshotValidator snapshotValidatorValidValues;
     @Autowired SnapshotValidator snapshotValidatorValidCards;
+    @Autowired SnapshotValidator snapshotValidatorOpenPPL;
 
     @Autowired HandValidator handValidatorFullHand;
 

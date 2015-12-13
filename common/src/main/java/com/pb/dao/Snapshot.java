@@ -62,6 +62,6 @@ public class Snapshot {
     Player[] players;
     Double[] pots;
     State    state;
-    Map<String, String> symbols;
-    Map<String, String> ppl_symbols;
+    Map<String, Double> symbols;
+    Map<String, Double> ppl_symbols;
 }
