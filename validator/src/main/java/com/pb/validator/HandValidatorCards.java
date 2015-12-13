@@ -11,8 +11,6 @@ import java.util.*;
  * Validate cards through out the entire hand
  */
 public class HandValidatorCards implements HandValidator {
-    // TODO: Validate no card changes through the hand
-    // TODO: Validate public cards matches game state (maybe in snapshot validator)
 
     public static final ValidatorStatus CARD_CHANGED_IN_HAND = new ValidatorStatus("Card changed in hand");
 

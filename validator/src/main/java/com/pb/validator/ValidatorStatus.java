@@ -10,5 +10,6 @@ package com.pb.validator;
 public class ValidatorStatus {
     public final static ValidatorStatus OK = new ValidatorStatus("OK");
     public final static ValidatorStatus NOT_FOUND = new ValidatorStatus("Not found");
+    public final static ValidatorStatus INTERNAL_ERROR = new ValidatorStatus("Internal error");
     private String description;
 }
