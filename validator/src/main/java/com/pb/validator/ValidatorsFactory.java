@@ -1,6 +1,5 @@
 package com.pb.validator;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

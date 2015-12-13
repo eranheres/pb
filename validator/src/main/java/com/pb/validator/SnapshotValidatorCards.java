@@ -14,6 +14,39 @@ public class SnapshotValidatorCards implements SnapshotValidator {
     public final static ValidatorStatus PLAYER_CARDS_INVALID     = new ValidatorStatus("Player card is invalid");
     public final static ValidatorStatus DUPLICATE_CARDS_IN_TABLE = new ValidatorStatus("Duplicate card in table");
     public final static ValidatorStatus WRONG_AMOUNT_PUBLIC_CARDS = new ValidatorStatus("Invalid amount of public cards");
+    public final static ValidatorStatus BETROUND_NOT_FIT_CARDS = new ValidatorStatus("Betround not fits public cards");
+
+    private Integer countCards(Card[] cards) {
+        Integer count = 0;
+        for (Card card : cards) {
+            if (!card.isEmpty()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private ValidatorStatus validateRoundBet(Snapshot snapshot) {
+        Integer count = countCards(snapshot.getCards());
+        if ((snapshot.getCards() == null) || (snapshot.getCards().length !=5) ||
+            (count == 1) || (count ==2)) {
+            return WRONG_AMOUNT_PUBLIC_CARDS;
+        }
+        if ((count == 0) && (!snapshot.getState().getBetround().equals(Snapshot.VALUES.PREFLOP))) {
+            return BETROUND_NOT_FIT_CARDS;
+        }
+        if ((count == 3) && (!snapshot.getState().getBetround().equals(Snapshot.VALUES.FLOP))) {
+            return BETROUND_NOT_FIT_CARDS;
+        }
+        if ((count == 4) && (!snapshot.getState().getBetround().equals(Snapshot.VALUES.TURN))) {
+            return BETROUND_NOT_FIT_CARDS;
+        }
+        if ((count == 5) && (!snapshot.getState().getBetround().equals(Snapshot.VALUES.RIVER))) {
+            return BETROUND_NOT_FIT_CARDS;
+        }
+
+        return ValidatorStatus.OK;
+    }
 
     @Override
     public ValidatorStatus validate(Snapshot snapshot) {
@@ -33,9 +66,6 @@ public class SnapshotValidatorCards implements SnapshotValidator {
                 return DUPLICATE_CARDS_IN_TABLE;
             }
         }
-        if ((snapshot.getCards() == null) || (snapshot.getCards().length !=5)) {
-            return WRONG_AMOUNT_PUBLIC_CARDS;
-        }
         int cardCount = 0;
         for (Card card : snapshot.getCards()) {
             if (!card.isEmpty()) {
@@ -51,6 +81,10 @@ public class SnapshotValidatorCards implements SnapshotValidator {
                 return DUPLICATE_CARDS_IN_TABLE;
             }
         }
+        // Test that amount of public cards fits the roundbet value
+        ValidatorStatus stat = validateRoundBet(snapshot);
+        if (!stat.equals(ValidatorStatus.OK))
+            return stat;
         return ValidatorStatus.OK;
     }
 }

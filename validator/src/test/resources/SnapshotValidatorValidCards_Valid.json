@@ -1,17 +1,21 @@
 [
   {
+    "state" : { "betround" : "river" },
     "players" : [ { "cards" : [ "3s", "9h" ] }, { "cards" : [ "7s", "7h" ]} ],
     "cards" : [ "2s", "3h", "4s", "5s", "6s" ]
   },
   {
+    "state" : { "betround" : "flop" },
     "players" : [ { "cards" : [ "", "" ] }, { "cards" : [ "2s", "5d" ]} ],
     "cards" : [ "2h", "3s", "4s", "", "" ]
   },
   {
+    "state" : { "betround" : "preflop" },
     "players" : [ { "cards" : [ "As", "Js" ] }, { "cards" : [ "", "" ]} ],
     "cards" : [ "", "", "", "", "" ]
   },
   {
+    "state" : { "betround" : "turn" },
     "players" : [ { "cards" : [ "", "" ] }, { "cards" : [ "", "" ]} ],
     "cards" : [ "2s", "3s", "4s", "5s", "" ]
   }

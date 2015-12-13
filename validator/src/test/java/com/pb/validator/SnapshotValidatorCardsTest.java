@@ -45,6 +45,8 @@ public class SnapshotValidatorCardsTest {
         assertEquals(SnapshotValidatorCards.DUPLICATE_CARDS_IN_TABLE,  validator.validate(lu[8]));
         assertEquals(SnapshotValidatorCards.WRONG_AMOUNT_PUBLIC_CARDS, validator.validate(lu[9]));
         assertEquals(SnapshotValidatorCards.WRONG_AMOUNT_PUBLIC_CARDS, validator.validate(lu[10]));
-        assertEquals(11, lu.length); // Make sure nothing is missed
+        assertEquals(SnapshotValidatorCards.BETROUND_NOT_FIT_CARDS, validator.validate(lu[11]));
+        assertEquals(SnapshotValidatorCards.BETROUND_NOT_FIT_CARDS, validator.validate(lu[12]));
+        assertEquals(13, lu.length); // Make sure nothing is missed
     }
 }

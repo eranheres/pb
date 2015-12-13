@@ -4,19 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 // TODO: UnitTesting that are missing
-// Validate syntax of important state info
-// Validate consistency of cards throughout the entire hand
-// Validate conflicts of cards in a snapshot
 // Validate game state (flop, river etc) against the community cards numbers in a snapshot
-// Validate OpenPPL Error symbols
-// Hand validator that checks constant remains the same in the hand (player name etc.)
-// Validate public cards matches game state (maybe in snapshot validator)
-// Check for more valid values to test in game state structure (balance_known etc.)
-
-// TODO: Next steps
-// Return error code and upload (or keep localy) images upon errors
-// Add more testings (see above)
-// Hand validator that checks constant remains the same in the hand (player name etc.)
 
 // TODO: Major milestones
 // Complete verifications
