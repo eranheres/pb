@@ -34,7 +34,7 @@ public class SnapshotValidatorValidValuesTest {
         assertEquals(ValidatorStatus.OK, validator.validate(lu[4]));
         assertEquals(ValidatorStatus.OK, validator.validate(lu[5]));
         assertEquals(ValidatorStatus.OK, validator.validate(lu[6]));
-        assertEquals(7, lu.length); // Make sure nothing is missed
+        assertEquals(8, lu.length); // Make sure nothing is missed
 
         // Test invalid values
         url = Thread.currentThread().getContextClassLoader().getResource("SnapshotValidatorValidValuesTest_Invalid.json");

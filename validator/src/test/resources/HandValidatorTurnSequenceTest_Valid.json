@@ -3,44 +3,38 @@
     "snapshots" : [
       {
         "state": {
-          "datatype": "heartbeat",
-          "betround": "preflop"
-        }
-      },
-      {
-        "state": {
           "datatype": "handreset",
           "betround": "preflop"
         }
       },
       {
         "state": {
-          "datatype": "showdown",
+          "datatype": "heartbeat",
           "betround": "preflop"
         }
       },
       {
         "state": {
-          "datatype": "myturn",
-          "betround": "preflop"
+          "datatype": "my_turn",
+          "betround": "turn"
         }
       },
       {
         "state": {
-          "datatype": "myturn",
-          "betround": "flop"
-        }
-      },
-      {
-        "state": {
-          "datatype": "myturn",
+          "datatype": "my_turn",
           "betround": "river"
         }
       },
       {
         "state": {
-          "datatype": "myturn",
-          "betround": "turn"
+          "datatype": "showdown",
+          "betround": "river"
+        }
+      },
+      {
+        "state": {
+          "datatype": "showdown",
+          "betround": "river"
         }
       }
     ]

@@ -3,24 +3,25 @@
     { "state" : { "datatype" : "heartbeat" }},
     { "state" : { "datatype" : "handreset" }},
     { "state" : { "datatype" : "showdown"}},
+    { "state" : { "datatype" : "new_round"}},
     { "state" :
       {
-          "datatype" : "myturn",
+          "datatype" : "my_turn",
           "betround" : "preflop"
       }},
       { "state" :
       {
-          "datatype" : "myturn",
+          "datatype" : "my_turn",
           "betround" : "flop"
       }},
       { "state" :
       {
-          "datatype" : "myturn",
+          "datatype" : "my_turn",
           "betround" : "river"
       }},
       { "state" :
       {
-          "datatype" : "myturn",
+          "datatype" : "my_turn",
           "betround" : "turn"
       }}
 ]

@@ -1,9 +1,6 @@
 package com.pb.dao;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Map;
 
@@ -23,9 +20,9 @@ public class Snapshot {
         public final static String HEARTBEAT = "heartbeat";
         public final static String MYTURN    = "my_turn";
         public final static String SHOWDOWN  = "showdown";
+        public final static String NEWROUND  = "new_round";
     }
 
-    @EqualsAndHashCode
     @NoArgsConstructor
     @Getter @Setter
     public static class State {
@@ -43,10 +40,28 @@ public class Snapshot {
         Integer is_posting;
         Integer fillerbits;
     }
-    String[] cards;
-    Object[] players;
+
+    @NoArgsConstructor
+    @Getter @Setter
+    public static class Player {
+        Double  currentbet;
+        Double  balance;
+        String  name;
+        Card[]  cards;
+        Integer balance_known;
+        Integer name_known;
+        Integer fillerbits;
+        Integer fillerbytes;
+        Integer playing;
+        Integer blind;
+        Integer active;
+        Integer dealt;
+        Integer cards_shows;
+    }
+    Card[]   cards;
+    Player[] players;
     Double[] pots;
-    State state;
-    Map<String, String> symbols;
-    Map<String, String> ppl_symbols;
+    State    state;
+    Map<String, Double> symbols;
+    Map<String, Double> ppl_symbols;
 }

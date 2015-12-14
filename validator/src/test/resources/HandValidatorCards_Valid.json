@@ -1,0 +1,36 @@
+[
+  {
+    // player hands changes
+    "snapshots" : [
+      {
+        "players": [
+          { "name": "1", "cards": ["As", "Ah"] },
+          { "name": "2", "cards": ["", ""] }
+        ],
+        "cards": ["", "", "", "", ""]
+      },
+      {
+        "players": [
+          { "name": "1", "cards": ["As", "Ah"] },
+          { "name": "2", "cards": ["Js", "Jh"] }
+        ],
+        "cards": ["As", "Ah", "Ks", "", ""]
+      },
+      {
+        "players": [
+          { "name": "1", "cards": ["As", "Ah"] },
+          { "name": "2", "cards": ["Js", "Jh"] }
+        ],
+        "cards": ["As", "Ah", "Ks", "Kc", ""]
+      },
+      {
+        "players": [
+          { "name": "1", "cards": ["As", "Ah"] },
+          { "name": "2", "cards": ["Js", "Jh"] }
+        ],
+        "cards": ["As", "Ah", "Ks", "Kc", "3s"]
+      }
+    ]
+  }
+]
+

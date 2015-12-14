@@ -10,26 +10,21 @@ import java.net.URL;
 
 import static org.junit.Assert.*;
 
-public class HandValidatorTurnSeqTest {
+public class HandValidatorCardsTest {
 
     @Test
     public void testIsValid() throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-        //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // Test invalid values
-        URL url = Thread.currentThread().getContextClassLoader().
-                  getResource("HandValidatorTurnSequenceTest_Invalid.json");
+        URL url = Thread.currentThread().getContextClassLoader(). getResource("HandValidatorCards_Invalid.json");
         assertNotNull(url);
         Hand[] hands = mapper.readValue(new File(url.getPath()), Hand[].class);
-        HandValidator validator = new HandValidatorTurnSeq();
+        HandValidator validator = new HandValidatorCards();
 
-        assertEquals(HandValidatorTurnSeq.NO_HANDRESET_ON_FIRST,   validator.validate(hands[0]));
-        assertEquals(HandValidatorTurnSeq.HANDRESET_MUST_BE_FIRST, validator.validate(hands[1]));
-        assertEquals(HandValidatorTurnSeq.BETROUND_OUT_OF_ORDER,   validator.validate(hands[2]));
-        assertEquals(HandValidatorTurnSeq.INVALID_VAL_BETROUND,    validator.validate(hands[3]));
-        assertTrue(hands.length == 4); // Make sure nothing is missed
+        assertEquals(HandValidatorCards.CARD_CHANGED_IN_HAND, validator.validate(hands[0]));
+        assertEquals(HandValidatorCards.CARD_CHANGED_IN_HAND, validator.validate(hands[1]));
+        assertTrue(hands.length == 2); // Make sure nothing is missed
     }
 
     @Test
@@ -40,10 +35,10 @@ public class HandValidatorTurnSeqTest {
         //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // Test invalid values
         URL url = Thread.currentThread().getContextClassLoader().
-                getResource("HandValidatorTurnSequenceTest_Valid.json");
+                getResource("HandValidatorCards_Valid.json");
         assertNotNull(url);
         Hand[] hands = mapper.readValue(new File(url.getPath()), Hand[].class);
-        HandValidator validator = new HandValidatorTurnSeq();
+        HandValidator validator = new HandValidatorCards();
 
         assertEquals(ValidatorStatus.OK,   validator.validate(hands[0]));
         assertTrue(hands.length == 1); // Make sure nothing is missed

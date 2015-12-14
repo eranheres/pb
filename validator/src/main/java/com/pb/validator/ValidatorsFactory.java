@@ -1,6 +1,5 @@
 package com.pb.validator;
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -10,14 +9,34 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ValidatorsFactory {
     @Autowired HandValidator handValidatorTurnSeq;
+    @Autowired HandValidator handValidatorCards;
+    @Autowired HandValidator handValidatorValuesStable;
     @Autowired SnapshotValidator snapshotValidatorValidValues;
+    @Autowired SnapshotValidator snapshotValidatorValidCards;
+    @Autowired SnapshotValidator snapshotValidatorOpenPPL;
 
-    public HandValidator[] getHandValidators() {
-        return new HandValidator[]{ handValidatorTurnSeq };
+    @Autowired HandValidator handValidatorFullHand;
+
+    public HandValidator[] getHandInProgressValidators() {
+        return new HandValidator[]{
+                handValidatorTurnSeq,
+                handValidatorCards,
+                handValidatorValuesStable
+        };
+    }
+
+    public HandValidator[] getHandFullValidators() {
+        return new HandValidator[]{
+                handValidatorTurnSeq,
+                handValidatorFullHand
+        };
     }
 
     public SnapshotValidator[] getSnapshotValidators() {
-        return new SnapshotValidator[] { snapshotValidatorValidValues };
+        return new SnapshotValidator[] {
+                snapshotValidatorValidValues,
+                snapshotValidatorValidCards
+        };
     }
 
 }

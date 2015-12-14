@@ -1,0 +1,64 @@
+[
+  {
+    // player hands changes
+    "snapshots" : [
+      {
+        "players": [
+          {
+            "name": "1",
+            "balance_known": 1,
+            "name_known": 1,
+            "fillerbits": 1,
+            "fillerbytes": 1,
+            "blind": 1,
+            "dealt": 1
+          },
+          { "name": "1",
+                "balance_known": 1,
+                "name_known": 1,
+                "fillerbits": 1,
+                "fillerbytes": 1,
+                "blind": 1,
+                "dealt": 1
+          }
+        ],
+        "state": {
+          "dealer_chair": 1,
+          "title": "title",
+          "room": "room",
+          "uuid": "uuid",
+          "fillerbits" : 1
+        }
+      },
+      {
+        "players": [
+          {
+            "name": "1",
+            "balance_known": 1,
+            "name_known": 1,
+            "fillerbits": 1,
+            "fillerbytes": 1,
+            "blind": 1,
+            "dealt": 1
+          },
+          { "name": "1",
+            "balance_known": 1,
+            "name_known": 1,
+            "fillerbits": 1,
+            "fillerbytes": 1,
+            "blind": 1,
+            "dealt": 1
+          }
+        ],
+        "state": {
+          "dealer_chair": 1,
+          "title": "title",
+          "room": "room",
+          "uuid": "uuid",
+          "fillerbits" : 1
+        }
+      }
+    ]
+  }
+]
+
