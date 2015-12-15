@@ -25,9 +25,7 @@ public class PersistorController {
     @Autowired
     ValidationQuery query;
 
-    public void setSnapshot(String id, String datatype, String body) throws IOException {
-        String decodedBody = java.net.URLDecoder.decode(body, "UTF-8");
-        dataSource.saveToList(id, decodedBody);
+    public void complete(String id) throws IOException {
         ValidationQuery.validatorRes res = query.validateHand(id);
         if (!res.getValidation().toUpperCase().equals("OK"))
             throw new HandValidationException(res.getReason());

@@ -12,33 +12,30 @@ import static org.mockito.Mockito.when;
 public class PersistorControllerTest {
 
     // Checks two things:
-    // A. Data is saved
-    // B. Data is validated
+    // A. Data is validated
+    // B. TODO Data is saved
     @Test
     public void testSetSnapshot() throws Exception {
-        /*
+
         PBDataSource dao = mock(PBDataSource.class);
         ValidationQuery query = mock(ValidationQuery.class);
         PersistorController controller = new PersistorController(dao, query);
 
         when(query.validateHand("zzz")).thenReturn(new ValidationQuery.validatorRes("ok", ""));
-        controller.setSnapshot("zzz", "type1", "body");
+        controller.complete("zzz");
         verify(query).validateHand("zzz");
-        verify(dao).saveToList("zzz", "body");
-        */
+        //verify(dao).saveToList("zzz", "body");
     }
 
-    //@Test(expected = HandValidationException.class)
+    @Test(expected = HandValidationException.class)
     public void testSetSnapshotExeption() throws Exception {
-        /*
         PBDataSource dao = mock(PBDataSource.class);
         ValidationQuery query = mock(ValidationQuery.class);
         PersistorController controller = new PersistorController(dao, query);
 
         when(query.validateHand("zzz")).thenReturn(new ValidationQuery.validatorRes("not ok", ""));
-        controller.setSnapshot("zzz", "type1", "body");
+        controller.complete("zzz");
         verify(query).validateHand("zzz");
         verify(dao).saveToList("zzz", "body");
-        */
     }
 }

@@ -20,9 +20,9 @@ public class GatewayControllerTest {
         ValidationQuery query = mock(ValidationQuery.class);
         GatewayController controller = new GatewayController(dao, query);
 
-        when(query.validateHand("zzz")).thenReturn(new ValidationQuery.validatorRes("ok", ""));
+        when(query.validateSnapshot("zzz")).thenReturn(new ValidationQuery.validatorRes("ok", ""));
         controller.setSnapshot("zzz", "type1", "body");
-        verify(query).validateHand("zzz");
+        verify(query).validateSnapshot("zzz");
         verify(dao).saveToList("zzz", "body");
     }
 
@@ -32,9 +32,9 @@ public class GatewayControllerTest {
         ValidationQuery query = mock(ValidationQuery.class);
         GatewayController controller = new GatewayController(dao, query);
 
-        when(query.validateHand("zzz")).thenReturn(new ValidationQuery.validatorRes("not ok", ""));
+        when(query.validateSnapshot("zzz")).thenReturn(new ValidationQuery.validatorRes("not ok", ""));
         controller.setSnapshot("zzz", "type1", "body");
-        verify(query).validateHand("zzz");
+        verify(query).validateSnapshot("zzz");
         verify(dao).saveToList("zzz", "body");
     }
 }

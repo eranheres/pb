@@ -36,8 +36,7 @@ public class ValidationQuery {
         }
     }
 
-    public validatorRes validateHand(String handId) throws IOException {
-        String fullUrl = String.format("%s/validate/snapshot/%s",validatorUrl,handId);
+    private validatorRes sendRequest(String fullUrl) throws IOException {
         URL url = new URL(fullUrl);
         URLConnection urlConnection = url.openConnection();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -48,5 +47,13 @@ public class ValidationQuery {
         }
 
         return validatorRes.deserialize(response);
+    }
+
+    public validatorRes validateSnapshot(String handId) throws IOException {
+        return sendRequest(String.format("%s/validate/snapshot/%s",validatorUrl,handId));
+    }
+
+    public validatorRes validateHand(String handId) throws IOException {
+        return sendRequest(String.format("%s/validate/fullhand/%s",validatorUrl,handId));
     }
 }

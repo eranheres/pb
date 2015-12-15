@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 /**
  *
  */
+@SuppressWarnings("Duplicates")
 @Component
 public class ValidatorsManager {
 
