@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -39,7 +39,12 @@ public class ValidationQuery {
     private validatorRes sendRequest(String fullUrl) throws IOException {
         URL url = new URL(fullUrl);
         URLConnection urlConnection = url.openConnection();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        BufferedReader bufferedReader;
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        } catch (FileNotFoundException e) {
+            throw new HandValidationException("Hand not found");
+        }
         String response = "";
         String line;
         while ((line = bufferedReader.readLine()) != null) {

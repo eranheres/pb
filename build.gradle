@@ -43,5 +43,6 @@ project(':monoapp') {
     dependencies {
         compile project(':gateway')
         compile project(':validator')
+        compile project(':persistor')
     }
 }
