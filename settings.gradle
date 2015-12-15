@@ -1,1 +1,1 @@
-include ":common", ":gateway", ":validator", ":monoapp", ":persistor"
+include ":common", ":gateway", ":validator", ":monoapp", ":persistor", ":player"

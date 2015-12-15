@@ -29,5 +29,6 @@ public class PersistorController {
         ValidationQuery.validatorRes res = query.validateHand(id);
         if (!res.getValidation().toUpperCase().equals("OK"))
             throw new HandValidationException(res.getReason());
+        // TODO !!! - Add a computation of hand summary and store to a DB
     }
 }

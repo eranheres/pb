@@ -39,6 +39,12 @@ project(':persistor') {
     }
 }
 
+project(':player') {
+    dependencies {
+        compile project(':common')
+    }
+}
+
 project(':monoapp') {
     dependencies {
         compile project(':gateway')
