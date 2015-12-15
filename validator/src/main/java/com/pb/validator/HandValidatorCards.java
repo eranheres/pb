@@ -18,7 +18,7 @@ public class HandValidatorCards implements HandValidator {
        if (current.size() < previous.size())
            return false;
        for (String idx : previous.keySet()) {
-           List<Card> previousCards = new ArrayList(previous.get(idx));
+           List<Card> previousCards = new ArrayList<>(previous.get(idx));
            List<Card> currentCards  = current.get(idx);
            if (currentCards == null)
                return false;

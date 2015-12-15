@@ -27,8 +27,13 @@ project(':gateway') {
     }
 }
 
-//App Project specific stuff
 project(':validator') {
+    dependencies {
+        compile project(':common')
+    }
+}
+
+project(':persistor') {
     dependencies {
         compile project(':common')
     }

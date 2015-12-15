@@ -1,4 +1,4 @@
-package com.pb.gateway;
+package com.pb.persistor;
 
 import com.pb.api.HandValidationException;
 import com.pb.api.ValidationQuery;
@@ -17,7 +17,7 @@ import java.io.IOException;
 @Service
 @NoArgsConstructor
 @AllArgsConstructor
-public class GatewayController {
+public class PersistorController {
 
     @Autowired
     PBDataSource dataSource;

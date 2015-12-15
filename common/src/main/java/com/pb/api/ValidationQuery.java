@@ -1,4 +1,4 @@
-package com.pb.gateway;
+package com.pb.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;

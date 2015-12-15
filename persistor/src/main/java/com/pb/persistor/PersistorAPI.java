@@ -1,4 +1,4 @@
-package com.pb.gateway;
+package com.pb.persistor;
 
 import com.pb.api.HandValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +13,9 @@ import java.io.IOException;
 /**
  */
 @RestController
-public class GatewayAPI {
+public class PersistorAPI {
     @Autowired
-    GatewayController controller;
+    PersistorController controller;
 
     @RequestMapping(value = "/tablestate/{id}/{datatype}", method = RequestMethod.POST)
     public ResponseEntity<String> index(@PathVariable String id,

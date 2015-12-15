@@ -1,4 +1,4 @@
-package com.pb.gateway;
+package com.pb.api;
 
 import lombok.Getter;
 import lombok.Setter;
