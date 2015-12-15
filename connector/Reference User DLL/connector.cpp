@@ -28,13 +28,16 @@ using namespace std;
 //#define Log printf
 //#define Log WriteLog
 #define Log pblog
-void init_curl();
-void clean_curl();
 
 // Forward declarations
+void init_curl();
+void clean_curl();
 int request(const char *url, char* buffer, unsigned int buffer_size);
 int is_openppl_command(const char* pquery);
 void clear_hand_images();
+int is_heartbeat(const char* pquery);
+int is_new_round(const char* pquery);
+bool is_OH_betround_bug(const char* pquery);
 
 HANDLE symbol_need, symbol_ready, have_result;
 
@@ -53,6 +56,7 @@ struct ext_holdem_state {
     int hand_count;
 	int hand_error;
 	int first_hand;
+	bool passed_preflop;           // true if the hand passed preflop betround 
 	int snapshot_count;
 	std::string hand_uuid;
     int dll_listening_port;
@@ -314,6 +318,16 @@ void send_table_state() {
 	write_error_to_captures(filename, rescode, response, url, data);
 }
 
+bool is_OH_betround_bug(const char* pquery) 
+{
+	// OH has a bug that it changes the betround before handreset is changed , happens on new_round and heartbeat events 
+	if ((CURRENT_EXT_STATE.passed_preflop) && 
+		((is_heartbeat(pquery) || is_new_round(pquery))) &&
+		(CURRENT_EXT_STATE.betround == "preflop"))
+		return true;
+	return false;
+}
+
 int is_showdown() {
 	holdem_state* cstate = &state[STATE_INDEX];
 	// Check first if river
@@ -351,10 +365,12 @@ int is_heartbeat(const char* pquery)
 	return 0;
 }
 
-int do_heartbeat()
+int do_heartbeat(const char* pquery)
 {
 	ext_state.datatype = "heartbeat";
-	send_table_state();
+	if (!is_OH_betround_bug(pquery)) {
+		send_table_state();
+	}
 	return 0;
 }
 
@@ -393,6 +409,7 @@ void init_new_hand()
 	ext_state.hand_count++;
 	ext_state.snapshot_count = 0;
 	ext_state.hand_error = false;
+	ext_state.passed_preflop = false;
 }
 
 int do_hand_reset() 
@@ -417,10 +434,11 @@ int is_new_round(const char* pquery)
 	return 0;
 }
 
-int do_new_round()
+int do_new_round(const char* pquery)
 {
 	ext_state.datatype = "new_round";
-	send_table_state(); // bug in OH, sometime sends new round preflop before handreset
+	if (!is_OH_betround_bug(pquery))
+		send_table_state(); // bug in OH, sometime sends new round preflop before handreset
 	return 0;
 }
 
@@ -476,6 +494,8 @@ void fill_extended_table_state(const char* pquery)
 
     holdem_state* cstate = &state[STATE_INDEX];
 	ext_state.betround = get_current_betround();
+	if (ext_state.betround != "preflop")
+		ext_state.passed_preflop = true;
 	ext_state.snapshot_count++;
 	ext_state.current_query = pquery;
 	for (int i=0; i<10; i++) {
@@ -530,10 +550,10 @@ double process_query(const char* pquery)
         return do_hand_error(pquery);
 
 	if (is_new_round(pquery))
-		return do_new_round();
+		return do_new_round(pquery);
 
 	if (is_heartbeat(pquery)) {
-		do_heartbeat();
+		do_heartbeat(pquery);
 		if (!is_playing())
 			do_not_playing(); 
 		if (is_showdown()) 
