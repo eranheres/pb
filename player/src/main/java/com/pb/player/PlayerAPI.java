@@ -1,4 +1,4 @@
-package com.pb.gateway;
+package com.pb.player;
 
 import com.pb.api.HandValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,21 +13,19 @@ import java.io.IOException;
 /**
  */
 @RestController
-public class GatewayAPI {
+public class PlayerAPI {
     @Autowired
-    GatewayController controller;
+    PlayerController controller;
 
-    @RequestMapping(value = "/tablestate/{id}/{datatype}", method = RequestMethod.POST)
-    public ResponseEntity<String> index(@PathVariable String id,
-                                        @PathVariable String datatype,
-                                        @RequestBody String body) throws IOException {
+    @RequestMapping(value = "/play/{id}/{betround}", method = RequestMethod.GET)
+    public ResponseEntity<String> index(@PathVariable String id, @PathVariable String betround) throws IOException {
         try {
-            controller.setSnapshot(id, datatype, body);
+            controller.play(id, betround);
         } catch (HandValidationException ex) {
             String val = "Snapshot failed validation:" + ex.getReason();
-            return new ResponseEntity<String>(val, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(val, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<String>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @ExceptionHandler({SerializationException.class})

@@ -1,4 +1,4 @@
-package com.pb.gateway;
+package com.pb.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -36,11 +36,15 @@ public class ValidationQuery {
         }
     }
 
-    public validatorRes validateHand(String handId) throws IOException {
-        String fullUrl = String.format("%s/validate/snapshot/%s",validatorUrl,handId);
+    private validatorRes sendRequest(String fullUrl) throws IOException {
         URL url = new URL(fullUrl);
         URLConnection urlConnection = url.openConnection();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        BufferedReader bufferedReader;
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        } catch (FileNotFoundException e) {
+            throw new HandValidationException("Hand not found");
+        }
         String response = "";
         String line;
         while ((line = bufferedReader.readLine()) != null) {
@@ -48,5 +52,13 @@ public class ValidationQuery {
         }
 
         return validatorRes.deserialize(response);
+    }
+
+    public validatorRes validateSnapshot(String handId) throws IOException {
+        return sendRequest(String.format("%s/validate/snapshot/%s",validatorUrl,handId));
+    }
+
+    public validatorRes validateHand(String handId) throws IOException {
+        return sendRequest(String.format("%s/validate/fullhand/%s",validatorUrl,handId));
     }
 }

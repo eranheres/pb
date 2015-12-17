@@ -1,4 +1,4 @@
-package com.pb.gateway;
+package com.pb.persistor;
 
 import com.pb.api.HandValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,21 +13,19 @@ import java.io.IOException;
 /**
  */
 @RestController
-public class GatewayAPI {
+public class PersistorAPI {
     @Autowired
-    GatewayController controller;
+    PersistorController controller;
 
-    @RequestMapping(value = "/tablestate/{id}/{datatype}", method = RequestMethod.POST)
-    public ResponseEntity<String> index(@PathVariable String id,
-                                        @PathVariable String datatype,
-                                        @RequestBody String body) throws IOException {
+    @RequestMapping(value = "/complete/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<String> index(@PathVariable String id) throws IOException {
         try {
-            controller.setSnapshot(id, datatype, body);
+            controller.complete(id);
         } catch (HandValidationException ex) {
             String val = "Snapshot failed validation:" + ex.getReason();
-            return new ResponseEntity<String>(val, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(val, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<String>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @ExceptionHandler({SerializationException.class})

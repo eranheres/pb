@@ -27,8 +27,19 @@ project(':gateway') {
     }
 }
 
-//App Project specific stuff
 project(':validator') {
+    dependencies {
+        compile project(':common')
+    }
+}
+
+project(':persistor') {
+    dependencies {
+        compile project(':common')
+    }
+}
+
+project(':player') {
     dependencies {
         compile project(':common')
     }
@@ -38,5 +49,6 @@ project(':monoapp') {
     dependencies {
         compile project(':gateway')
         compile project(':validator')
+        compile project(':persistor')
     }
 }

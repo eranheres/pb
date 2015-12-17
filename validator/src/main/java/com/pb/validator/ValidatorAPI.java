@@ -13,6 +13,12 @@ public class ValidatorAPI {
     @Autowired
     ValidatorController controller;
 
+    private String responseValue(ValidatorStatus status) {
+        return String.format("{\n\"validation\":\"%s\",\n\"reason\":\"%s\"\n}",
+                status.equals(ValidatorStatus.OK)?"ok":"failed",
+                status.getDescription());
+    }
+
     @RequestMapping(value = "/validate/snapshot/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> snapshot(@PathVariable String id) throws Exception {
         try {
@@ -21,7 +27,7 @@ public class ValidatorAPI {
             if (status.equals(ValidatorStatus.NOT_FOUND))
                 httpStatus = HttpStatus.NOT_FOUND;
 
-            return new ResponseEntity<String>(responseValue(status), httpStatus);
+            return new ResponseEntity<>(responseValue(status), httpStatus);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -29,9 +35,19 @@ public class ValidatorAPI {
         }
     }
 
-    private String responseValue(ValidatorStatus status) {
-        return String.format("{\n\"validation\":\"%s\",\n\"reason\":\"%s\"\n}",
-                status.equals(ValidatorStatus.OK)?"ok":"failed",
-                status.getDescription());
+    @RequestMapping(value = "/validate/fullhand/{id}", method = RequestMethod.GET)
+    public ResponseEntity<String> hand(@PathVariable String id) throws Exception {
+        try {
+            ValidatorStatus status = controller.validatorHand(id);
+            HttpStatus httpStatus = HttpStatus.OK;
+            if (status.equals(ValidatorStatus.NOT_FOUND))
+                httpStatus = HttpStatus.NOT_FOUND;
+
+            return new ResponseEntity<>(responseValue(status), httpStatus);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e);
+        }
     }
 }

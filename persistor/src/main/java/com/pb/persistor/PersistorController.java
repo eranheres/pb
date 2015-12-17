@@ -1,4 +1,4 @@
-package com.pb.gateway;
+package com.pb.persistor;
 
 import com.pb.api.HandValidationException;
 import com.pb.api.ValidationQuery;
@@ -17,7 +17,7 @@ import java.io.IOException;
 @Service
 @NoArgsConstructor
 @AllArgsConstructor
-public class GatewayController {
+public class PersistorController {
 
     @Autowired
     PBDataSource dataSource;
@@ -25,11 +25,10 @@ public class GatewayController {
     @Autowired
     ValidationQuery query;
 
-    public void setSnapshot(String id, String datatype, String body) throws IOException {
-        String decodedBody = java.net.URLDecoder.decode(body, "UTF-8");
-        dataSource.saveToList(id, decodedBody);
-        ValidationQuery.validatorRes res = query.validateSnapshot(id);
+    public void complete(String id) throws IOException {
+        ValidationQuery.validatorRes res = query.validateHand(id);
         if (!res.getValidation().toUpperCase().equals("OK"))
             throw new HandValidationException(res.getReason());
+        // TODO !!! - Add a computation of hand summary and store to a DB
     }
 }
