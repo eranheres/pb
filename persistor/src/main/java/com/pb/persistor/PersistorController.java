@@ -2,6 +2,7 @@ package com.pb.persistor;
 
 import com.pb.api.HandValidationException;
 import com.pb.api.ValidationQuery;
+import com.pb.dao.HandId;
 import com.pb.dao.PBDataSource;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class PersistorController {
     @Autowired
     ValidationQuery query;
 
-    public void complete(String id) throws IOException {
+    public void complete(HandId id) throws IOException {
         ValidationQuery.validatorRes res = query.validateHand(id);
         if (!res.getValidation().toUpperCase().equals("OK"))
             throw new HandValidationException(res.getReason());

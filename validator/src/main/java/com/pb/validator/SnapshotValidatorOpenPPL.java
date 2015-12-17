@@ -10,9 +10,9 @@ public class SnapshotValidatorOpenPPL implements SnapshotValidator {
 
     @Override
     public ValidatorStatus validate(Snapshot snapshot) {
-        for (String key : snapshot.getPpl_symbols().keySet()) {
+        for (String key : snapshot.getSymbols().keySet()) {
             if ((key.toUpperCase().startsWith("ERROR_")) &&
-                (snapshot.getPpl_symbols().get(key) != 0)) {
+                (snapshot.getSymbols().get(key) != 0)) {
                     return OPEN_PPL_ERROR;
             }
         }

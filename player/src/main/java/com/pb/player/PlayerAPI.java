@@ -1,6 +1,7 @@
 package com.pb.player;
 
 import com.pb.api.HandValidationException;
+import com.pb.dao.HandId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class PlayerAPI {
     @RequestMapping(value = "/play/{id}/{betround}", method = RequestMethod.GET)
     public ResponseEntity<String> index(@PathVariable String id, @PathVariable String betround) throws IOException {
         try {
-            controller.play(id, betround);
+            controller.play(HandId.of(id), betround);
         } catch (HandValidationException ex) {
             String val = "Snapshot failed validation:" + ex.getReason();
             return new ResponseEntity<>(val, HttpStatus.BAD_REQUEST);

@@ -2,6 +2,7 @@ package com.pb.persistor;
 
 import com.pb.api.HandValidationException;
 import com.pb.api.ValidationQuery;
+import com.pb.dao.HandId;
 import com.pb.dao.PBDataSource;
 import org.junit.Test;
 
@@ -21,9 +22,9 @@ public class PersistorControllerTest {
         ValidationQuery query = mock(ValidationQuery.class);
         PersistorController controller = new PersistorController(dao, query);
 
-        when(query.validateHand("zzz")).thenReturn(new ValidationQuery.validatorRes("ok", ""));
-        controller.complete("zzz");
-        verify(query).validateHand("zzz");
+        when(query.validateHand(HandId.of("zzz"))).thenReturn(new ValidationQuery.validatorRes("ok", ""));
+        controller.complete(HandId.of("zzz"));
+        verify(query).validateHand(HandId.of("zzz"));
         //verify(dao).saveToList("zzz", "body");
     }
 
@@ -33,9 +34,9 @@ public class PersistorControllerTest {
         ValidationQuery query = mock(ValidationQuery.class);
         PersistorController controller = new PersistorController(dao, query);
 
-        when(query.validateHand("zzz")).thenReturn(new ValidationQuery.validatorRes("not ok", ""));
-        controller.complete("zzz");
-        verify(query).validateHand("zzz");
+        when(query.validateHand(HandId.of("zzz"))).thenReturn(new ValidationQuery.validatorRes("not ok", ""));
+        controller.complete(HandId.of("zzz"));
+        verify(query).validateHand(HandId.of("zzz"));
         verify(dao).saveToList("zzz", "body");
     }
 }

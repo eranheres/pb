@@ -1,6 +1,7 @@
 package com.pb.persistor;
 
 import com.pb.api.HandValidationException;
+import com.pb.dao.HandId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class PersistorAPI {
     @RequestMapping(value = "/complete/{id}", method = RequestMethod.PUT)
     public ResponseEntity<String> index(@PathVariable String id) throws IOException {
         try {
-            controller.complete(id);
+            controller.complete(HandId.of(id));
         } catch (HandValidationException ex) {
             String val = "Snapshot failed validation:" + ex.getReason();
             return new ResponseEntity<>(val, HttpStatus.BAD_REQUEST);

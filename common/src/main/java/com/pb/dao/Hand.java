@@ -8,4 +8,8 @@ import lombok.*;
 @EqualsAndHashCode
 public class Hand {
     @Getter @Setter private Snapshot[] snapshots;
+
+    public Snapshot latestSnapshot() {
+        return snapshots[snapshots.length-1];
+    };
 }

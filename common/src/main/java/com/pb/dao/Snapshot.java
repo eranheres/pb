@@ -63,5 +63,10 @@ public class Snapshot {
     Double[] pots;
     State    state;
     Map<String, Double> symbols;
-    Map<String, Double> ppl_symbols;
+
+    static public Snapshot fromSymbols(Map<String, Double> symbols) {
+        Snapshot snapshot = new Snapshot();
+        snapshot.setSymbols(symbols);
+        return snapshot;
+    }
 }

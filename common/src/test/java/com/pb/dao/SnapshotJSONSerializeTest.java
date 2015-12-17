@@ -28,8 +28,7 @@ public class SnapshotJSONSerializeTest {
 
         assertEquals(10, snapshot.getPots().length);
         assertEquals(5, snapshot.getCards().length);
-        assertEquals(6, snapshot.getSymbols().keySet().size());
-        assertEquals(5, snapshot.getPpl_symbols().keySet().size());
+        assertEquals(11, snapshot.getSymbols().keySet().size());
 
         // Serialize
         byte[] stream = snapshotSerialize.serialize(snapshot);
