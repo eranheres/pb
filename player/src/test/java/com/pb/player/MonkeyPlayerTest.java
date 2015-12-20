@@ -28,7 +28,7 @@ public class MonkeyPlayerTest {
         GameOp expected;
     }
 
-    @DataProvider(name = "Parameters")
+    @DataProvider(name = "Parameters1")
     public Object[][] parameterProvider3() {
         return new Object[][]{
                 { new TestAndExpected(
@@ -46,7 +46,7 @@ public class MonkeyPlayerTest {
         };
     }
 
-    @Test(dataProvider = "Parameters")
+    @Test(dataProvider = "Parameters1")
     public void testPlay(TestAndExpected param) throws Exception {
         Random random = mock(Random.class);
         PlayOptions playOptions = mock(PlayOptions.class);
@@ -56,7 +56,7 @@ public class MonkeyPlayerTest {
         when(playOptions.minRaiseVal(hand)).thenReturn(param.minRaise);
         when(playOptions.maxRaiseVal(hand)).thenReturn(param.maxRaise);
         when(random.nextInt(param.opList.size())).thenReturn(param.opIndex);
-        when(random.nextInt(0)).thenThrow(new IllegalArgumentException()); // verify that there is no invalid random call
+        when(random.nextInt(0)).thenThrow(new IllegalArgumentException()); // verify that there is no invalid randomizer call
         if (param.maxRaise - param.minRaise != 0) {
             when(random.nextInt(param.maxRaise - param.minRaise)).thenReturn(param.expected.getRaiseAmount());
         }

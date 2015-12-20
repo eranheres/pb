@@ -4,7 +4,7 @@ import com.pb.api.HandValidationException;
 import com.pb.api.ValidationQuery;
 import com.pb.dao.HandId;
 import com.pb.dao.PBDataSource;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -28,7 +28,7 @@ public class PersistorControllerTest {
         //verify(dao).saveToList("zzz", "body");
     }
 
-    @Test(expected = HandValidationException.class)
+    @Test(expectedExceptions = HandValidationException.class)
     public void testSetSnapshotExeption() throws Exception {
         PBDataSource dao = mock(PBDataSource.class);
         ValidationQuery query = mock(ValidationQuery.class);

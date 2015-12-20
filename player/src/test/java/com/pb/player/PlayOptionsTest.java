@@ -6,11 +6,10 @@ import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.testng.AssertJUnit.assertEquals;
 
 public class PlayOptionsTest {
 

@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pb.dao.Snapshot;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.net.URL;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 public class SnapshotValidatorOpenPPLTest {
 
@@ -19,7 +20,7 @@ public class SnapshotValidatorOpenPPLTest {
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         URL url = Thread.currentThread().getContextClassLoader().getResource("SnapshotValidatorOpenPPL_Valid.json");
-        assertNotNull(url);
+        Assert.assertNotNull(url);
         Snapshot[] lu = mapper.readValue(new File(url.getPath()), Snapshot[].class);
 
         SnapshotValidator validator = new SnapshotValidatorOpenPPL();
@@ -29,7 +30,7 @@ public class SnapshotValidatorOpenPPLTest {
 
         // Test invalid values
         url = Thread.currentThread().getContextClassLoader().getResource("SnapshotValidatorOpenPPL_Invalid.json");
-        assertNotNull(url);
+        Assert.assertNotNull(url);
         lu = mapper.readValue(new File(url.getPath()), Snapshot[].class);
 
         assertEquals(SnapshotValidatorOpenPPL.OPEN_PPL_ERROR,      validator.validate(lu[0]));

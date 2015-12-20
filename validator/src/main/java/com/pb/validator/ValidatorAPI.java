@@ -1,5 +1,7 @@
 package com.pb.validator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class ValidatorAPI {
     @Autowired
     ValidatorController controller;
+    Logger logger = LoggerFactory.getLogger(ValidatorAPI.class.getName());
 
     private String responseValue(ValidatorStatus status) {
         return String.format("{\n\"validation\":\"%s\",\n\"reason\":\"%s\"\n}",
@@ -21,6 +24,8 @@ public class ValidatorAPI {
 
     @RequestMapping(value = "/validate/snapshot/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> snapshot(@PathVariable String id) throws Exception {
+        logger.info("snapshot validation for ",id);
+
         try {
             ValidatorStatus status = controller.validateSnapshot(id);
             HttpStatus httpStatus = HttpStatus.OK;

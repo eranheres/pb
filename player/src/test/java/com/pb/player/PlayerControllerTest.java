@@ -3,14 +3,14 @@ package com.pb.player;
 import com.pb.api.HandValidationException;
 import com.pb.api.ValidationQuery;
 import com.pb.dao.*;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 public class PlayerControllerTest {
 
@@ -41,7 +41,7 @@ public class PlayerControllerTest {
         verify(query).validateOngoingHand(HandId.of("yyy"));
     }
 
-    @Test(expected = HandValidationException.class)
+    @Test(expectedExceptions = HandValidationException.class)
     public void testException() throws Exception {
         HandDao dao = mock(HandDao.class);
         ValidationQuery query = mock(ValidationQuery.class);
@@ -51,7 +51,7 @@ public class PlayerControllerTest {
         controller.play(HandId.of("yyy"), "river");
     }
 
-    @Test(expected = IOException.class)
+    @Test(expectedExceptions = IOException.class)
     public void testException2() throws Exception {
         HandDao dao = mock(HandDao.class);
         ValidationQuery query = mock(ValidationQuery.class);

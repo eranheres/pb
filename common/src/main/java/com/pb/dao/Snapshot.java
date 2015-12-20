@@ -21,6 +21,11 @@ public class Snapshot {
         public final static String MYTURN    = "my_turn";
         public final static String SHOWDOWN  = "showdown";
         public final static String NEWROUND  = "new_round";
+
+        public final static String SYMBOL_AMOUNT_TO_CALL    = "DollarsToCall";
+        public final static String SYMBOL_BALANCE           = "balance";
+        public final static String SYMBOL_CHIP_LEADER_STACK = "MaxOpponentStackSizeCalculation";
+        public final static String SYMBOL_BIG_BLIND         = "bblind";
     }
 
     @NoArgsConstructor
