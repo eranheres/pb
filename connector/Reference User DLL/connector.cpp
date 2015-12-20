@@ -248,11 +248,10 @@ json_t* holdem_state_to_json(holdem_state* state) {
 	    json_object_set_new(symbols, sym, json_real(val));
 	}
 
-	json_t *ppl_symbols = json_object();
 	idx = 0;
 	while (*(sym = all_ppl_symbol_names[idx++]) != '\0') {
 		double val = GetSymbol(sym);
-		json_object_set_new(ppl_symbols, sym, json_real(val));
+		json_object_set_new(symbols, sym, json_real(val));
 	}
 	
 	// build the main object
@@ -262,7 +261,6 @@ json_t* holdem_state_to_json(holdem_state* state) {
 	json_object_set_new(main, "pots", pots);
     json_object_set_new(main, "players", players);
 	json_object_set_new(main, "symbols", symbols);
-	json_object_set_new(main, "ppl_symbols", ppl_symbols);
 
     return main;
 }
