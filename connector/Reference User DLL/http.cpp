@@ -73,7 +73,7 @@ void clean_curl()
 }
 
 // Post a request to a server. HTTP response code is returned as a value
-int post(const char *url, const char* data, char* res_data, unsigned int res_data_size)
+int http_post(const char *url, const char* data, char* res_data, unsigned int res_data_size)
 {
     CURLcode status;
     struct curl_slist *headers = NULL;
@@ -93,6 +93,45 @@ int post(const char *url, const char* data, char* res_data, unsigned int res_dat
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(data));
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+
+    status = curl_easy_perform(curl);
+    res_data[write_res.pos] = '\0';
+    if(status != 0)
+    {
+        fprintf(stderr, "error: unable to request data from %s:\n", url);
+        fprintf(stderr, "%s\n", curl_easy_strerror(status));
+        return -1;
+    }
+
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+    if(code != 200)
+    {
+        fprintf(stderr, "error: server responded with code %ld\n", code);
+        return code;
+    }
+
+    return code;
+}
+
+// Get request to a server. HTTP response code is returned as a value
+int http_get(const char *url, char* res_data, unsigned int res_data_size)
+{
+    CURLcode status;
+    struct curl_slist *headers = NULL;
+    long code;
+    
+    if(!curl)
+        return -1;
+
+    struct write_result write_res;
+	write_res.data = res_data;
+	write_res.pos = 0;
+	write_res.buffer_size = res_data_size;
+
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_response);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &write_res); 
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
     status = curl_easy_perform(curl);
     res_data[write_res.pos] = '\0';
