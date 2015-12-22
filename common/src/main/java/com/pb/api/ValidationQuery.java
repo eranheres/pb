@@ -1,6 +1,7 @@
 package com.pb.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pb.dao.HandId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,11 +55,11 @@ public class ValidationQuery {
         return validatorRes.deserialize(response);
     }
 
-    public validatorRes validateSnapshot(String handId) throws IOException {
+    public validatorRes validateOngoingHand(HandId handId) throws IOException {
         return sendRequest(String.format("%s/validate/snapshot/%s",validatorUrl,handId));
     }
 
-    public validatorRes validateHand(String handId) throws IOException {
+    public validatorRes validateHand(HandId handId) throws IOException {
         return sendRequest(String.format("%s/validate/fullhand/%s",validatorUrl,handId));
     }
 }

@@ -3,12 +3,11 @@ package com.pb.validator;
 import com.pb.dao.Hand;
 import com.pb.dao.HandDao;
 import com.pb.dao.HandId;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertEquals;
 
 public class ValidatorControllerTest {
 

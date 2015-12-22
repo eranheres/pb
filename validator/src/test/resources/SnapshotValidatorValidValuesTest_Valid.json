@@ -1,28 +1,96 @@
 [
-    // Acceptable values
-    { "state" : { "datatype" : "heartbeat" }},
-    { "state" : { "datatype" : "handreset" }},
-    { "state" : { "datatype" : "showdown"}},
-    { "state" : { "datatype" : "new_round"}},
-    { "state" :
-      {
-          "datatype" : "my_turn",
-          "betround" : "preflop"
-      }},
-      { "state" :
-      {
-          "datatype" : "my_turn",
-          "betround" : "flop"
-      }},
-      { "state" :
-      {
-          "datatype" : "my_turn",
-          "betround" : "river"
-      }},
-      { "state" :
-      {
-          "datatype" : "my_turn",
-          "betround" : "turn"
-      }}
+  // Acceptable values
+  {
+    "state": {
+      "datatype": "heartbeat"
+    },
+    "symbols": {
+       "DollarsToCall" : 0.0,
+       "balance" : 0.0,
+       "MaxOpponentStackSizeCalculation": 0.0,
+       "bblind": 0.0
+    }
+  },
+  {
+    "state": {
+      "datatype": "handreset"
+    },
+    "symbols": {
+       "DollarsToCall" : 0.0,
+       "balance" : 0.0,
+       "MaxOpponentStackSizeCalculation": 0.0,
+       "bblind": 0.0
+    }
+  },
+  {
+    "state": {
+      "datatype": "showdown"
+    },
+    "symbols": {
+       "DollarsToCall" : 0.0,
+       "balance" : 0.0,
+       "MaxOpponentStackSizeCalculation": 0.0,
+       "bblind": 0.0
+    }
+  },
+  {
+    "state": {
+      "datatype": "new_round"
+    },
+    "symbols": {
+       "DollarsToCall" : 0.0,
+       "balance" : 0.0,
+       "MaxOpponentStackSizeCalculation": 0.0,
+       "bblind": 0.0
+    }
+  },
+  {
+    "state": {
+      "datatype": "my_turn",
+      "betround": "preflop"
+    },
+    "symbols": {
+       "DollarsToCall" : 0.0,
+       "balance" : 0.0,
+       "MaxOpponentStackSizeCalculation": 0.0,
+       "bblind": 0.0
+    }
+  },
+  {
+    "state": {
+      "datatype": "my_turn",
+      "betround": "flop"
+    },
+    "symbols": {
+       "DollarsToCall" : 0.0,
+       "balance" : 0.0,
+       "MaxOpponentStackSizeCalculation": 0.0,
+       "bblind": 0.0
+    }
+  },
+  {
+    "state": {
+      "datatype": "my_turn",
+      "betround": "river"
+    },
+    "symbols": {
+       "DollarsToCall" : 0.0,
+       "balance" : 0.0,
+       "MaxOpponentStackSizeCalculation": 0.0,
+       "bblind": 0.0
+    }
+  },
+  {
+    "state": {
+      "datatype": "my_turn",
+      "betround": "turn"
+    },
+    "symbols": {
+       "DollarsToCall" : 0.0,
+       "balance" : 0.0,
+       "MaxOpponentStackSizeCalculation": 0.0,
+       "bblind": 0.0
+    }
+  }
 ]
 

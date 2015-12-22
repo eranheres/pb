@@ -21,6 +21,11 @@ public class Snapshot {
         public final static String MYTURN    = "my_turn";
         public final static String SHOWDOWN  = "showdown";
         public final static String NEWROUND  = "new_round";
+
+        public final static String SYMBOL_AMOUNT_TO_CALL    = "DollarsToCall";
+        public final static String SYMBOL_BALANCE           = "balance";
+        public final static String SYMBOL_CHIP_LEADER_STACK = "MaxOpponentStackSizeCalculation";
+        public final static String SYMBOL_BIG_BLIND         = "bblind";
     }
 
     @NoArgsConstructor
@@ -63,5 +68,10 @@ public class Snapshot {
     Double[] pots;
     State    state;
     Map<String, Double> symbols;
-    Map<String, Double> ppl_symbols;
+
+    static public Snapshot fromSymbols(Map<String, Double> symbols) {
+        Snapshot snapshot = new Snapshot();
+        snapshot.setSymbols(symbols);
+        return snapshot;
+    }
 }

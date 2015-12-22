@@ -21,3 +21,4 @@ common/gradle
 monoapp/build
 .DS_Store
 persistor/build
+player/build

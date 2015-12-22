@@ -1,13 +1,12 @@
 package com.pb.dao;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 /**
  *
@@ -28,8 +27,7 @@ public class SnapshotJSONSerializeTest {
 
         assertEquals(10, snapshot.getPots().length);
         assertEquals(5, snapshot.getCards().length);
-        assertEquals(6, snapshot.getSymbols().keySet().size());
-        assertEquals(5, snapshot.getPpl_symbols().keySet().size());
+        assertEquals(11, snapshot.getSymbols().keySet().size());
 
         // Serialize
         byte[] stream = snapshotSerialize.serialize(snapshot);

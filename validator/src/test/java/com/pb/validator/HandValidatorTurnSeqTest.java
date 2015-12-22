@@ -3,12 +3,15 @@ package com.pb.validator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pb.dao.Hand;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.net.URL;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 
 public class HandValidatorTurnSeqTest {
 
@@ -21,7 +24,7 @@ public class HandValidatorTurnSeqTest {
         // Test invalid values
         URL url = Thread.currentThread().getContextClassLoader().
                   getResource("HandValidatorTurnSequenceTest_Invalid.json");
-        assertNotNull(url);
+        Assert.assertNotNull(url);
         Hand[] hands = mapper.readValue(new File(url.getPath()), Hand[].class);
         HandValidator validator = new HandValidatorTurnSeq();
 
@@ -41,7 +44,7 @@ public class HandValidatorTurnSeqTest {
         // Test invalid values
         URL url = Thread.currentThread().getContextClassLoader().
                 getResource("HandValidatorTurnSequenceTest_Valid.json");
-        assertNotNull(url);
+        Assert.assertNotNull(url);
         Hand[] hands = mapper.readValue(new File(url.getPath()), Hand[].class);
         HandValidator validator = new HandValidatorTurnSeq();
 

@@ -1,9 +1,9 @@
 package com.pb.dao;
 
 import com.google.common.collect.ImmutableMap;
-import org.junit.Assert;
-import org.junit.Test;
 import org.mockito.Mockito;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.Map;

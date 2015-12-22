@@ -41,6 +41,9 @@ dependencyManagement {
 	}
 }
 
+test {
+    useTestNG()
+}
 
 eclipse {
     classpath {
