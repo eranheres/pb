@@ -2,7 +2,7 @@
 
 // OpenScrape 7.7.5
 
-// 2015-12-22 18:56:51
+// 2015-12-22 19:55:17
 // 32 bits per pixel
 
 //
@@ -131,7 +131,7 @@ r$p3dealer           645 351 645 352 ff000000    4 C
 r$p3name             585 423 645 435 ffffffff    1 T0
 r$p3seated           613 427 617 444 ff020155  -10 C
 r$p4active           499 426 503 443   1a16ad  -10 C
-r$p4balance          470 436 530 447 ff00ffff    0 T0
+r$p4balance          470 436 530 447 ffffffff    0 T0
 r$p4bet              468 306 525 317 ffffffff    1 T1
 r$p4cardback         464 450 465 450    10153    5 C
 r$p4cardface0        -193 596 -193 596        0    0 N
