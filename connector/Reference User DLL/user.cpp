@@ -55,14 +55,14 @@ double loopback_debug(const char* pquery) {
 //   Handling the lookup of dll$symbols
 DLL_IMPLEMENTS double __stdcall ProcessQuery(const char* pquery) {
 	if (!is_connector_enabled()) {
-        std::cout << "connector not enabled" << std::endl;
+    std::cout << "connector not enabled" << std::endl;
 		return 0;
 	}
 	if (pquery==NULL)
 		return 0;
 	if (strncmp(pquery,"dll$test",8)==0) {
 		return GetSymbol("random");
-    }
+  }
 	if (GetSymbol("f$loopback_debug") == 1) {
 		return loopback_debug(pquery);
 	}

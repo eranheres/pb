@@ -8,14 +8,16 @@
 #include "stdio.h"
 
 #include <windows.h>
+#include <algorithm>
+#include <iterator>
 #include <process.h>
 #include <vector>
+#include <set>
 #include <fstream>
 #include <bitset>
 #include <ostream>
 #include "jansson.h"
 #include "http.h"
-#include "AllSymbols.h"
 #include "AllPPLSymbols.h"
 #include "boost/uuid/uuid.hpp"
 #include "boost/uuid/random_generator.hpp"
@@ -23,6 +25,7 @@
 #include "boost/filesystem.hpp"
 #include "boost/iostreams/device/file.hpp"
 #include "boost/iostreams/stream.hpp"
+#include "boost/algorithm/string.hpp"
 
 using namespace std;
 //#define Log printf
@@ -40,6 +43,8 @@ int is_new_round(const char* pquery);
 bool is_OH_betround_bug(const char* pquery);
 
 HANDLE symbol_need, symbol_ready, have_result;
+
+std::set<std::string> all_symbol_names;
 
 bool connector_enabled = false;
 struct ext_holdem_player {
@@ -97,6 +102,23 @@ void pblog(const char* fmt,...) {
 	printf(buffer);
 }
 
+void init_all_symbols_names() {
+	char *excluded[] = {
+			"f$debug", 
+			"dll",
+			"f"
+			""
+	};
+  const char* all_symbols_string = GetAllSymbols();
+	all_symbol_names.clear();
+	std::set<std::string> all_symbols;
+	boost::split(all_symbols, all_symbols_string, boost::is_any_of(" "));
+  std::set<std::string> excluded_set(excluded, excluded + (sizeof(excluded) / sizeof(excluded[0])));
+	std::set_difference(all_symbols.begin(), all_symbols.end(), excluded_set.begin(), excluded_set.end(), 
+			            std::inserter(all_symbol_names, all_symbol_names.begin()));
+	all_symbol_names.erase("");
+}
+
 string num_to_card(unsigned char num) 
 {
     if (!CARD_VALID(num)) return "--";
@@ -144,33 +166,32 @@ string holdem_player_to_string(int num)
 
 string holdem_state_to_string()
 {
-    ostringstream os;
-    os << ext_state.hand_uuid 
-		<< "|betround:" << EXT_STATE.betround
-		<< "|board:";
-    for (int i=0; i<5; i++) {
-        os << num_to_card(CURRENT_STATE.m_cards[i]);
-        if (i!=4) os << ",";
-    }
-    os << "|pot:";
-    for (int i=0; i<10; i++) {
-        os << (int)state->m_pot[i];
-        if (i!=9) os << ",";
-    }
-    os << (state->m_is_playing?"|play":"|not play")
-       << (state->m_is_posting?"|post":"|not post") 
+  ostringstream os;
+  os << ext_state.hand_uuid 
+     << "|betround:" << EXT_STATE.betround
+     << "|board:";
+  for (int i=0; i<5; i++) {
+    os << num_to_card(CURRENT_STATE.m_cards[i]);
+    if (i!=4) os << ",";
+  }
+  os << "|pot:";
+  for (int i=0; i<10; i++) {
+    os << (int)state->m_pot[i];
+    if (i!=9) os << ",";
+  }
+  os << (state->m_is_playing?"|play":"|not play")
+     << (state->m_is_posting?"|post":"|not post") 
 	   << "|sttidx:" << std::to_string((long double)STATE_INDEX)
-       << "|deal:" << (int)CURRENT_STATE.m_dealer_chair;
+     << "|deal:" << (int)CURRENT_STATE.m_dealer_chair;
 	os << "|query:" << EXT_STATE.current_query;
-    os << "\n";
-    for (int i=0; i<10; i++) {
-        if (state->m_player[i].m_name_known == 0)
-            continue;
-        os << "    " << holdem_player_to_string(i) << "\n";
-    }
+  os << "\n";
+  for (int i=0; i<10; i++) {
+    if (state->m_player[i].m_name_known == 0)
+      continue;
+    os << "    " << holdem_player_to_string(i) << "\n";
+  }
 
-
-    return os.str();
+  return os.str();
 }
 
 json_t* json_holdem_player(holdem_player* player, ext_holdem_player* ext_player) {
@@ -181,7 +202,7 @@ json_t* json_holdem_player(holdem_player* player, ext_holdem_player* ext_player)
 	
     // build main json
 	json_t *main = json_object();
-    json_object_set_new(main, "name", json_string(player->m_name));
+  json_object_set_new(main, "name", json_string(player->m_name));
 	json_object_set_new(main, "balance", json_real(player->m_balance));
 	json_object_set_new(main, "currentbet", json_real(player->m_currentbet));
 	json_object_set_new(main, "cards", cards);
@@ -242,22 +263,21 @@ json_t* holdem_state_to_json(holdem_state* state) {
 		json_array_append_new(players, json_holdem_player(&state->m_player[i], &ext_state.player[i]));
 
 	// add symbols
-    json_t *symbols = json_object();
-	const char* sym = 0;
+  json_t *symbols = json_object();
 	int idx = 0;
-	while (*(sym = all_symbol_names[idx++]) != '\0') {
-		// excluded symbols (TODOs)
-		if (sym == "icm_allilose1") // crashes
-			continue;
-	    double val = GetSymbol(sym);
-	    json_object_set_new(symbols, sym, json_real(val));
+	std::set<std::string>::iterator it;
+  for (it = all_symbol_names.begin(); it != all_symbol_names.end(); ++it) {
+    std::string sym = *it; 
+	  double val = GetSymbol(sym.c_str());
+	  json_object_set_new(symbols, sym.c_str(), json_real(val));
 	}
 
 	idx = 0;
-    double init = GetSymbol("TimeToInitMemorySymbols");
+  double init = GetSymbol("TimeToInitMemorySymbols");
 	if (init != 0)
 		Log("Time to init memory symbols");
 	GetSymbol("InitMemorySymbols"); // Initialize OpenPPL memory symbols
+	const char* sym = 0;
 	while (*(sym = all_ppl_symbol_names[idx++]) != '\0') {
 		// exluded symbols (TODOs)
 		if (string(sym) == "HaveBackdoorStraightDraw") // crashes
@@ -268,14 +288,14 @@ json_t* holdem_state_to_json(holdem_state* state) {
 	}
 	
 	// build the main object
-    json_t *main = json_object();
+  json_t *main = json_object();
 	json_object_set_new(main, "state", jstate);
 	json_object_set_new(main, "cards", cards);
 	json_object_set_new(main, "pots", pots);
-    json_object_set_new(main, "players", players);
+  json_object_set_new(main, "players", players);
 	json_object_set_new(main, "symbols", symbols);
 
-    return main;
+  return main;
 }
 
 string holdem_state_to_json_string(holdem_state* state)
@@ -709,7 +729,8 @@ void init_connector()
 		return;
 
 	clear_on_restart();
-    init_new_hand();
+  init_new_hand();
+	init_all_symbols_names();
 	connector_enabled = true;
 }
 
