@@ -73,6 +73,7 @@ EXE_IMPLEMENTS void*  __stdcall GetPhl1k();
 EXE_IMPLEMENTS void*  __stdcall GetPrw1326();
 EXE_IMPLEMENTS void   __stdcall WriteLog(char* format, ...);
 EXE_IMPLEMENTS char*  __stdcall GetHandnumber();
+EXE_IMPLEMENTS const char* __stdcall GetAllSymbols();
 
 // Variables exported by OpenHoldem
 // avoiding the message-mess of WinHoldem,

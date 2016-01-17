@@ -1,0 +1,5 @@
+{
+    "server_url": "http://10.0.1.10:8080",
+	"offline": "yes",
+    "clear_on_restart" : "yes"
+}

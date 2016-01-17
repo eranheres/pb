@@ -220,22 +220,30 @@ dll$debug
 // OpenPPL lifecycle methods
 ////////////////////////////////////
 ##f$preflop##
-WHEN (dll$preflop_raise = 1) RaiseTo dll$preflop_raise_to FORCE
-WHEN (dll$preflop_call = 1) Call FORCE
-WHEN (dll$preflop_fold = 1) Fold FORCE
+WHEN (dll$player_allin = 1) Allin FORCE
+WHEN (dll$player_raise = 1) RaiseTo dll$player_raise_to FORCE
+WHEN (dll$player_call = 1) Call FORCE
+WHEN (dll$player_check = 1) Check FORCE
+WHEN (dll$player_fold = 1) Fold FORCE
 ​
 ##f$flop##
-WHEN (dll$flop_raise = 1) RaiseTo dll$flop_raise_to FORCE
-WHEN (dll$flop_call = 1) Call FORCE
-WHEN (dll$flop_fold = 1) Fold FORCE
+WHEN (dll$player_allin = 1) Allin FORCE
+WHEN (dll$player_raise = 1) RaiseTo dll$player_raise_to FORCE
+WHEN (dll$player_call = 1) Call FORCE
+WHEN (dll$player_check = 1) Check FORCE
+WHEN (dll$player_fold = 1) Fold FORCE
 ​
 ##f$turn##
-WHEN (dll$turn_raise = 1) RaiseTo dll$turn_raise_to FORCE
-WHEN (dll$turn_call = 1) Call FORCE
-WHEN (dll$turn_fold = 1) Fold FORCE
+WHEN (dll$player_allin = 1) Allin FORCE
+WHEN (dll$player_raise = 1) RaiseTo dll$player_raise_to FORCE
+WHEN (dll$player_call = 1) Call FORCE
+WHEN (dll$player_check = 1) Check FORCE
+WHEN (dll$player_fold = 1) Fold FORCE
 ​
 ##f$river##
-WHEN (dll$river_raise = 1) RaiseTo dll$river_raise_to FORCE
-WHEN (dll$river_call = 1) Call FORCE
-WHEN (dll$river_fold = 1) Fold FORCE
+WHEN (dll$player_allin = 1) Allin FORCE
+WHEN (dll$player_raise = 1) RaiseTo dll$player_raise_to FORCE
+WHEN (dll$player_call = 1) Call FORCE
+WHEN (dll$player_check = 1) Check FORCE
+WHEN (dll$player_fold = 1) Fold FORCE
 

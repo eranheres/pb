@@ -97,7 +97,9 @@
       <OutputFile>.\Debug/whuser.bsc</OutputFile>
     </Bscmake>
     <PreBuildEvent>
-      <Command>python generate_ppl_symbols.py $(OutDir)OpenPPL_Library.ohf AllPPLSymbols.h.template $(OutDir)AllPPLSymbols.h</Command>
+      <Command>python generate_ppl_symbols.py $(SolutionDir)OpenPPL\OpenPPL_Library\OpenPPL_Library.ohf AllPPLSymbols.h.template $(OutDir)AllPPLSymbols.h;
+copy $(SolutionDir)OpenPPL\OpenPPL_Library\OpenPPL_Library.ohf $(OutDir);
+xcopy "$(ProjectDir)..\oh_config\*.*" $(OutDir) /EY</Command>
     </PreBuildEvent>
     <PreLinkEvent>
       <Command>copy "$(ProjectDir)thirdParty\lib\*.*" "$(OutDir)"</Command>
