@@ -51,11 +51,8 @@ public class PlayOptions {
         if (!getValidOps(hand).contains(GameOp.OP_RAISE))
             throw new IllegalStateException("Can't evaluate raise value when raise is not an option");
         Map<String, Double> symbols = hand.latestSnapshot().getSymbols();
-        Integer chipLeaderStack = symbols.get(Snapshot.VALUES.SYMBOL_CHIP_LEADER_STACK).intValue();
         Integer balance = symbols.get(Snapshot.VALUES.SYMBOL_BALANCE).intValue();
         Integer bigBlind = symbols.get(Snapshot.VALUES.SYMBOL_BIG_BLIND).intValue();
-        if (chipLeaderStack < balance)
-            return chipLeaderStack;
         return balance-bigBlind;
     }
 }

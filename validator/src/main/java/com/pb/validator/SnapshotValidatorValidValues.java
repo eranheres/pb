@@ -37,7 +37,7 @@ public class SnapshotValidatorValidValues implements SnapshotValidator {
             Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL,
             Snapshot.VALUES.SYMBOL_BALANCE,
             Snapshot.VALUES.SYMBOL_BIG_BLIND,
-            Snapshot.VALUES.SYMBOL_CHIP_LEADER_STACK
+            Snapshot.VALUES.SYMBOL_OPPONENTS_WITH_HIGHER_STACK
     );
 
     @Override

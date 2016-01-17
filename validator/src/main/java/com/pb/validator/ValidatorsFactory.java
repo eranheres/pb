@@ -35,7 +35,8 @@ public class ValidatorsFactory {
     public SnapshotValidator[] getSnapshotValidators() {
         return new SnapshotValidator[] {
                 snapshotValidatorValidValues,
-                snapshotValidatorValidCards
+                snapshotValidatorValidCards,
+                snapshotValidatorOpenPPL
         };
     }
 

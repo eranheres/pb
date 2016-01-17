@@ -24,7 +24,7 @@ public class Snapshot {
 
         public final static String SYMBOL_AMOUNT_TO_CALL    = "DollarsToCall";
         public final static String SYMBOL_BALANCE           = "balance";
-        public final static String SYMBOL_CHIP_LEADER_STACK = "MaxOpponentStackSizeCalculation";
+        public final static String SYMBOL_OPPONENTS_WITH_HIGHER_STACK = "OpponentsWithHigherStack";
         public final static String SYMBOL_BIG_BLIND         = "bblind";
     }
 

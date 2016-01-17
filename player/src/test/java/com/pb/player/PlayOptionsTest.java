@@ -73,13 +73,22 @@ public class PlayOptionsTest {
     public Object[][] parameterProvider2() {
         return new Object[][]{
                 { new TestAndExpectedRaise(
-                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 0.0, "bblind", 2.0, "balance", 100.0, "MaxOpponentStackSizeCalculation", 400.0)),
+                        Snapshot.fromSymbols(ImmutableMap.of(
+                                Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL, 0.0,
+                                "bblind", 2.0,
+                                "balance", 100.0)),
                         98) },
                 { new TestAndExpectedRaise(
-                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "bblind", 2.0, "balance", 100.0, "MaxOpponentStackSizeCalculation", 200.0)),
+                        Snapshot.fromSymbols(ImmutableMap.of(
+                                Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL, 50.0,
+                                "bblind", 2.0,
+                                "balance", 100.0)),
                         98) },
                 { new TestAndExpectedRaise(
-                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "bblind", 2.0, "balance", 100.0, "MaxOpponentStackSizeCalculation", 200.0)),
+                        Snapshot.fromSymbols(ImmutableMap.of(
+                                "DollarsToCall", 50.0,
+                                "bblind", 2.0,
+                                "balance", 100.0)),
                         98) },
         };
     }

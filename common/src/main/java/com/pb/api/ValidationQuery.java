@@ -56,10 +56,10 @@ public class ValidationQuery {
     }
 
     public validatorRes validateOngoingHand(HandId handId) throws IOException {
-        return sendRequest(String.format("%s/validate/snapshot/%s",validatorUrl,handId));
+        return sendRequest(String.format("%s/validate/snapshot/%s",validatorUrl,handId.toString()));
     }
 
     public validatorRes validateHand(HandId handId) throws IOException {
-        return sendRequest(String.format("%s/validate/fullhand/%s",validatorUrl,handId));
+        return sendRequest(String.format("%s/validate/fullhand/%s",validatorUrl,handId.toString()));
     }
 }
