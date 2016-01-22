@@ -26,8 +26,9 @@ public class MonkeyPlayer {
     public GameOp play(Hand hand) {
         List<GameOp> ops = playOptions.getValidOps(hand);
         GameOp selected = randomGameOp(ops);
-        if (selected.equals(GameOp.OP_RAISE)) {
-            selected.setRaiseAmount(randomizer.nextInt(playOptions.maxRaiseVal(hand) - playOptions.minRaiseVal(hand)));
+        if (selected.getOp().equals(GameOp.OP_RAISE().getOp())) {
+            Integer amount = randomizer.nextInt(playOptions.maxRaiseVal(hand) - playOptions.minRaiseVal(hand));
+            selected.setAmount((double)amount);
         }
         return selected;
     }

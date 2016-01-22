@@ -55,7 +55,9 @@ public class SnapshotValidatorValidValuesTest {
     private final static Map<String, Double> mandatorySymbols = ImmutableMap.of(
             Snapshot.SYMBOLS.AMOUNT_TO_CALL,      0.0,
             Snapshot.SYMBOLS.BALANCE,             0.0,
-            Snapshot.SYMBOLS.BIG_BLIND,           0.0
+            Snapshot.SYMBOLS.BIG_BLIND,           0.0,
+            Snapshot.SYMBOLS.OPPONENTS_WITH_HIGHER_STACK, 0.0,
+            Snapshot.SYMBOLS.PREVACTION, 0.0
     );
 
     @DataProvider(name = "Parameters")

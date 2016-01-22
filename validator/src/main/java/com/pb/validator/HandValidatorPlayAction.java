@@ -80,15 +80,15 @@ public class HandValidatorPlayAction implements HandValidator {
         double prevAction = current.getSymbols().get(Snapshot.SYMBOLS.PREVACTION);
         if (prevAction == Snapshot.VALUES.PREVACTION_PREFOLD)
             return RECORDED_PLAY_WASNT_PLAYED.args("expected", op);
-        if ((prevAction == Snapshot.VALUES.PREVACTION_ALLIN) && (!op.equals(GameOp.OP_ALLIN)))
+        if ((prevAction == Snapshot.VALUES.PREVACTION_ALLIN) && (!op.getOp().equals(GameOp.OP_ALLIN().getOp())))
             return WRONG_ACTION_TAKEN.args("expected", "Allin", "actual", op);
-        if ((prevAction == Snapshot.VALUES.PREVACTION_CALL) && (!op.equals(GameOp.OP_CALL)))
+        if ((prevAction == Snapshot.VALUES.PREVACTION_CALL) && (!op.getOp().equals(GameOp.OP_CALL().getOp())))
             return WRONG_ACTION_TAKEN.args("expected", "Call", "actual", op);
-        if ((prevAction == Snapshot.VALUES.PREVACTION_CHECK) && (!op.equals(GameOp.OP_CHECK)))
+        if ((prevAction == Snapshot.VALUES.PREVACTION_CHECK) && (!op.getOp().equals(GameOp.OP_CHECK().getOp())))
             return WRONG_ACTION_TAKEN.args("expected", "Check", "actual", op);
-        if ((prevAction == Snapshot.VALUES.PREVACTION_FOLD) && (!op.equals(GameOp.OP_FOLD)))
+        if ((prevAction == Snapshot.VALUES.PREVACTION_FOLD) && (!op.getOp().equals(GameOp.OP_FOLD().getOp())))
             return WRONG_ACTION_TAKEN.args("expected", "Fold", "actual", op);
-        if ((prevAction == Snapshot.VALUES.PREVACTION_RAISE) && (!op.equals(GameOp.OP_RAISE)))
+        if ((prevAction == Snapshot.VALUES.PREVACTION_RAISE) && (!op.getOp().equals(GameOp.OP_RAISE().getOp())))
             return WRONG_ACTION_TAKEN.args("expected", "Raise", "actual", op);
 
         return ValidatorStatus.OK;

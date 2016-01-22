@@ -47,7 +47,7 @@ public class PlayerAPI {
     }
 
     private String ApiResponse(GameOp op) {
-        return "{ \"status\" : \"ok\", \"action\":\""+op.getOp()+"\", \"raise\":"+String.valueOf(op.getRaiseAmount())+"}";
+        return "{ \"status\" : \"ok\", \"action\":\""+op.getOp()+"\", \"raise\":"+String.valueOf(op.getAmount())+"}";
     }
 
 }

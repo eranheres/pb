@@ -11,17 +11,21 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 public class GameOp {
-    public static final GameOp OP_CHECK  = new GameOp("check");
-    public static final GameOp OP_CALL   = new GameOp("call");
-    public static final GameOp OP_RAISE  = new GameOp("raise"); // Operates as "bet" also
-    public static final GameOp OP_FOLD   = new GameOp("fold");
-    public static final GameOp OP_ALLIN  = new GameOp("allin");
+    public static GameOp OP_CHECK() { return new GameOp("check"); }
+    public static GameOp OP_CALL()  { return new GameOp("call"); }
+    public static GameOp OP_RAISE() { return new GameOp("raise"); } // Operates as "bet" also
+    public static GameOp OP_FOLD()  { return new GameOp("fold"); }
+    public static GameOp OP_ALLIN() { return new GameOp("allin"); }
 
     String op;
-    Integer raiseAmount;
+    Double amount;
 
     public GameOp(String opName) {
         this.op = opName;
-        raiseAmount = -1;
+        amount = 0.0;
+    }
+    public GameOp amount(Double raiseAmount) {
+        this.amount = raiseAmount;
+        return this;
     }
 }

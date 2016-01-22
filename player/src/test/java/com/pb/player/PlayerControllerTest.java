@@ -35,12 +35,12 @@ public class PlayerControllerTest {
         Hand hand = new Hand(snapshots);
         when(dao.getHand(HandId.of("yyy"))).thenReturn(hand);
         when(query.validateOngoingHand(HandId.of("yyy"))).thenReturn(new ValidationQuery.validatorRes("ok", ""));
-        when(player.play(hand)).thenReturn(GameOp.OP_ALLIN);
+        when(player.play(hand)).thenReturn(GameOp.OP_ALLIN());
 
-        assertEquals(controller.play(HandId.of("yyy"), "river"), GameOp.OP_ALLIN);
+        assertEquals(controller.play(HandId.of("yyy"), "river"), GameOp.OP_ALLIN());
 
         verify(dao).getHand(HandId.of("yyy"));
-        verify(dataSource).saveGameOp("yyy", 100, GameOp.OP_ALLIN);
+        verify(dataSource).saveGameOp("yyy", 100, GameOp.OP_ALLIN());
         verify(query).validateOngoingHand(HandId.of("yyy"));
     }
 

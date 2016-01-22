@@ -29,17 +29,17 @@ public class MonkeyPlayerTest {
     public Object[][] parameterProvider3() {
         return new Object[][]{
                 { new TestAndExpected(
-                        Arrays.asList(GameOp.OP_ALLIN, GameOp.OP_CHECK, GameOp.OP_FOLD),
+                        Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_CHECK(), GameOp.OP_FOLD()),
                         2, -1, -1,
-                        GameOp.OP_FOLD) },
+                        GameOp.OP_FOLD()) },
                 { new TestAndExpected(
-                        Arrays.asList(GameOp.OP_ALLIN, GameOp.OP_CHECK, GameOp.OP_FOLD, GameOp.OP_CALL),
+                        Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_CHECK(), GameOp.OP_FOLD(), GameOp.OP_CALL()),
                         0, -1, -1,
-                        GameOp.OP_ALLIN) },
+                        GameOp.OP_ALLIN()) },
                 { new TestAndExpected(
-                        Arrays.asList(GameOp.OP_ALLIN, GameOp.OP_RAISE, GameOp.OP_FOLD, GameOp.OP_CALL),
+                        Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_RAISE(), GameOp.OP_FOLD(), GameOp.OP_CALL()),
                         1, 100, 33,
-                        new GameOp(GameOp.OP_RAISE.getOp(), 77)) }
+                        GameOp.OP_RAISE().amount(77.0)) }
         };
     }
 
@@ -55,7 +55,7 @@ public class MonkeyPlayerTest {
         when(random.nextInt(param.opList.size())).thenReturn(param.opIndex);
         when(random.nextInt(0)).thenThrow(new IllegalArgumentException()); // verify that there is no invalid randomizer call
         if (param.maxRaise - param.minRaise != 0) {
-            when(random.nextInt(param.maxRaise - param.minRaise)).thenReturn(param.expected.getRaiseAmount());
+            when(random.nextInt(param.maxRaise - param.minRaise)).thenReturn(param.expected.getAmount().intValue());
         }
         MonkeyPlayer player = new MonkeyPlayer(random, playOptions);
         assertEquals(param.expected, player.play(hand));

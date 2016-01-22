@@ -114,13 +114,13 @@ public class PlayOptionsTest {
         return new Object[][]{
                 { new TestAndExpectedOps(
                         Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 0.0, "balance", 100.0)),
-                        Arrays.asList(GameOp.OP_ALLIN, GameOp.OP_CHECK, GameOp.OP_RAISE)) },
+                        Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_CHECK(), GameOp.OP_RAISE())) },
                 { new TestAndExpectedOps(
                         Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "balance", 100.0)),
-                        Arrays.asList(GameOp.OP_ALLIN, GameOp.OP_CALL, GameOp.OP_RAISE, GameOp.OP_FOLD)) },
+                        Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_CALL(), GameOp.OP_RAISE(), GameOp.OP_FOLD())) },
                 { new TestAndExpectedOps(
                         Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "balance", 30.0)),
-                        Arrays.asList(GameOp.OP_ALLIN, GameOp.OP_FOLD)) }
+                        Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_FOLD())) }
         };
     }
 

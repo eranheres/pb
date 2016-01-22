@@ -63,13 +63,13 @@ public class SnapshotValidatorValidValues implements SnapshotValidator {
                 return SYMBOLS_NOT_FOUND;
             Double val =  (snapshot.getSymbols().get(symbol));
             if ((val == null) || (val < 0)) {
-                return NULL_OR_NEGATIVE_SYMBOL.args(symbol, val);
+                return NULL_OR_NEGATIVE_SYMBOL.args(symbol, val==null?"null":val);
             }
         }
         // Check that prevaction is within boundaries
         Double prevAction = snapshot.getSymbols().get(Snapshot.SYMBOLS.PREVACTION);
         if (prevAction == null)
-            return MISSING_MANDATORY_VALUE.args("prevaction", null);
+            return MISSING_MANDATORY_VALUE.args("prevaction", "null");
         if (!Arrays.asList(new Double[]{-2.0, -1.0, 0.0, 1.0, 2.0, /*3.0,*/ 4.0}).contains(prevAction))
             return VALUE_OUT_OF_BOUNDS.args("prevaction", prevAction);
         return ValidatorStatus.OK;

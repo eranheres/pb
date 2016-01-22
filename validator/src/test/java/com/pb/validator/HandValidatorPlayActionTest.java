@@ -46,14 +46,14 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_FOLD)}),
-                        ImmutableMap.of(0, GameOp.OP_FOLD),
+                        ImmutableMap.of(0, GameOp.OP_FOLD()),
                         ValidatorStatus.OK) },
                 // 1. Positive - fold will be shown at showdown
                 { new TestAndExpected(
                         hand(new Snapshot[] {
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  Snapshot.VALUES.PREVACTION_FOLD)}),
-                        ImmutableMap.of(0, GameOp.OP_FOLD),
+                        ImmutableMap.of(0, GameOp.OP_FOLD()),
                         ValidatorStatus.OK) },
                 // 2. Positive - all actions
                 { new TestAndExpected(
@@ -64,17 +64,17 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_CHECK),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  Snapshot.VALUES.PREVACTION_ALLIN)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_CALL,
-                                1, GameOp.OP_RAISE,
-                                2, GameOp.OP_CHECK,
-                                3, GameOp.OP_ALLIN ),
+                                0, GameOp.OP_CALL(),
+                                1, GameOp.OP_RAISE(),
+                                2, GameOp.OP_CHECK(),
+                                3, GameOp.OP_ALLIN() ),
                         ValidatorStatus.OK) },
                 // 3. Negative - allin shown at the first time myturn shown
                 { new TestAndExpected(
                         hand(new Snapshot[] {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_CALL)}),
-                        ImmutableMap.of(0, GameOp.OP_CALL),
+                        ImmutableMap.of(0, GameOp.OP_CALL()),
                         HandValidatorPlayAction.UNINSTRUCTED_PLAY_ACTION) },
                 // 4. Negative - allin shown at myturn
                 { new TestAndExpected(
@@ -82,7 +82,7 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_ALLIN)}),
-                        ImmutableMap.of(0, GameOp.OP_ALLIN),
+                        ImmutableMap.of(0, GameOp.OP_ALLIN()),
                         HandValidatorPlayAction.ALLIN_NOT_IN_PLACE) },
                 // 5. Negative - fold shown at myturn
                 { new TestAndExpected(
@@ -90,7 +90,7 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_FOLD)}),
-                        ImmutableMap.of(0, GameOp.OP_FOLD),
+                        ImmutableMap.of(0, GameOp.OP_FOLD()),
                         HandValidatorPlayAction.FOLD_NOT_IN_PLACE) },
                 // 6. Negative - play op was not taken at all
                 { new TestAndExpected(
@@ -98,7 +98,7 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD)}),
-                        ImmutableMap.of(0, GameOp.OP_CALL),
+                        ImmutableMap.of(0, GameOp.OP_CALL()),
                         HandValidatorPlayAction.RECORDED_PLAY_WASNT_PLAYED) },
                 // 7. Negative - play op took wrong action
                 { new TestAndExpected(
@@ -106,7 +106,7 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_RAISE)}),
-                        ImmutableMap.of(0, GameOp.OP_CALL),
+                        ImmutableMap.of(0, GameOp.OP_CALL()),
                         HandValidatorPlayAction.WRONG_ACTION_TAKEN) },
                 // 8. Negative - action wasn't taken
                 { new TestAndExpected(
@@ -114,8 +114,8 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN, Snapshot.VALUES.PREVACTION_RAISE)}),
-                        ImmutableMap.of(0, GameOp.OP_CALL,
-                                        1, GameOp.OP_ALLIN),
+                        ImmutableMap.of(0, GameOp.OP_CALL(),
+                                        1, GameOp.OP_ALLIN()),
                         HandValidatorPlayAction.WRONG_ACTION_TAKEN) },
                 // 9. Negative - action wasn't taken
                 { new TestAndExpected(
@@ -123,8 +123,8 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN, Snapshot.VALUES.PREVACTION_CALL)}),
-                        ImmutableMap.of(0, GameOp.OP_CALL,
-                                        1, GameOp.OP_ALLIN),
+                        ImmutableMap.of(0, GameOp.OP_CALL(),
+                                        1, GameOp.OP_ALLIN()),
                         HandValidatorPlayAction.RECORDED_PLAY_WASNT_PLAYED) },
                 // 10. Negative - action wasn't taken
                 { new TestAndExpected(
@@ -135,8 +135,9 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_CALL),
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_CALL),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN, Snapshot.VALUES.PREVACTION_CALL)}),
-                        ImmutableMap.of(0, GameOp.OP_CALL,
-                                1, GameOp.OP_ALLIN),
+                        ImmutableMap.of(
+                                0, GameOp.OP_CALL(),
+                                1, GameOp.OP_ALLIN()),
                         HandValidatorPlayAction.RECORDED_PLAY_WASNT_PLAYED) },
                 // 11. Negative - action not recorded
                 { new TestAndExpected(
@@ -147,8 +148,8 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_RAISE),
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_CALL),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN, Snapshot.VALUES.PREVACTION_CALL)}),
-                        ImmutableMap.of(0, GameOp.OP_CALL,
-                                        1, GameOp.OP_RAISE),
+                        ImmutableMap.of(0, GameOp.OP_CALL(),
+                                        1, GameOp.OP_RAISE()),
                         HandValidatorPlayAction.ACTION_NOT_RECORDED) },
                 // 12. Positive call
                 { new TestAndExpected(
@@ -156,7 +157,7 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    Snapshot.VALUES.PREVACTION_CALL)}),
-                        ImmutableMap.of(0, GameOp.OP_CALL),
+                        ImmutableMap.of(0, GameOp.OP_CALL()),
                         ValidatorStatus.OK) }
         };
     }

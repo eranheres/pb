@@ -2,7 +2,6 @@ package com.pb.validator;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.Arrays;
 import java.util.Map;
 
 @lombok.Getter
@@ -27,6 +26,14 @@ public class ValidatorStatus {
     }
     public ValidatorStatus args(String str1, Object value1, String str2, Object value2) {
         this.args(ImmutableMap.of(str1, value1, str2, value2));
+        return this;
+    }
+    public ValidatorStatus args(String str1, Object value1, String str2, Object value2, String str3, Object obj3) {
+        this.args(ImmutableMap.of(str1, value1, str2, value2, str3, obj3));
+        return this;
+    }
+    public ValidatorStatus args(String str1, Object value1, String str2, Object value2, String str3, Object obj3, String str4, Object obj4) {
+        this.args(ImmutableMap.of(str1, value1, str2, value2, str3, obj3, str4, obj4));
         return this;
     }
 
