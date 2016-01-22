@@ -25,7 +25,7 @@ public class PersistorControllerTest {
         when(query.validateHand(HandId.of("zzz"))).thenReturn(new ValidationQuery.validatorRes("ok", ""));
         controller.complete(HandId.of("zzz"));
         verify(query).validateHand(HandId.of("zzz"));
-        //verify(dao).saveToList("zzz", "body");
+        //verify(dao).saveSnapshotToList("zzz", "body");
     }
 
     @Test(expectedExceptions = HandValidationException.class)
@@ -37,6 +37,6 @@ public class PersistorControllerTest {
         when(query.validateHand(HandId.of("zzz"))).thenReturn(new ValidationQuery.validatorRes("not ok", ""));
         controller.complete(HandId.of("zzz"));
         verify(query).validateHand(HandId.of("zzz"));
-        verify(dao).saveToList("zzz", "body");
+        verify(dao).saveSnapshotToList("zzz", "body");
     }
 }

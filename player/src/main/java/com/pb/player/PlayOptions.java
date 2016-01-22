@@ -1,5 +1,6 @@
 package com.pb.player;
 
+import com.pb.dao.GameOp;
 import com.pb.dao.Hand;
 import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
@@ -18,8 +19,8 @@ public class PlayOptions {
 
     public List<GameOp> getValidOps(Hand hand) {
         Snapshot snapshot = hand.latestSnapshot();
-        Double amountToCall = snapshot.getSymbols().get(Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL);
-        Double balance = snapshot.getSymbols().get(Snapshot.VALUES.SYMBOL_BALANCE);
+        Double amountToCall = snapshot.getSymbols().get(Snapshot.SYMBOLS.AMOUNT_TO_CALL);
+        Double balance = snapshot.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
         // Options when zero amount to call
         if (amountToCall == 0) {
             return Arrays.asList(GameOp.OP_ALLIN, GameOp.OP_CHECK, GameOp.OP_RAISE);
@@ -40,8 +41,8 @@ public class PlayOptions {
             throw new IllegalStateException("Can't evaluate raise value when raise is not an option");
 
         Map<String, Double> symbols = hand.latestSnapshot().getSymbols();
-        Integer amountToCall = symbols.get(Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL).intValue();
-        Integer bigBlind = symbols.get(Snapshot.VALUES.SYMBOL_BIG_BLIND).intValue();
+        Integer amountToCall = symbols.get(Snapshot.SYMBOLS.AMOUNT_TO_CALL).intValue();
+        Integer bigBlind = symbols.get(Snapshot.SYMBOLS.BIG_BLIND).intValue();
         if (amountToCall == 0)
             return bigBlind;
         return amountToCall;
@@ -51,8 +52,8 @@ public class PlayOptions {
         if (!getValidOps(hand).contains(GameOp.OP_RAISE))
             throw new IllegalStateException("Can't evaluate raise value when raise is not an option");
         Map<String, Double> symbols = hand.latestSnapshot().getSymbols();
-        Integer balance = symbols.get(Snapshot.VALUES.SYMBOL_BALANCE).intValue();
-        Integer bigBlind = symbols.get(Snapshot.VALUES.SYMBOL_BIG_BLIND).intValue();
+        Integer balance = symbols.get(Snapshot.SYMBOLS.BALANCE).intValue();
+        Integer bigBlind = symbols.get(Snapshot.SYMBOLS.BIG_BLIND).intValue();
         return balance-bigBlind;
     }
 }

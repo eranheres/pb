@@ -14,16 +14,19 @@ import java.util.List;
 @NoArgsConstructor
 public class SnapshotValidatorValidValues implements SnapshotValidator {
 
-    public final static ValidatorStatus INVALID_FIELD_DATATYPE = new ValidatorStatus("Datatype field is invalid");
-    public final static ValidatorStatus INVALID_FIELD_ACTION   = new ValidatorStatus("Action field is invalid");
-    public final static ValidatorStatus NULL_OR_NEGATIVE_SYMBOL = new ValidatorStatus("Mandatory symbol is null or negative");
+    public final static ValidatorStatus INVALID_FIELD_DATATYPE   = new ValidatorStatus("Datatype field is invalid");
+    public final static ValidatorStatus INVALID_FIELD_ACTION     = new ValidatorStatus("Action field is invalid");
+    public final static ValidatorStatus NULL_OR_NEGATIVE_SYMBOL  = new ValidatorStatus("Mandatory symbol is negative");
+    public final static ValidatorStatus SYMBOLS_NOT_FOUND        = new ValidatorStatus("Symbols not found");
+    public final static ValidatorStatus MISSING_MANDATORY_VALUE  = new ValidatorStatus("Mandatory symbol is missing");
+    public final static ValidatorStatus VALUE_OUT_OF_BOUNDS      = new ValidatorStatus("Value out of bounds");
 
     private static final List<String> VALID_DATATYPE_VALUES = Arrays.asList(
-            Snapshot.VALUES.HANDRESET,
-            Snapshot.VALUES.HEARTBEAT,
-            Snapshot.VALUES.SHOWDOWN,
-            Snapshot.VALUES.MYTURN,
-            Snapshot.VALUES.NEWROUND
+            Snapshot.VALUES.DATATYPE_HANDRESET,
+            Snapshot.VALUES.DATATYPE_HEARTBEAT,
+            Snapshot.VALUES.DATATYPE_SHOWDOWN,
+            Snapshot.VALUES.DATATYPE_MYTURN,
+            Snapshot.VALUES.DATATYPE_NEWROUND
     );
 
     private static final List<String> VALID_ACTION_VALUES = Arrays.asList(
@@ -34,10 +37,10 @@ public class SnapshotValidatorValidValues implements SnapshotValidator {
     );
 
     private static final List<String> MANDATORY_POSITIVE_VAL = Arrays.asList(
-            Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL,
-            Snapshot.VALUES.SYMBOL_BALANCE,
-            Snapshot.VALUES.SYMBOL_BIG_BLIND,
-            Snapshot.VALUES.SYMBOL_OPPONENTS_WITH_HIGHER_STACK
+            Snapshot.SYMBOLS.AMOUNT_TO_CALL,
+            Snapshot.SYMBOLS.BALANCE,
+            Snapshot.SYMBOLS.BIG_BLIND,
+            Snapshot.SYMBOLS.OPPONENTS_WITH_HIGHER_STACK
     );
 
     @Override
@@ -50,19 +53,25 @@ public class SnapshotValidatorValidValues implements SnapshotValidator {
             return INVALID_FIELD_DATATYPE;
         }
         // Check that if myturn then action is valid
-        if ((snapshot.getState().getDatatype().equals(Snapshot.VALUES.MYTURN) &&
+        if ((snapshot.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_MYTURN) &&
             (!VALID_ACTION_VALUES.contains(snapshot.getState().getBetround())))) {
             return INVALID_FIELD_ACTION;
         }
         // Check that all the symbols are not null and positive
         for (String symbol : MANDATORY_POSITIVE_VAL) {
             if (snapshot.getSymbols() == null)
-                return NULL_OR_NEGATIVE_SYMBOL;
+                return SYMBOLS_NOT_FOUND;
             Double val =  (snapshot.getSymbols().get(symbol));
             if ((val == null) || (val < 0)) {
-                return NULL_OR_NEGATIVE_SYMBOL;
+                return NULL_OR_NEGATIVE_SYMBOL.args(symbol, val);
             }
         }
+        // Check that prevaction is within boundaries
+        Double prevAction = snapshot.getSymbols().get(Snapshot.SYMBOLS.PREVACTION);
+        if (prevAction == null)
+            return MISSING_MANDATORY_VALUE.args("prevaction", null);
+        if (!Arrays.asList(new Double[]{-2.0, -1.0, 0.0, 1.0, 2.0, /*3.0,*/ 4.0}).contains(prevAction))
+            return VALUE_OUT_OF_BOUNDS.args("prevaction", prevAction);
         return ValidatorStatus.OK;
     }
 

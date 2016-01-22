@@ -1,4 +1,4 @@
-package com.pb.player;
+package com.pb.dao;
 
 import lombok.*;
 
@@ -17,11 +17,11 @@ public class GameOp {
     public static final GameOp OP_FOLD   = new GameOp("fold");
     public static final GameOp OP_ALLIN  = new GameOp("allin");
 
-    String opName;
+    String op;
     Integer raiseAmount;
 
     public GameOp(String opName) {
-        this.opName = opName;
+        this.op = opName;
         raiseAmount = -1;
     }
 }

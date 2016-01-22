@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.pb.dao.Hand;
 import com.pb.dao.Snapshot;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,11 +33,11 @@ public class HandValidatorTurnSeq implements HandValidator {
         for (int i=0; i<snapshots.length; i++) {
             Snapshot snapshot = snapshots[i];
             // Must have reset on hand start
-            if ((0 == i) && (!snapshot.getState().getDatatype().equals(Snapshot.VALUES.HANDRESET))) {
+            if ((0 == i) && (!snapshot.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_HANDRESET))) {
                 return NO_HANDRESET_ON_FIRST;
             }
             // Must not have handreset in other position than 0
-            if ((i!=0) && (snapshot.getState().getDatatype().equals(Snapshot.VALUES.HANDRESET))) {
+            if ((i!=0) && (snapshot.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_HANDRESET))) {
                 return HANDRESET_MUST_BE_FIRST;
             }
             if (snapshot.getState().getBetround() == null) {

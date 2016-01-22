@@ -16,16 +16,28 @@ public class Snapshot {
         public final static String TURN      = "turn";
         public final static String RIVER     = "river";
 
-        public final static String HANDRESET = "handreset";
-        public final static String HEARTBEAT = "heartbeat";
-        public final static String MYTURN    = "my_turn";
-        public final static String SHOWDOWN  = "showdown";
-        public final static String NEWROUND  = "new_round";
+        public final static String DATATYPE_HANDRESET = "handreset";
+        public final static String DATATYPE_HEARTBEAT = "heartbeat";
+        public final static String DATATYPE_MYTURN = "my_turn";
+        public final static String DATATYPE_SHOWDOWN = "showdown";
+        public final static String DATATYPE_NEWROUND = "new_round";
 
-        public final static String SYMBOL_AMOUNT_TO_CALL    = "DollarsToCall";
-        public final static String SYMBOL_BALANCE           = "balance";
-        public final static String SYMBOL_OPPONENTS_WITH_HIGHER_STACK = "OpponentsWithHigherStack";
-        public final static String SYMBOL_BIG_BLIND         = "bblind";
+        public final static double PREVACTION_PREFOLD   = -2.0;
+        public final static double PREVACTION_FOLD      = -1.0;
+        public final static double PREVACTION_CHECK     = 0.0;
+        public final static double PREVACTION_CALL      = 1.0;
+        public final static double PREVACTION_RAISE     = 2.0;
+        public final static double PREVACTION_BETSIZE   = 3.0;
+        public final static double PREVACTION_ALLIN     = 4.0;
+    }
+
+    public final class SYMBOLS {
+        public final static String AMOUNT_TO_CALL               = "DollarsToCall";
+        public final static String BALANCE                      = "balance";
+        public final static String OPPONENTS_WITH_HIGHER_STACK  = "OpponentsWithHigherStack";
+        public final static String BIG_BLIND                    = "bblind";
+
+        public final static String PREVACTION                   = "prevaction";
     }
 
     @NoArgsConstructor
@@ -39,6 +51,7 @@ public class Snapshot {
         String  title;
         String  room;
         Integer handcount;
+        Integer my_turn_count;
         String  uuid;
         Integer is_playing;
         String  betround;

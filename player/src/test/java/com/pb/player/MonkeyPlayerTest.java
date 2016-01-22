@@ -1,9 +1,7 @@
 package com.pb.player;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import com.pb.dao.GameOp;
 import com.pb.dao.Hand;
-import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -13,7 +11,6 @@ import java.util.List;
 import java.util.Random;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.*;
 
@@ -42,7 +39,7 @@ public class MonkeyPlayerTest {
                 { new TestAndExpected(
                         Arrays.asList(GameOp.OP_ALLIN, GameOp.OP_RAISE, GameOp.OP_FOLD, GameOp.OP_CALL),
                         1, 100, 33,
-                        new GameOp(GameOp.OP_RAISE.getOpName(), 77)) }
+                        new GameOp(GameOp.OP_RAISE.getOp(), 77)) }
         };
     }
 

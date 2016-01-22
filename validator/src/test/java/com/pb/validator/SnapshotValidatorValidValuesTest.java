@@ -35,13 +35,11 @@ public class SnapshotValidatorValidValuesTest {
 
         SnapshotValidator validator = new SnapshotValidatorValidValues();
 
-        assertEquals(ValidatorStatus.OK, validator.validate(lu[0]));
-        assertEquals(ValidatorStatus.OK, validator.validate(lu[1]));
-        assertEquals(ValidatorStatus.OK, validator.validate(lu[2]));
-        assertEquals(ValidatorStatus.OK, validator.validate(lu[3]));
-        assertEquals(ValidatorStatus.OK, validator.validate(lu[4]));
-        assertEquals(ValidatorStatus.OK, validator.validate(lu[5]));
-        assertEquals(ValidatorStatus.OK, validator.validate(lu[6]));
+        assertEquals(validator.validate(lu[0]), ValidatorStatus.OK);
+        assertEquals(validator.validate(lu[1]), ValidatorStatus.OK);
+        assertEquals(validator.validate(lu[4]), ValidatorStatus.OK);
+        assertEquals(validator.validate(lu[5]), ValidatorStatus.OK);
+        assertEquals(validator.validate(lu[6]), ValidatorStatus.OK);
         assertEquals(8, lu.length); // Make sure nothing is missed
 
         // Test invalid values
@@ -54,15 +52,15 @@ public class SnapshotValidatorValidValuesTest {
         assertTrue(lu.length == 2); // Make sure nothing is missed
     }
 
-    private final static Map<String, Double> mandatorSymbols = ImmutableMap.of(
-            Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL,      0.0,
-            Snapshot.VALUES.SYMBOL_BALANCE,             0.0,
-            Snapshot.VALUES.SYMBOL_BIG_BLIND,           0.0
+    private final static Map<String, Double> mandatorySymbols = ImmutableMap.of(
+            Snapshot.SYMBOLS.AMOUNT_TO_CALL,      0.0,
+            Snapshot.SYMBOLS.BALANCE,             0.0,
+            Snapshot.SYMBOLS.BIG_BLIND,           0.0
     );
 
     @DataProvider(name = "Parameters")
-    public Object[][] parametersFortestNegativeOrNullValues() {
-        Object values[] = mandatorSymbols.keySet().toArray();
+    public Object[][] parametersForTestNegativeOrNullValues() {
+        Object values[] = mandatorySymbols.keySet().toArray();
         return new Object[][] {
             { values[0] }, { values[1] }, { values[2] }, { values[3] }
         };
@@ -72,14 +70,14 @@ public class SnapshotValidatorValidValuesTest {
     public void testNegativeOrNullValues(String str) throws Exception {
         SnapshotValidator validator = new SnapshotValidatorValidValues();
         Snapshot snapshot = new Snapshot();
-        snapshot.setSymbols(new HashMap<>(mandatorSymbols));
+        snapshot.setSymbols(new HashMap<>(mandatorySymbols));
         snapshot.setState(new Snapshot.State());
-        snapshot.getState().setDatatype(Snapshot.VALUES.HANDRESET);
+        snapshot.getState().setDatatype(Snapshot.VALUES.DATATYPE_HANDRESET);
 
         // Validate 0 value
         assertEquals(validator.validate(snapshot), ValidatorStatus.OK);
 
-        // Validate possitive value
+        // Validate positive value
         snapshot.getSymbols().put(str, 10.0);
         assertEquals(validator.validate(snapshot), ValidatorStatus.OK);
 

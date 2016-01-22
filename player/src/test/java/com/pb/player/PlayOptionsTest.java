@@ -1,6 +1,7 @@
 package com.pb.player;
 
 import com.google.common.collect.ImmutableMap;
+import com.pb.dao.GameOp;
 import com.pb.dao.Hand;
 import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
@@ -74,13 +75,13 @@ public class PlayOptionsTest {
         return new Object[][]{
                 { new TestAndExpectedRaise(
                         Snapshot.fromSymbols(ImmutableMap.of(
-                                Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL, 0.0,
+                                Snapshot.SYMBOLS.AMOUNT_TO_CALL, 0.0,
                                 "bblind", 2.0,
                                 "balance", 100.0)),
                         98) },
                 { new TestAndExpectedRaise(
                         Snapshot.fromSymbols(ImmutableMap.of(
-                                Snapshot.VALUES.SYMBOL_AMOUNT_TO_CALL, 50.0,
+                                Snapshot.SYMBOLS.AMOUNT_TO_CALL, 50.0,
                                 "bblind", 2.0,
                                 "balance", 100.0)),
                         98) },

@@ -1,6 +1,7 @@
 package com.pb.player;
 
 import com.pb.api.HandValidationException;
+import com.pb.dao.GameOp;
 import com.pb.dao.HandId;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ public class PlayerAPI {
     }
 
     private String ApiResponse(GameOp op) {
-        return "{ \"status\" : \"ok\", \"action\":\""+op.getOpName()+"\", \"raise\":"+String.valueOf(op.getRaiseAmount())+"}";
+        return "{ \"status\" : \"ok\", \"action\":\""+op.getOp()+"\", \"raise\":"+String.valueOf(op.getRaiseAmount())+"}";
     }
 
 }
