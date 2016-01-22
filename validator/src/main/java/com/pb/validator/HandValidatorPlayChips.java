@@ -5,6 +5,7 @@ import com.pb.dao.Hand;
 import com.pb.dao.PBDataSource;
 import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @SuppressWarnings("Duplicates")
 @AllArgsConstructor
+@NoArgsConstructor
 @Service
 public class HandValidatorPlayChips implements HandValidator {
 

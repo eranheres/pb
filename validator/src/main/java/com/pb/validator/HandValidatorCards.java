@@ -4,12 +4,14 @@ import com.google.common.collect.ArrayListMultimap;
 import com.pb.dao.Card;
 import com.pb.dao.Hand;
 import com.pb.dao.Snapshot;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 /**
  * Validate cards through out the entire hand
  */
+@Component
 public class HandValidatorCards implements HandValidator {
 
     public static final ValidatorStatus CARD_CHANGED_IN_HAND = new ValidatorStatus("Card changed in hand");

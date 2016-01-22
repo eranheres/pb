@@ -5,6 +5,7 @@ import com.pb.dao.Hand;
 import com.pb.dao.PBDataSource;
 import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
  * Validates that the action ordered by the server is actually taken by the client
  */
 @AllArgsConstructor
+@NoArgsConstructor
 @Service
 public class HandValidatorPlayAction implements HandValidator {
 
