@@ -22,6 +22,7 @@ public class RedisDataSource implements PBDataSource {
 
     @Value("${dao.redisdatasource.ttlmin}")
     private static Integer SNAPSHOT_TTL_MIN;
+    @Value("${dao.redisdatasource.ttlmin}")
     private static Integer ACTION_TTL_MIN;
 
 
@@ -41,7 +42,7 @@ public class RedisDataSource implements PBDataSource {
     @Override
     public void saveSnapshotToList(String id, String value) {
         Snapshot snapshot = (Snapshot) snapshotTemplate.getValueSerializer().deserialize(value.getBytes());
-        saveSnapshotToList(snapshotKey(id), snapshot);
+        saveSnapshotToList(id, snapshot);
     }
 
     @Override
@@ -57,7 +58,9 @@ public class RedisDataSource implements PBDataSource {
     public void saveGameOp(String id, Integer turn, GameOp op) {
         String key = gameOpKey(id, turn);
         gameOpTemplate.opsForValue().setIfAbsent(key, op);
-        snapshotTemplate.expire(key, ACTION_TTL_MIN, TimeUnit.MINUTES);
+        if (ACTION_TTL_MIN != null) {
+            snapshotTemplate.expire(key, ACTION_TTL_MIN, TimeUnit.MINUTES);
+        }
     }
 
     @Override

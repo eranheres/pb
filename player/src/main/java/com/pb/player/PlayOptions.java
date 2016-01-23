@@ -23,15 +23,15 @@ public class PlayOptions {
         Double balance = snapshot.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
         // Options when zero amount to call
         if (amountToCall == 0) {
-            return Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_CHECK(), GameOp.OP_RAISE());
+            return Arrays.asList(GameOp.OP_ALLIN().amount(balance), GameOp.OP_CHECK(), GameOp.OP_RAISE());
         }
         // Option when amount to call is lower than our stack
         if ((amountToCall > 0) && (balance > amountToCall)) {
-            return Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_CALL(), GameOp.OP_RAISE(), GameOp.OP_FOLD());
+            return Arrays.asList(GameOp.OP_ALLIN().amount(balance), GameOp.OP_CALL().amount(amountToCall), GameOp.OP_RAISE(), GameOp.OP_FOLD());
         }
         // Option when amount to call is higher or equal than our stack
         if ((amountToCall > 0) && (balance <= amountToCall)) {
-            return Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_FOLD());
+            return Arrays.asList(GameOp.OP_ALLIN().amount(balance), GameOp.OP_FOLD());
         }
         throw new IllegalStateException("Can't decide on valid options to play");
     }

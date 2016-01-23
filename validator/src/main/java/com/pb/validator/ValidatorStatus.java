@@ -36,6 +36,10 @@ public class ValidatorStatus {
         this.args(ImmutableMap.of(str1, value1, str2, value2, str3, obj3, str4, obj4));
         return this;
     }
+    public ValidatorStatus args(String str1, Object value1, String str2, Object value2, String str3, Object obj3, String str4, Object obj4, String str5, Object obj5) {
+        this.args(ImmutableMap.of(str1, value1, str2, value2, str3, obj3, str4, obj4, str5, obj5));
+        return this;
+    }
 
     @Override
     public String toString() {

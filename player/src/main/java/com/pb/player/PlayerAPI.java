@@ -24,10 +24,10 @@ public class PlayerAPI {
 
     @RequestMapping(value = "/play/{id}/{betround}", method = RequestMethod.POST)
     public ResponseEntity<String> index(@PathVariable String id, @PathVariable String betround) throws IOException {
-        logger.info(id+" - Request for play betround "+betround);
+        logger.debug(id+" - Request for play betround "+betround);
         try {
             GameOp op = controller.play(HandId.of(id), betround);
-            logger.info(id+" - Request for play response betround"+betround+":"+op.toString());
+            logger.info(id+" - play response - betround"+betround+":"+op.toString());
             return new ResponseEntity<>(ApiResponse(op), HttpStatus.OK);
         } catch (HandValidationException ex) {
             String val = "Snapshot failed validation:" + ex.getReason();

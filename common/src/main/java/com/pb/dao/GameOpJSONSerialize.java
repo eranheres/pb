@@ -26,6 +26,8 @@ public class GameOpJSONSerialize implements RedisSerializer<GameOp> {
 
     @Override
     public GameOp deserialize(byte[] bytes) throws SerializationException {
+        if (bytes == null)
+            return null;
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

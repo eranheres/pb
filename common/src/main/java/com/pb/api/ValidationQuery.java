@@ -43,7 +43,7 @@ public class ValidationQuery {
         BufferedReader bufferedReader;
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new HandValidationException("Hand not found");
         }
         String response = "";

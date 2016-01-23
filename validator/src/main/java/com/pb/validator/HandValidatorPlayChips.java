@@ -29,15 +29,13 @@ public class HandValidatorPlayChips implements HandValidator {
     @Override
     public ValidatorStatus validate(Hand hand) {
         Boolean afterMyTurn = false;
-        Integer turnCount = 0;
         Snapshot previousSnapshot = null;
         for (Snapshot snapshot : hand.getSnapshots()) {
             if (afterMyTurn) {
-                ValidatorStatus status = getValidatorStatus(turnCount, previousSnapshot, snapshot);
+                ValidatorStatus status = getValidatorStatus(previousSnapshot, snapshot);
                 if (status != ValidatorStatus.OK) {
                     return status;
                 }
-                turnCount++;
             }
 
             // loops until after my turn
@@ -48,11 +46,13 @@ public class HandValidatorPlayChips implements HandValidator {
         return ValidatorStatus.OK;
     }
 
-    private ValidatorStatus getValidatorStatus(Integer turnCount, Snapshot previous, Snapshot current) {
+    private ValidatorStatus getValidatorStatus(Snapshot previous, Snapshot current) {
         String uuid = current.getState().getUuid();
+
+        Integer turnCount = previous.getState().getMy_turn_count();
         GameOp op = dataSource.getGameOp(uuid, turnCount);
         if (op == null)
-            return ACTION_NOT_RECORDED.args("uuid", uuid, "turnCount", turnCount);
+            return ACTION_NOT_RECORDED.args("turnCount", turnCount);
         double prevAction = current.getSymbols().get(Snapshot.SYMBOLS.PREVACTION);
         double prevBalance = previous.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
         double currentBalance = current.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
@@ -66,9 +66,25 @@ public class HandValidatorPlayChips implements HandValidator {
             }
             return ValidatorStatus.OK;
         }
+        if (prevAction == Snapshot.VALUES.PREVACTION_ALLIN) {
+            // TODO - calculate remaining balance more correctly
+            if (currentBalance >= prevBalance) {
+                return BALANCE_WRONG_AFTER_PLAY
+                        .args("prevaction", prevAction,
+                                "prevbalance", prevBalance,
+                                "currentBalance", currentBalance,
+                                "turn", turnCount,
+                                "op", op);
+            }
+            return ValidatorStatus.OK;
+        }
         if (prevBalance - op.getAmount() != currentBalance) {
             return BALANCE_WRONG_AFTER_PLAY
-                    .args("prevaction", prevAction, "prevbalance", prevBalance, "currentBalance", currentBalance, "op", op);
+                    .args("prevaction", prevAction,
+                          "prevbalance", prevBalance,
+                          "currentBalance", currentBalance,
+                          "turn", turnCount,
+                          "op", op);
         }
         return ValidatorStatus.OK;
     }
