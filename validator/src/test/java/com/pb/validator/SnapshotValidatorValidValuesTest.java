@@ -92,4 +92,31 @@ public class SnapshotValidatorValidValuesTest {
         assertEquals(validator.validate(snapshot), SnapshotValidatorValidValues.NULL_OR_NEGATIVE_SYMBOL);
     }
 
+    @DataProvider(name = "prevactions")
+    public Object[][] parametersForPrevactionTest() {
+        return new Object[][] {
+                { ValidatorStatus.OK,                               Snapshot.VALUES.PREVACTION_PREFOLD},
+                { ValidatorStatus.OK,                               Snapshot.VALUES.PREVACTION_FOLD},
+                { ValidatorStatus.OK,                               Snapshot.VALUES.PREVACTION_CHECK},
+                { ValidatorStatus.OK,                               Snapshot.VALUES.PREVACTION_CALL},
+                { SnapshotValidatorValidValues.VALUE_OUT_OF_BOUNDS, Snapshot.VALUES.PREVACTION_RAISE},
+                { ValidatorStatus.OK,                               Snapshot.VALUES.PREVACTION_BETRAISE},
+                { ValidatorStatus.OK,                               Snapshot.VALUES.PREVACTION_ALLIN},
+                { SnapshotValidatorValidValues.VALUE_OUT_OF_BOUNDS, Snapshot.VALUES.PREVACTION_ALLIN + 1},
+                { SnapshotValidatorValidValues.VALUE_OUT_OF_BOUNDS, Snapshot.VALUES.PREVACTION_PREFOLD -1}
+        };
+    }
+    @Test(dataProvider = "prevactions")
+    public void testPrevactionValues(ValidatorStatus expected, double prevaction) {
+        SnapshotValidator validator = new SnapshotValidatorValidValues();
+        Snapshot snapshot = new Snapshot();
+        snapshot.setSymbols(new HashMap<>(mandatorySymbols));
+        snapshot.setState(new Snapshot.State());
+        snapshot.getState().setDatatype(Snapshot.VALUES.DATATYPE_HANDRESET);
+
+        // Validate 0 value
+        snapshot.getSymbols().put(Snapshot.SYMBOLS.PREVACTION, prevaction);
+        assertEquals(validator.validate(snapshot), expected);
+    }
+
 }

@@ -38,7 +38,10 @@ public class HandValidatorPlayAction implements HandValidator {
             Double prevaction = snapshot.getSymbols().get(Snapshot.SYMBOLS.PREVACTION);
             String datatype   = snapshot.getState().getDatatype();
             Integer dataTurnCount = snapshot.getState().getMy_turn_count();
-            // Myturn with allin or with fold action is not valid
+            if (!datatype.equals(Snapshot.VALUES.DATATYPE_MYTURN) &&
+                !datatype.equals(Snapshot.VALUES.DATATYPE_POSTHAND) &&
+                !datatype.equals(Snapshot.VALUES.DATATYPE_SHOWDOWN))
+                continue;
             if (datatype.equals(Snapshot.VALUES.DATATYPE_MYTURN)) {
                 turnCount++;
                 if (prevaction == Snapshot.VALUES.PREVACTION_ALLIN)
@@ -51,7 +54,7 @@ public class HandValidatorPlayAction implements HandValidator {
             }
             if (!dataTurnCount.equals(turnCount))
                 return TURN_COUNT_OUT_OF_ORDER.args("dataTurnCount", dataTurnCount, "calc", turnCount);
-            if (afterMyTurn) {
+            if (previousSnapshot != null) {
                 // check the snapshot immediately after my turn and see if it is executed correctly
                 Integer dataPrevTurnCount = previousSnapshot.getState().getMy_turn_count();
                 ValidatorStatus status = validatePlayActionHistory(dataPrevTurnCount, snapshot);
@@ -59,14 +62,11 @@ public class HandValidatorPlayAction implements HandValidator {
                     return status;
                 }
             }
-
-            // loops until after my turn
-            String dataType = snapshot.getState().getDatatype();
-            afterMyTurn = (dataType.equals(Snapshot.VALUES.DATATYPE_MYTURN) || dataType.equals(Snapshot.VALUES.DATATYPE_SHOWDOWN));
             previousSnapshot = snapshot;
         }
         // check that all recorded ops have been verified
-        if (dataSource.getGameOp(previousSnapshot.getState().getUuid(), turnCount+1) != null)
+        if ((previousSnapshot != null) &&
+            (dataSource.getGameOp(previousSnapshot.getState().getUuid(), turnCount+1) != null))
             return RECORDED_PLAY_WASNT_PLAYED.args("turnCount", turnCount+1);
         return ValidatorStatus.OK;
     }
@@ -77,6 +77,8 @@ public class HandValidatorPlayAction implements HandValidator {
         GameOp op = dataSource.getGameOp(uuid, turnCount);
         if (op == null)
             return ACTION_NOT_RECORDED.args("turnCount", turnCount, "prevaction", prevAction);
+        if (current.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_POSTHAND))
+            return ValidatorStatus.OK;
         if (prevAction == Snapshot.VALUES.PREVACTION_PREFOLD)
             return RECORDED_PLAY_WASNT_PLAYED.args("expected", op);
         if ((prevAction == Snapshot.VALUES.PREVACTION_ALLIN) && (!op.getOp().equals(GameOp.OP_ALLIN().getOp())))
@@ -87,7 +89,7 @@ public class HandValidatorPlayAction implements HandValidator {
             return WRONG_ACTION_TAKEN.args("expected", "Check", "actual", op, "turn", turnCount);
         if ((prevAction == Snapshot.VALUES.PREVACTION_FOLD) && (!op.getOp().equals(GameOp.OP_FOLD().getOp())))
             return WRONG_ACTION_TAKEN.args("expected", "Fold", "actual", op, "turn", turnCount);
-        if ((prevAction == Snapshot.VALUES.PREVACTION_RAISE) && (!op.getOp().equals(GameOp.OP_RAISE().getOp())))
+        if ((prevAction == Snapshot.VALUES.PREVACTION_BETRAISE) && (!op.getOp().equals(GameOp.OP_RAISE().getOp())))
             return WRONG_ACTION_TAKEN.args("expected", "Raise", "actual", op, "turn", turnCount);
 
         return ValidatorStatus.OK;

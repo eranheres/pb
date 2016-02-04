@@ -19,14 +19,14 @@ public class GameOp {
     public static GameOp OP_ALLIN() { return new GameOp("allin"); }
 
     String op;
-    Double amount;
+    Integer amountInBB;
 
     public GameOp(String opName) {
         this.op = opName;
-        amount = 0.0;
+        amountInBB = 0;
     }
-    public GameOp amount(Double raiseAmount) {
-        this.amount = raiseAmount;
+    public GameOp amountInBB(Integer raiseAmount) {
+        this.amountInBB = raiseAmount;
         return this;
     }
 }

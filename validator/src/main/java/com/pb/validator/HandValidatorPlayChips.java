@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class HandValidatorPlayChips implements HandValidator {
 
-    public static ValidatorStatus ACTION_NOT_RECORDED = new ValidatorStatus("Action not recorded");
+    public static ValidatorStatus ACTION_NOT_RECORDED = new ValidatorStatus("Action not recorded while checking chips");
     public static ValidatorStatus ACTION_CHECK_FOLD_OP_AMOUNT = new ValidatorStatus("Action check/fold while op amount is > 0");
     public static ValidatorStatus ACTION_CHECK_FOLD_BALANCE_CHANGED = new ValidatorStatus("Action check/fold while balance changed");
     public static ValidatorStatus BALANCE_WRONG_AFTER_PLAY = new ValidatorStatus("Balance is wrong after play");
@@ -28,19 +28,18 @@ public class HandValidatorPlayChips implements HandValidator {
 
     @Override
     public ValidatorStatus validate(Hand hand) {
-        Boolean afterMyTurn = false;
         Snapshot previousSnapshot = null;
         for (Snapshot snapshot : hand.getSnapshots()) {
-            if (afterMyTurn) {
+            String dataType = snapshot.getState().getDatatype();
+            if (!dataType.equals(Snapshot.VALUES.DATATYPE_MYTURN) &&
+                !dataType.equals(Snapshot.VALUES.DATATYPE_POSTHAND))
+                continue;
+            if (previousSnapshot != null) {
                 ValidatorStatus status = getValidatorStatus(previousSnapshot, snapshot);
                 if (status != ValidatorStatus.OK) {
                     return status;
                 }
             }
-
-            // loops until after my turn
-            String dataType = snapshot.getState().getDatatype();
-            afterMyTurn = (dataType.equals(Snapshot.VALUES.DATATYPE_MYTURN) || dataType.equals(Snapshot.VALUES.DATATYPE_SHOWDOWN));
             previousSnapshot = snapshot;
         }
         return ValidatorStatus.OK;
@@ -57,7 +56,7 @@ public class HandValidatorPlayChips implements HandValidator {
         double prevBalance = previous.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
         double currentBalance = current.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
         if ((prevAction == Snapshot.VALUES.PREVACTION_CHECK) || (prevAction == Snapshot.VALUES.PREVACTION_FOLD)) {
-            if (op.getAmount() != 0) {
+            if (op.getAmountInBB() != 0) {
                 return ACTION_CHECK_FOLD_OP_AMOUNT.args("prevaction", prevAction, "op", op);
             }
             if (prevBalance != currentBalance) {
@@ -78,7 +77,11 @@ public class HandValidatorPlayChips implements HandValidator {
             }
             return ValidatorStatus.OK;
         }
-        if (prevBalance - op.getAmount() != currentBalance) {
+        Double bblind = current.getSymbols().get(Snapshot.SYMBOLS.BIG_BLIND);
+        Double currentbet = 0.0;
+        if (current.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_POSTHAND))
+            currentbet = current.getSymbols().get(Snapshot.SYMBOLS.CURRENTBET);
+        if (prevBalance - op.getAmountInBB()*bblind != currentBalance+currentbet) {
             return BALANCE_WRONG_AFTER_PLAY
                     .args("prevaction", prevAction,
                           "prevbalance", prevBalance,

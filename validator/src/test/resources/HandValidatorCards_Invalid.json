@@ -3,6 +3,7 @@
     // player hands changes
     "snapshots" : [
       {
+        "state": { "datatype": "heartbeat" },
         "players": [
           { "cards": ["As", "Ah"] },
           { "cards": ["Js", "Jh"] }
@@ -10,6 +11,7 @@
         "cards": ["As", "Ah", "Ks", "Kc", ""]
       },
       {
+        "state": { "datatype": "heartbeat" },
         "players": [
           { "cards": ["As", "Ah"] },
           { "cards": ["Js", "Jh"] }
@@ -17,6 +19,7 @@
         "cards": ["As", "Ah", "Ks", "Kc", ""]
       },
       {
+        "state": { "datatype": "heartbeat" },
         "players": [
           { "cards": ["Ac", "Ah"] },
           { "cards": ["Js", "Jh"] }
@@ -29,6 +32,7 @@
     // board hand changes
     "snapshots" : [
       {
+        "state": { "datatype": "heartbeat" },
         "players": [
           { "cards": ["Ac", "8h"] },
           { "cards": ["Js", "Jh"] }
@@ -36,6 +40,7 @@
          "cards": ["As", "Ah", "Ks", "Kc", ""]
       },
       {
+        "state": { "datatype": "heartbeat" },
         "players": [
           { "cards": ["Ac", "8h"] },
           { "cards": ["Js", "Jh"] }
@@ -43,6 +48,7 @@
         "cards": ["As", "Ah", "Ks", "Kc", ""]
       },
       {
+        "state": { "datatype": "heartbeat" },
         "players": [
           { "cards": ["Ac", "8h"] },
           { "cards": ["Js", "Jh"] }

@@ -1,7 +1,9 @@
 package com.pb.player;
 
+import com.google.common.collect.ImmutableMap;
 import com.pb.dao.GameOp;
 import com.pb.dao.Hand;
+import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -38,8 +40,8 @@ public class MonkeyPlayerTest {
                         GameOp.OP_ALLIN()) },
                 { new TestAndExpected(
                         Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_RAISE(), GameOp.OP_FOLD(), GameOp.OP_CALL()),
-                        1, 100, 33,
-                        GameOp.OP_RAISE().amount(77.0)) }
+                        1, 100, 40,
+                        GameOp.OP_RAISE().amountInBB( (40 + ((100-40)/2))/2 )) }
         };
     }
 
@@ -49,15 +51,17 @@ public class MonkeyPlayerTest {
         PlayOptions playOptions = mock(PlayOptions.class);
 
         Hand hand = new Hand();
+        hand.setSnapshots(new Snapshot[] { Snapshot.fromSymbols(ImmutableMap.of("bblind",2.0))});
         when(playOptions.getValidOps(hand)).thenReturn(param.opList);
         when(playOptions.minRaiseVal(hand)).thenReturn(param.minRaise);
         when(playOptions.maxRaiseVal(hand)).thenReturn(param.maxRaise);
         when(random.nextInt(param.opList.size())).thenReturn(param.opIndex);
         when(random.nextInt(0)).thenThrow(new IllegalArgumentException()); // verify that there is no invalid randomizer call
         if (param.maxRaise - param.minRaise != 0) {
-            when(random.nextInt(param.maxRaise - param.minRaise)).thenReturn(param.expected.getAmount().intValue());
+            when(random.nextInt(param.maxRaise - param.minRaise)).
+                    thenReturn((param.maxRaise - param.minRaise)/2);
         }
         MonkeyPlayer player = new MonkeyPlayer(random, playOptions);
-        assertEquals(param.expected, player.play(hand));
+        assertEquals(player.play(hand), param.expected);
     }
 }

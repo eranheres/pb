@@ -26,6 +26,7 @@ public class SnapshotValidatorValidValues implements SnapshotValidator {
             Snapshot.VALUES.DATATYPE_HEARTBEAT,
             Snapshot.VALUES.DATATYPE_SHOWDOWN,
             Snapshot.VALUES.DATATYPE_MYTURN,
+            Snapshot.VALUES.DATATYPE_POSTHAND,
             Snapshot.VALUES.DATATYPE_NEWROUND
     );
 
@@ -70,7 +71,15 @@ public class SnapshotValidatorValidValues implements SnapshotValidator {
         Double prevAction = snapshot.getSymbols().get(Snapshot.SYMBOLS.PREVACTION);
         if (prevAction == null)
             return MISSING_MANDATORY_VALUE.args("prevaction", "null");
-        if (!Arrays.asList(new Double[]{-2.0, -1.0, 0.0, 1.0, 2.0, /*3.0,*/ 4.0}).contains(prevAction))
+        if (!Arrays.asList(new Double[]{
+                Snapshot.VALUES.PREVACTION_PREFOLD,
+                Snapshot.VALUES.PREVACTION_FOLD,
+                Snapshot.VALUES.PREVACTION_CHECK,
+                Snapshot.VALUES.PREVACTION_CALL,
+                /* Snapshot.VALUES.PREVACTION_RAISE, */
+                Snapshot.VALUES.PREVACTION_BETRAISE,
+                Snapshot.VALUES.PREVACTION_ALLIN
+            }).contains(prevAction))
             return VALUE_OUT_OF_BOUNDS.args("prevaction", prevAction);
         return ValidatorStatus.OK;
     }

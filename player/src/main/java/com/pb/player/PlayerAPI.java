@@ -27,11 +27,11 @@ public class PlayerAPI {
         logger.debug(id+" - Request for play betround "+betround);
         try {
             GameOp op = controller.play(HandId.of(id), betround);
-            logger.info(id+" - play response - betround"+betround+":"+op.toString());
+            logger.info(id+" - play response - betround-"+betround+":"+op.toString());
             return new ResponseEntity<>(ApiResponse(op), HttpStatus.OK);
         } catch (HandValidationException ex) {
             String val = "Snapshot failed validation:" + ex.getReason();
-            logger.info("Error in request for play response "+id+" "+betround+":"+val);
+            logger.info(id +" - Error in request for play response. Betround "+betround+":"+val);
             return new ResponseEntity<>(val, HttpStatus.BAD_REQUEST);
         }
     }
@@ -47,7 +47,7 @@ public class PlayerAPI {
     }
 
     private String ApiResponse(GameOp op) {
-        return "{ \"status\" : \"ok\", \"action\":\""+op.getOp()+"\", \"raise\":"+String.valueOf(op.getAmount())+"}";
+        return "{ \"status\" : \"ok\", \"action\":\""+op.getOp()+"\", \"raise\":"+String.valueOf(op.getAmountInBB())+"}";
     }
 
 }

@@ -16,18 +16,19 @@ public class Snapshot {
         public final static String TURN      = "turn";
         public final static String RIVER     = "river";
 
-        public final static String DATATYPE_HANDRESET = "handreset";
-        public final static String DATATYPE_HEARTBEAT = "heartbeat";
-        public final static String DATATYPE_MYTURN = "my_turn";
-        public final static String DATATYPE_SHOWDOWN = "showdown";
-        public final static String DATATYPE_NEWROUND = "new_round";
+        public final static String DATATYPE_HANDRESET   = "handreset";
+        public final static String DATATYPE_HEARTBEAT   = "heartbeat";
+        public final static String DATATYPE_MYTURN      = "my_turn";
+        public final static String DATATYPE_SHOWDOWN    = "showdown";
+        public final static String DATATYPE_POSTHAND    = "posthand";
+        public final static String DATATYPE_NEWROUND    = "new_round";
 
         public final static double PREVACTION_PREFOLD   = -2.0;
         public final static double PREVACTION_FOLD      = -1.0;
         public final static double PREVACTION_CHECK     = 0.0;
         public final static double PREVACTION_CALL      = 1.0;
         public final static double PREVACTION_RAISE     = 2.0;
-        public final static double PREVACTION_BETSIZE   = 3.0;
+        public final static double PREVACTION_BETRAISE  = 3.0;
         public final static double PREVACTION_ALLIN     = 4.0;
     }
 
@@ -36,7 +37,7 @@ public class Snapshot {
         public final static String BALANCE                      = "balance";
         public final static String OPPONENTS_WITH_HIGHER_STACK  = "OpponentsWithHigherStack";
         public final static String BIG_BLIND                    = "bblind";
-
+        public final static String CURRENTBET                   = "currentbet";
         public final static String PREVACTION                   = "prevaction";
     }
 

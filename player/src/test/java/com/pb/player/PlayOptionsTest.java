@@ -26,11 +26,11 @@ public class PlayOptionsTest {
     public Object[][] parameterProvider4() {
         return new Object[][]{
                 { new TestAndExpectedRaise(
-                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 100.0, "balance", 5.0)),
-                        2) },
+                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 100.0, "balance", 6.0, "bblind", 2.0)),
+                        50) },
                 { new TestAndExpectedRaise(
                         Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "bblind", 2.0, "balance", 0.0)),
-                        50) }
+                        25) }
         };
     }
 
@@ -113,14 +113,14 @@ public class PlayOptionsTest {
     public Object[][] parameterProvider() {
         return new Object[][]{
                 { new TestAndExpectedOps(
-                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 0.0, "balance", 100.0)),
-                        Arrays.asList(GameOp.OP_ALLIN().amount(100.0), GameOp.OP_CHECK(), GameOp.OP_RAISE())) },
+                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 0.0, "balance", 100.0, "bblind", 2.0)),
+                        Arrays.asList(GameOp.OP_ALLIN().amountInBB(100/2), GameOp.OP_CHECK(), GameOp.OP_RAISE())) },
                 { new TestAndExpectedOps(
-                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "balance", 100.0)),
-                        Arrays.asList(GameOp.OP_ALLIN().amount(100.0), GameOp.OP_CALL().amount(50.0), GameOp.OP_RAISE(), GameOp.OP_FOLD())) },
+                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "balance", 100.0, "bblind", 4.0)),
+                        Arrays.asList(GameOp.OP_ALLIN().amountInBB(100/4), GameOp.OP_CALL().amountInBB(50/4 + 1), GameOp.OP_RAISE(), GameOp.OP_FOLD())) },
                 { new TestAndExpectedOps(
-                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "balance", 30.0)),
-                        Arrays.asList(GameOp.OP_ALLIN().amount(30.0), GameOp.OP_FOLD())) }
+                        Snapshot.fromSymbols(ImmutableMap.of("DollarsToCall", 50.0, "balance", 30.0, "bblind", 10.0)),
+                        Arrays.asList(GameOp.OP_ALLIN().amountInBB(30/10), GameOp.OP_FOLD())) }
         };
     }
 

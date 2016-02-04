@@ -32,6 +32,8 @@ public class HandValidatorPlayChipsTest {
         snapshot.getState().setDatatype(type);
         snapshot.getSymbols().put(Snapshot.SYMBOLS.BALANCE, balance);
         snapshot.getSymbols().put(Snapshot.SYMBOLS.PREVACTION, prevaction);
+        snapshot.getSymbols().put(Snapshot.SYMBOLS.BIG_BLIND, 2.0);
+        snapshot.getSymbols().put(Snapshot.SYMBOLS.CURRENTBET, 0.0);
         snapshot.getState().setMy_turn_count(turn);
         return snapshot;
     }
@@ -54,10 +56,10 @@ public class HandValidatorPlayChipsTest {
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,     3,  Snapshot.VALUES.PREVACTION_CHECK, 150),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,   3,  Snapshot.VALUES.PREVACTION_ALLIN, 0)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_CALL().amount(50.0),
-                                1, GameOp.OP_RAISE().amount(100.0),
+                                0, GameOp.OP_CALL().amountInBB(25),
+                                1, GameOp.OP_RAISE().amountInBB(50),
                                 2, GameOp.OP_CHECK(),
-                                3, GameOp.OP_ALLIN().amount(150.0)),
+                                3, GameOp.OP_ALLIN().amountInBB(75)),
                         ValidatorStatus.OK)},
                 // 1. Positive - fold
                 {new TestAndExpected(
@@ -65,67 +67,67 @@ public class HandValidatorPlayChipsTest {
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,   0, Snapshot.VALUES.PREVACTION_PREFOLD, 500),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN, 0, Snapshot.VALUES.PREVACTION_FOLD, 500)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_FOLD().amount(0.0)),
+                                0, GameOp.OP_FOLD().amountInBB(0)),
                         ValidatorStatus.OK)},
                 // 2. Negative - action check/fold and balanced changed
                 {new TestAndExpected(
                         hand(new Snapshot[]{
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,   0, Snapshot.VALUES.PREVACTION_PREFOLD, 500),
-                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN, 0, Snapshot.VALUES.PREVACTION_FOLD, 10)}),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND, 0, Snapshot.VALUES.PREVACTION_FOLD, 10)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_FOLD().amount(0.0)),
+                                0, GameOp.OP_FOLD().amountInBB(0)),
                         HandValidatorPlayChips.ACTION_CHECK_FOLD_BALANCE_CHANGED)},
                 // 3. Negative - op is fold and op amount is >0
                 {new TestAndExpected(
                         hand(new Snapshot[]{
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,   0, Snapshot.VALUES.PREVACTION_PREFOLD, 500),
-                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN, 0, Snapshot.VALUES.PREVACTION_FOLD, 500)}),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND, 0, Snapshot.VALUES.PREVACTION_FOLD, 500)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_FOLD().amount(10.0)),
+                                0, GameOp.OP_FOLD().amountInBB(5)),
                         HandValidatorPlayChips.ACTION_CHECK_FOLD_OP_AMOUNT)},
                 // 4. Negative - op is check and op amount is >0
                 {new TestAndExpected(
                         hand(new Snapshot[]{
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,   0, Snapshot.VALUES.PREVACTION_PREFOLD, 500),
-                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN, 0, Snapshot.VALUES.PREVACTION_FOLD, 500)}),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND, 0, Snapshot.VALUES.PREVACTION_FOLD, 500)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_CHECK().amount(10.0)),
+                                0, GameOp.OP_CHECK().amountInBB(5)),
                         HandValidatorPlayChips.ACTION_CHECK_FOLD_OP_AMOUNT)},
                 // 5. Negative - play call for 50 and balance is wrong
                 {new TestAndExpected(
                         hand(new Snapshot[]{
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    0, Snapshot.VALUES.PREVACTION_PREFOLD, 500),
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, 0, Snapshot.VALUES.PREVACTION_CALL, 400),
-                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  0, Snapshot.VALUES.PREVACTION_CALL, 500)}),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND,  0, Snapshot.VALUES.PREVACTION_CALL, 500)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_CALL().amount(50.0)),
+                                0, GameOp.OP_CALL().amountInBB(25)),
                         HandValidatorPlayChips.BALANCE_WRONG_AFTER_PLAY)},
                 // 6. Negative - play raise for 100 and balance is wrong
                 {new TestAndExpected(
                         hand(new Snapshot[]{
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    0, Snapshot.VALUES.PREVACTION_PREFOLD, 500),
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, 0, Snapshot.VALUES.PREVACTION_RAISE, 500),
-                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  0, Snapshot.VALUES.PREVACTION_RAISE, 500)}),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND,  0, Snapshot.VALUES.PREVACTION_RAISE, 500)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_RAISE().amount(50.0)),
+                                0, GameOp.OP_RAISE().amountInBB(25)),
                         HandValidatorPlayChips.BALANCE_WRONG_AFTER_PLAY)},
                 // 7. Negative - play allin, stack must be reduced
                 {new TestAndExpected(
                         hand(new Snapshot[]{
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    0, Snapshot.VALUES.PREVACTION_PREFOLD, 500),
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, 0, Snapshot.VALUES.PREVACTION_ALLIN,   500),
-                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  0, Snapshot.VALUES.PREVACTION_ALLIN,   500)}),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND,  0, Snapshot.VALUES.PREVACTION_ALLIN,   500)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_ALLIN().amount(500.0)),
+                                0, GameOp.OP_ALLIN().amountInBB(250)),
                         HandValidatorPlayChips.BALANCE_WRONG_AFTER_PLAY)},
-                // 8. possitive - play allin, when caller is with lower stack
+                // 8. positive - play allin, when caller is with lower stack
                 {new TestAndExpected(
                         hand(new Snapshot[]{
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    0, Snapshot.VALUES.PREVACTION_PREFOLD, 500),
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, 0, Snapshot.VALUES.PREVACTION_ALLIN,   50),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  0, Snapshot.VALUES.PREVACTION_ALLIN,   50)}),
                         ImmutableMap.of(
-                                0, GameOp.OP_ALLIN().amount(500.0)),
+                                0, GameOp.OP_ALLIN().amountInBB(250)),
                         ValidatorStatus.OK)}
         };
     }

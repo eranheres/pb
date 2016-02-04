@@ -61,7 +61,7 @@ public class HandValidatorPlayActionTest {
                         hand(new Snapshot[] {
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    0, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    1, Snapshot.VALUES.PREVACTION_CALL),
-                                snap(Snapshot.VALUES.DATATYPE_MYTURN,    2, Snapshot.VALUES.PREVACTION_RAISE),
+                                snap(Snapshot.VALUES.DATATYPE_MYTURN,    2, Snapshot.VALUES.PREVACTION_BETRAISE),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,    3, Snapshot.VALUES.PREVACTION_CHECK),
                                 snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  3, Snapshot.VALUES.PREVACTION_ALLIN)}),
                         ImmutableMap.of(
@@ -106,7 +106,7 @@ public class HandValidatorPlayActionTest {
                         hand(new Snapshot[] {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, -1, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,     0, Snapshot.VALUES.PREVACTION_PREFOLD),
-                                snap(Snapshot.VALUES.DATATYPE_MYTURN,     1, Snapshot.VALUES.PREVACTION_RAISE)}),
+                                snap(Snapshot.VALUES.DATATYPE_MYTURN,     1, Snapshot.VALUES.PREVACTION_BETRAISE)}),
                         ImmutableMap.of(0, GameOp.OP_CALL()),
                         HandValidatorPlayAction.WRONG_ACTION_TAKEN) },
                 // 8. Negative - action wasn't taken
@@ -114,7 +114,9 @@ public class HandValidatorPlayActionTest {
                         hand(new Snapshot[] {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, -1, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,     0, Snapshot.VALUES.PREVACTION_PREFOLD),
-                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,   0, Snapshot.VALUES.PREVACTION_RAISE)}),
+                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,   0, Snapshot.VALUES.PREVACTION_BETRAISE),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND,   0, Snapshot.VALUES.PREVACTION_BETRAISE)
+                        }),
                         ImmutableMap.of(0, GameOp.OP_CALL(),
                                         1, GameOp.OP_ALLIN()),
                         HandValidatorPlayAction.WRONG_ACTION_TAKEN) },
@@ -146,9 +148,9 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, -1, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,     0, Snapshot.VALUES.PREVACTION_PREFOLD),
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,     1, Snapshot.VALUES.PREVACTION_CALL),
-                                snap(Snapshot.VALUES.DATATYPE_MYTURN,     2, Snapshot.VALUES.PREVACTION_RAISE),
+                                snap(Snapshot.VALUES.DATATYPE_MYTURN,     2, Snapshot.VALUES.PREVACTION_BETRAISE),
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT,  2, Snapshot.VALUES.PREVACTION_CALL),
-                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,   2, Snapshot.VALUES.PREVACTION_CALL)}),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND,   2, Snapshot.VALUES.PREVACTION_CALL)}),
                         ImmutableMap.of(0, GameOp.OP_CALL(),
                                         1, GameOp.OP_RAISE()),
                         HandValidatorPlayAction.ACTION_NOT_RECORDED) },
@@ -160,7 +162,17 @@ public class HandValidatorPlayActionTest {
                                 snap(Snapshot.VALUES.DATATYPE_MYTURN,     1, Snapshot.VALUES.PREVACTION_CALL)}),
                         ImmutableMap.of(0, GameOp.OP_CALL()),
                         ValidatorStatus.OK) },
-                // 13. Negative - turn count out of order
+                // 13. Positive - fold preflop and showdown twice
+                { new TestAndExpected(
+                        hand(new Snapshot[] {
+                                snap(Snapshot.VALUES.DATATYPE_HANDRESET, -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_MYTURN,    0, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  0, Snapshot.VALUES.PREVACTION_FOLD),
+                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  0, Snapshot.VALUES.PREVACTION_FOLD),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND,  0, Snapshot.VALUES.PREVACTION_FOLD)}),
+                        ImmutableMap.of(0, GameOp.OP_FOLD()),
+                        ValidatorStatus.OK) },
+                // 14. Negative - turn count out of order
                 { new TestAndExpected(
                         hand(new Snapshot[] {
                                 snap(Snapshot.VALUES.DATATYPE_HEARTBEAT, -1, Snapshot.VALUES.PREVACTION_PREFOLD),
@@ -183,7 +195,8 @@ public class HandValidatorPlayActionTest {
             when(dataSource.getGameOp(id, turn)).thenReturn(param.ops.get(turn));
             lastTurn = turn;
         }
-        when(dataSource.getGameOp(id, lastTurn+1)).thenReturn(null);
+        if (param.ops.size() != 0)
+            when(dataSource.getGameOp(id, lastTurn+1)).thenReturn(null);
         HandValidator validator = new HandValidatorPlayAction(dataSource);
         ValidatorStatus actual = validator.validate(param.hand);
         assertEquals(actual, param.expected);

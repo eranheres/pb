@@ -35,6 +35,8 @@ public class HandValidatorCards implements HandValidator {
     public ValidatorStatus validate(Hand hand) {
         ArrayListMultimap<String, Card> previousCards = ArrayListMultimap.create();
         for (Snapshot snapshot : hand.getSnapshots()) {
+            if (snapshot.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_POSTHAND))
+                continue;
             ArrayListMultimap<String, Card> cards = ArrayListMultimap.create();
             for (Snapshot.Player player : snapshot.getPlayers()) {
                 cards.putAll("player"+player.getName(), Arrays.asList(player.getCards()));

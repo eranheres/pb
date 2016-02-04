@@ -32,12 +32,13 @@ public class HandValidatorTurnSeq implements HandValidator {
         Integer highestBetRound = 0;
         for (int i=0; i<snapshots.length; i++) {
             Snapshot snapshot = snapshots[i];
+            String datatype = snapshot.getState().getDatatype();
             // Must have reset on hand start
-            if ((0 == i) && (!snapshot.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_HANDRESET))) {
+            if ((0 == i) && (!datatype.equals(Snapshot.VALUES.DATATYPE_HANDRESET))) {
                 return NO_HANDRESET_ON_FIRST;
             }
             // Must not have handreset in other position than 0
-            if ((i!=0) && (snapshot.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_HANDRESET))) {
+            if ((i!=0) && (datatype.equals(Snapshot.VALUES.DATATYPE_HANDRESET))) {
                 return HANDRESET_MUST_BE_FIRST;
             }
             if (snapshot.getState().getBetround() == null) {
@@ -48,7 +49,7 @@ public class HandValidatorTurnSeq implements HandValidator {
             if (current == null) {
                 return INVALID_VAL_BETROUND;
             }
-            if (current < highestBetRound) {
+            if ((current < highestBetRound) && (!datatype.equals(Snapshot.VALUES.DATATYPE_POSTHAND))) {
                 return BETROUND_OUT_OF_ORDER;
             }
             highestBetRound = current;
