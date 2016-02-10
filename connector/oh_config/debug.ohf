@@ -87,7 +87,12 @@ dll$ini_function_on_startup
 //   * Initialization of memory-symbols at well-defined times
 //   * Triggering calculations, e.g. in a DLL
 
+##f$betsize_enable_rounding##
+False
 
+##f$betsizeinterpretationmethod##
+3
+ 
 ##f$ini_function_on_connection##
 dll$ini_function_on_connection
  
