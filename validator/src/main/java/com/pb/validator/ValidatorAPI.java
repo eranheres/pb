@@ -24,13 +24,19 @@ public class ValidatorAPI {
 
     @RequestMapping(value = "/validate/snapshot/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> snapshot(@PathVariable String id) throws Exception {
-        logger.info("snapshot validation for ",id);
+        logger.debug(id + " - snapshot validation");
 
         try {
             ValidatorStatus status = controller.validateSnapshot(id);
             HttpStatus httpStatus = HttpStatus.OK;
             if (status.equals(ValidatorStatus.NOT_FOUND))
                 httpStatus = HttpStatus.NOT_FOUND;
+
+            if (status == ValidatorStatus.OK) {
+                logger.debug(id + " - response for " + status.toString());
+            } else {
+                logger.info(id + " - response for " + status.toString());
+            }
 
             return new ResponseEntity<>(responseValue(status), httpStatus);
 

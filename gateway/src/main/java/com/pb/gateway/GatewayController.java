@@ -28,7 +28,7 @@ public class GatewayController {
 
     public void setSnapshot(String id, String datatype, String body) throws IOException {
         String decodedBody = java.net.URLDecoder.decode(body, "UTF-8");
-        dataSource.saveToList(id, decodedBody);
+        dataSource.saveSnapshotToList(id, decodedBody);
         ValidationQuery.validatorRes res = query.validateOngoingHand(HandId.of(id));
         if (!res.getValidation().toUpperCase().equals("OK"))
             throw new HandValidationException(res.getReason());

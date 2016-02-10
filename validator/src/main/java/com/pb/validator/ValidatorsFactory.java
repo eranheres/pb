@@ -10,24 +10,28 @@ import org.springframework.stereotype.Repository;
 public class ValidatorsFactory {
     @Autowired HandValidator handValidatorTurnSeq;
     @Autowired HandValidator handValidatorCards;
-    @Autowired HandValidator handValidatorValuesStable;
+    @Autowired HandValidator handValidatorFullHand;
+    @Autowired HandValidator handValidatorPlayAction;
+    @Autowired HandValidator handValidatorPlayChips;
     @Autowired SnapshotValidator snapshotValidatorValidValues;
     @Autowired SnapshotValidator snapshotValidatorValidCards;
     @Autowired SnapshotValidator snapshotValidatorOpenPPL;
 
-    @Autowired HandValidator handValidatorFullHand;
 
     public HandValidator[] getHandInProgressValidators() {
         return new HandValidator[]{
                 handValidatorTurnSeq,
                 handValidatorCards,
-                handValidatorValuesStable
+                handValidatorPlayAction,
+                handValidatorPlayChips
         };
     }
 
     public HandValidator[] getHandFullValidators() {
         return new HandValidator[]{
                 handValidatorTurnSeq,
+                handValidatorPlayChips,
+                handValidatorPlayAction,
                 handValidatorFullHand
         };
     }
@@ -35,7 +39,8 @@ public class ValidatorsFactory {
     public SnapshotValidator[] getSnapshotValidators() {
         return new SnapshotValidator[] {
                 snapshotValidatorValidValues,
-                snapshotValidatorValidCards
+                snapshotValidatorValidCards,
+                snapshotValidatorOpenPPL
         };
     }
 

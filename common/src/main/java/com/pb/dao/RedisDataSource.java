@@ -15,27 +15,56 @@ import java.util.concurrent.TimeUnit;
 public class RedisDataSource implements PBDataSource {
 
     @Autowired
-    private RedisTemplate<String, Snapshot> redisTemplate;
+    private RedisTemplate<String, Snapshot> snapshotTemplate;
+
+    @Autowired
+    private RedisTemplate<String, GameOp> gameOpTemplate;
 
     @Value("${dao.redisdatasource.ttlmin}")
-    private static Integer VALUE_TTL_MIN;
+    private static Integer SNAPSHOT_TTL_MIN;
+    @Value("${dao.redisdatasource.ttlmin}")
+    private static Integer ACTION_TTL_MIN;
+
+
+    private String snapshotKey(String id) {
+        return "snapshot-"+id;
+    }
 
     @Override
-    public void saveToList(String id, Snapshot value) {
-        redisTemplate.opsForList().rightPush(id, value);
-        if ((VALUE_TTL_MIN != null) && (VALUE_TTL_MIN != 0)) {
-            redisTemplate.expire(id, VALUE_TTL_MIN, TimeUnit.MINUTES);
+    public void saveSnapshotToList(String id, Snapshot value) {
+        String key = snapshotKey(id);
+        snapshotTemplate.opsForList().rightPush(key, value);
+        if ((SNAPSHOT_TTL_MIN != null) && (SNAPSHOT_TTL_MIN != 0)) {
+            snapshotTemplate.expire(key, SNAPSHOT_TTL_MIN, TimeUnit.MINUTES);
         }
     }
 
     @Override
-    public void saveToList(String id, String value) {
-        Snapshot snapshot = (Snapshot) redisTemplate.getValueSerializer().deserialize(value.getBytes());
-        saveToList(id, snapshot);
+    public void saveSnapshotToList(String id, String value) {
+        Snapshot snapshot = (Snapshot) snapshotTemplate.getValueSerializer().deserialize(value.getBytes());
+        saveSnapshotToList(id, snapshot);
     }
 
     @Override
     public List<Snapshot> getList(String id) {
-        return redisTemplate.opsForList().range(id, 0, Long.MAX_VALUE);
+        return snapshotTemplate.opsForList().range(snapshotKey(id), 0, Long.MAX_VALUE);
+    }
+
+    private String gameOpKey(String id, Integer turn) {
+        return "gameop-"+id+"-"+turn.toString();
+    }
+
+    @Override
+    public void saveGameOp(String id, Integer turn, GameOp op) {
+        String key = gameOpKey(id, turn);
+        gameOpTemplate.opsForValue().setIfAbsent(key, op);
+        if (ACTION_TTL_MIN != null) {
+            snapshotTemplate.expire(key, ACTION_TTL_MIN, TimeUnit.MINUTES);
+        }
+    }
+
+    @Override
+    public GameOp getGameOp(String id, Integer turn) {
+        return gameOpTemplate.opsForValue().get(gameOpKey(id, turn));
     }
 }

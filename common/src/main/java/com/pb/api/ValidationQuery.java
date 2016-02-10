@@ -43,7 +43,7 @@ public class ValidationQuery {
         BufferedReader bufferedReader;
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new HandValidationException("Hand not found");
         }
         String response = "";
@@ -56,10 +56,10 @@ public class ValidationQuery {
     }
 
     public validatorRes validateOngoingHand(HandId handId) throws IOException {
-        return sendRequest(String.format("%s/validate/snapshot/%s",validatorUrl,handId));
+        return sendRequest(String.format("%s/validate/snapshot/%s",validatorUrl,handId.toString()));
     }
 
     public validatorRes validateHand(HandId handId) throws IOException {
-        return sendRequest(String.format("%s/validate/fullhand/%s",validatorUrl,handId));
+        return sendRequest(String.format("%s/validate/fullhand/%s",validatorUrl,handId.toString()));
     }
 }

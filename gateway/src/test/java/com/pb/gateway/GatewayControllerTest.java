@@ -25,7 +25,7 @@ public class GatewayControllerTest {
         when(query.validateOngoingHand(HandId.of("zzz"))).thenReturn(new ValidationQuery.validatorRes("ok", ""));
         controller.setSnapshot("zzz", "type1", "body");
         verify(query).validateOngoingHand(HandId.of("zzz"));
-        verify(dao).saveToList("zzz", "body");
+        verify(dao).saveSnapshotToList("zzz", "body");
     }
 
     @Test(expectedExceptions = HandValidationException.class)
@@ -37,6 +37,6 @@ public class GatewayControllerTest {
         when(query.validateOngoingHand(HandId.of("zzz"))).thenReturn(new ValidationQuery.validatorRes("not ok", ""));
         controller.setSnapshot("zzz", "type1", "body");
         verify(query).validateOngoingHand(HandId.of("zzz"));
-        verify(dao).saveToList("zzz", "body");
+        verify(dao).saveSnapshotToList("zzz", "body");
     }
 }

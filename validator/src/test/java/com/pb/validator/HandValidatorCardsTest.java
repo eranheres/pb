@@ -23,6 +23,7 @@ public class HandValidatorCardsTest {
         URL url = Thread.currentThread().getContextClassLoader(). getResource("HandValidatorCards_Invalid.json");
         Assert.assertNotNull(url);
         Hand[] hands = mapper.readValue(new File(url.getPath()), Hand[].class);
+
         HandValidator validator = new HandValidatorCards();
 
         assertEquals(HandValidatorCards.CARD_CHANGED_IN_HAND, validator.validate(hands[0]));
