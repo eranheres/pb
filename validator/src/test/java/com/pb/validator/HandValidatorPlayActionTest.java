@@ -182,7 +182,27 @@ public class HandValidatorPlayActionTest {
                         ImmutableMap.of(
                                 0, GameOp.OP_CALL(),
                                 1, GameOp.OP_CALL()),
-                        HandValidatorPlayAction.TURN_COUNT_OUT_OF_ORDER) }
+                        HandValidatorPlayAction.TURN_COUNT_OUT_OF_ORDER) },
+                // 15. hand was not played
+                { new TestAndExpected(
+                        hand(new Snapshot[] {
+                                snap(Snapshot.VALUES.DATATYPE_HANDRESET, -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_NEWROUND,  -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_NEWROUND,  -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_NEWROUND,  -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_POSTHAND,  -1, Snapshot.VALUES.PREVACTION_PREFOLD)}),
+                        ImmutableMap.of(),
+                        ValidatorStatus.OK) },
+                // 15. hand was not played
+                { new TestAndExpected(
+                        hand(new Snapshot[] {
+                                snap(Snapshot.VALUES.DATATYPE_HANDRESET, -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_NEWROUND,  -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  -1, Snapshot.VALUES.PREVACTION_PREFOLD),
+                                snap(Snapshot.VALUES.DATATYPE_SHOWDOWN,  -1, Snapshot.VALUES.PREVACTION_PREFOLD)}),
+                        ImmutableMap.of(),
+                        ValidatorStatus.OK) }
         };
     }
 

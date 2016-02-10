@@ -41,7 +41,7 @@ public class MonkeyPlayerTest {
                 { new TestAndExpected(
                         Arrays.asList(GameOp.OP_ALLIN(), GameOp.OP_RAISE(), GameOp.OP_FOLD(), GameOp.OP_CALL()),
                         1, 100, 40,
-                        GameOp.OP_RAISE().amountInBB( (40 + ((100-40)/2))/2 )) }
+                        GameOp.OP_RAISE().amount( (40.0 + ((100-40)/2)) )) }
         };
     }
 
@@ -51,10 +51,10 @@ public class MonkeyPlayerTest {
         PlayOptions playOptions = mock(PlayOptions.class);
 
         Hand hand = new Hand();
-        hand.setSnapshots(new Snapshot[] { Snapshot.fromSymbols(ImmutableMap.of("bblind",2.0))});
+        hand.setSnapshots(new Snapshot[] { Snapshot.create(ImmutableMap.of("bblind",2.0))});
         when(playOptions.getValidOps(hand)).thenReturn(param.opList);
-        when(playOptions.minRaiseVal(hand)).thenReturn(param.minRaise);
-        when(playOptions.maxRaiseVal(hand)).thenReturn(param.maxRaise);
+        when(playOptions.minRaiseVal(hand)).thenReturn(Double.valueOf(param.minRaise));
+        when(playOptions.maxRaiseVal(hand)).thenReturn(Double.valueOf(param.maxRaise));
         when(random.nextInt(param.opList.size())).thenReturn(param.opIndex);
         when(random.nextInt(0)).thenThrow(new IllegalArgumentException()); // verify that there is no invalid randomizer call
         if (param.maxRaise - param.minRaise != 0) {

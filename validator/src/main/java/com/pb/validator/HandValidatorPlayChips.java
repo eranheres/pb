@@ -22,6 +22,7 @@ public class HandValidatorPlayChips implements HandValidator {
     public static ValidatorStatus ACTION_CHECK_FOLD_OP_AMOUNT = new ValidatorStatus("Action check/fold while op amount is > 0");
     public static ValidatorStatus ACTION_CHECK_FOLD_BALANCE_CHANGED = new ValidatorStatus("Action check/fold while balance changed");
     public static ValidatorStatus BALANCE_WRONG_AFTER_PLAY = new ValidatorStatus("Balance is wrong after play");
+    public static ValidatorStatus UNKNOWN_ACTION = new ValidatorStatus("Unknown action");
 
     @Autowired
     PBDataSource dataSource;
@@ -53,37 +54,54 @@ public class HandValidatorPlayChips implements HandValidator {
         if (op == null)
             return ACTION_NOT_RECORDED.args("turnCount", turnCount);
         double prevAction = current.getSymbols().get(Snapshot.SYMBOLS.PREVACTION);
+        if (prevAction == Snapshot.VALUES.PREVACTION_CHECK)
+            return validatePrevCheck(turnCount, op, current, previous);
+        if (prevAction == Snapshot.VALUES.PREVACTION_FOLD)
+            return validatePrevFold(turnCount, op, current, previous);
+        if (prevAction == Snapshot.VALUES.PREVACTION_ALLIN)
+            return validatePrevAllin(turnCount, op, current, previous);
+        if (prevAction == Snapshot.VALUES.PREVACTION_CALL)
+            return validatePrevCall(turnCount, op, current, previous);
+        if (prevAction == Snapshot.VALUES.PREVACTION_BETRAISE)
+            return validatePrevBetraise(turnCount, op, current, previous);
+        if ((prevAction == Snapshot.VALUES.PREVACTION_PREFOLD) &&
+            (current.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_POSTHAND)))
+            return ValidatorStatus.OK;
+        return UNKNOWN_ACTION.args("prevaction", prevAction);
+    }
+
+    private ValidatorStatus validatePrevCheck(Integer turnCount, GameOp op, Snapshot current, Snapshot previous) {
+        if (op.getAmount() != 0) {
+            return ACTION_CHECK_FOLD_OP_AMOUNT.args("turnCount", turnCount, "op", op);
+        }
         double prevBalance = previous.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
         double currentBalance = current.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
-        if ((prevAction == Snapshot.VALUES.PREVACTION_CHECK) || (prevAction == Snapshot.VALUES.PREVACTION_FOLD)) {
-            if (op.getAmountInBB() != 0) {
-                return ACTION_CHECK_FOLD_OP_AMOUNT.args("prevaction", prevAction, "op", op);
-            }
-            if (prevBalance != currentBalance) {
-                return ACTION_CHECK_FOLD_BALANCE_CHANGED
-                        .args("prevaction", prevAction, "prevbalance", prevBalance, "currentBalance", currentBalance, "op", op);
-            }
-            return ValidatorStatus.OK;
+        if (prevBalance != currentBalance) {
+            return ACTION_CHECK_FOLD_BALANCE_CHANGED.args("turnCount", turnCount,
+                    "prevbalance", prevBalance, "currentBalance", currentBalance, "op", op);
         }
-        if (prevAction == Snapshot.VALUES.PREVACTION_ALLIN) {
-            // TODO - calculate remaining balance more correctly
-            if (currentBalance >= prevBalance) {
-                return BALANCE_WRONG_AFTER_PLAY
-                        .args("prevaction", prevAction,
-                                "prevbalance", prevBalance,
-                                "currentBalance", currentBalance,
-                                "turn", turnCount,
-                                "op", op);
-            }
-            return ValidatorStatus.OK;
+        return ValidatorStatus.OK;
+    }
+
+    private ValidatorStatus validatePrevFold(Integer turnCount, GameOp op, Snapshot current, Snapshot previous) {
+        if (op.getAmount() != 0) {
+            return ACTION_CHECK_FOLD_OP_AMOUNT.args("turnCount", turnCount, "op", op);
         }
-        Double bblind = current.getSymbols().get(Snapshot.SYMBOLS.BIG_BLIND);
-        Double currentbet = 0.0;
-        if (current.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_POSTHAND))
-            currentbet = current.getSymbols().get(Snapshot.SYMBOLS.CURRENTBET);
-        if (prevBalance - op.getAmountInBB()*bblind != currentBalance+currentbet) {
+        double prevBalance = previous.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
+        double currentBalance = current.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
+        if (prevBalance != currentBalance) {
+            return ACTION_CHECK_FOLD_BALANCE_CHANGED.args("turnCount", turnCount,
+                    "prevbalance", prevBalance, "currentBalance", currentBalance, "op", op);
+        }
+        return ValidatorStatus.OK;
+    }
+    private ValidatorStatus validatePrevAllin(Integer turnCount, GameOp op, Snapshot current, Snapshot previous) {
+        double prevBalance = previous.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
+        double currentBalance = current.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
+        // TODO - calculate remaining balance more correctly
+        if (currentBalance >= prevBalance) {
             return BALANCE_WRONG_AFTER_PLAY
-                    .args("prevaction", prevAction,
+                    .args("prevaction", "allin",
                           "prevbalance", prevBalance,
                           "currentBalance", currentBalance,
                           "turn", turnCount,
@@ -91,4 +109,39 @@ public class HandValidatorPlayChips implements HandValidator {
         }
         return ValidatorStatus.OK;
     }
+
+    private  ValidatorStatus validatePrevCall(Integer turnCount, GameOp op, Snapshot current, Snapshot previous) {
+        if (current.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_POSTHAND))
+            return ValidatorStatus.OK;
+        double prevBalance = previous.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
+        double currentBalance = current.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
+        if (prevBalance - op.getAmount() != currentBalance) {
+            return BALANCE_WRONG_AFTER_PLAY
+                    .args("prevaction", "call",
+                            "prevbalance", prevBalance,
+                            "currentBalance", currentBalance,
+                            "turn", turnCount,
+                            "op", op);
+        }
+        return ValidatorStatus.OK;
+    }
+
+    private  ValidatorStatus validatePrevBetraise(Integer turnCount, GameOp op, Snapshot current, Snapshot previous) {
+        if (current.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_POSTHAND))
+            return ValidatorStatus.OK;
+        double prevBalance = previous.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
+        double currentBalance = current.getSymbols().get(Snapshot.SYMBOLS.BALANCE);
+        double amountToCall = previous.getSymbols().get(Snapshot.SYMBOLS.AMOUNT_TO_CALL);
+        if (prevBalance - op.getAmount() - amountToCall != currentBalance) {
+            return BALANCE_WRONG_AFTER_PLAY
+                    .args("prevaction", "betraise",
+                            "prevbalance", prevBalance,
+                            "currentBalance", currentBalance,
+                            "turn", turnCount,
+                            "op", op);
+        }
+        return ValidatorStatus.OK;
+    }
 }
+
+

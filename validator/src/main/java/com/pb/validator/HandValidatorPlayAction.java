@@ -31,7 +31,6 @@ public class HandValidatorPlayAction implements HandValidator {
 
     @Override
     public ValidatorStatus validate(Hand hand) {
-        Boolean afterMyTurn = false;
         Integer turnCount = -1;
         Snapshot previousSnapshot = null;
         for (Snapshot snapshot : hand.getSnapshots()) {
@@ -75,22 +74,25 @@ public class HandValidatorPlayAction implements HandValidator {
         double prevAction = current.getSymbols().get(Snapshot.SYMBOLS.PREVACTION);
         String uuid = current.getState().getUuid();
         GameOp op = dataSource.getGameOp(uuid, turnCount);
-        if (op == null)
+        if ((op == null) && (turnCount != -1))
             return ACTION_NOT_RECORDED.args("turnCount", turnCount, "prevaction", prevAction);
+        if (op == null) // (turnCount == -1))
+            return ValidatorStatus.OK;
         if (current.getState().getDatatype().equals(Snapshot.VALUES.DATATYPE_POSTHAND))
             return ValidatorStatus.OK;
-        if (prevAction == Snapshot.VALUES.PREVACTION_PREFOLD)
+        if (prevAction == Snapshot.VALUES.PREVACTION_PREFOLD) {
             return RECORDED_PLAY_WASNT_PLAYED.args("expected", op);
+        }
         if ((prevAction == Snapshot.VALUES.PREVACTION_ALLIN) && (!op.getOp().equals(GameOp.OP_ALLIN().getOp())))
-            return WRONG_ACTION_TAKEN.args("expected", "Allin", "actual", op, "turn", turnCount);
+            return WRONG_ACTION_TAKEN.args("client", "Allin", "server", op, "turn", turnCount);
         if ((prevAction == Snapshot.VALUES.PREVACTION_CALL) && (!op.getOp().equals(GameOp.OP_CALL().getOp())))
-            return WRONG_ACTION_TAKEN.args("expected", "Call", "actual", op, "turn", turnCount);
+            return WRONG_ACTION_TAKEN.args("client", "Call", "server", op, "turn", turnCount);
         if ((prevAction == Snapshot.VALUES.PREVACTION_CHECK) && (!op.getOp().equals(GameOp.OP_CHECK().getOp())))
-            return WRONG_ACTION_TAKEN.args("expected", "Check", "actual", op, "turn", turnCount);
+            return WRONG_ACTION_TAKEN.args("client", "Check", "server", op, "turn", turnCount);
         if ((prevAction == Snapshot.VALUES.PREVACTION_FOLD) && (!op.getOp().equals(GameOp.OP_FOLD().getOp())))
-            return WRONG_ACTION_TAKEN.args("expected", "Fold", "actual", op, "turn", turnCount);
+            return WRONG_ACTION_TAKEN.args("client", "Fold", "server", op, "turn", turnCount);
         if ((prevAction == Snapshot.VALUES.PREVACTION_BETRAISE) && (!op.getOp().equals(GameOp.OP_RAISE().getOp())))
-            return WRONG_ACTION_TAKEN.args("expected", "Raise", "actual", op, "turn", turnCount);
+            return WRONG_ACTION_TAKEN.args("client", "Raise", "server", op, "turn", turnCount);
 
         return ValidatorStatus.OK;
     }

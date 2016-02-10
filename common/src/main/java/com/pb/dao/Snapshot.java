@@ -39,6 +39,7 @@ public class Snapshot {
         public final static String BIG_BLIND                    = "bblind";
         public final static String CURRENTBET                   = "currentbet";
         public final static String PREVACTION                   = "prevaction";
+        public final static String USERCHAIR                    = "userchair";
     }
 
     @NoArgsConstructor
@@ -76,6 +77,13 @@ public class Snapshot {
         Integer active;
         Integer dealt;
         Integer cards_shows;
+        public static Player create(Integer playing, Double balance, Double currentBet) {
+            Player p = new Player();
+            p.playing = playing;
+            p.balance = balance;
+            p.currentbet = currentBet;
+            return p;
+        }
     }
     Card[]   cards;
     Player[] players;
@@ -83,9 +91,16 @@ public class Snapshot {
     State    state;
     Map<String, Double> symbols;
 
-    static public Snapshot fromSymbols(Map<String, Double> symbols) {
+    static public Snapshot create(Map<String, Double> symbols) {
         Snapshot snapshot = new Snapshot();
         snapshot.setSymbols(symbols);
+        return snapshot;
+    }
+
+    static public Snapshot create(Map<String, Double> symbols, Player players[]) {
+        Snapshot snapshot = new Snapshot();
+        snapshot.setSymbols(symbols);
+        snapshot.setPlayers(players);
         return snapshot;
     }
 }
