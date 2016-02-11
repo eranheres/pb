@@ -53,7 +53,8 @@ public class PlayOptions {
         }
         // When allin val is lower than amount to call or big blind then it is not a raise situation
         Double allInVal = allInVal(hand);
-        if ((amountToCall > allInVal) || (bblind > allInVal)) {
+        Double amountToCallRoundedToBBlind = Math.ceil(amountToCall/bblind)*bblind;
+        if ((amountToCallRoundedToBBlind >= allInVal) || (bblind >= allInVal)) {
             canRaise = false;
         }
 

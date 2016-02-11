@@ -6,6 +6,7 @@ import com.pb.dao.Snapshot;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,17 +29,21 @@ public class MonkeyPlayer {
     @Autowired
     PlayOptions playOptions;
 
-    public static Boolean allwaysRais = true;
-    public static Boolean allwaysFold = false;
-    public static Boolean allwaysCall = false;
-    public static Boolean allwaysRaisMin = false;
+    @Value("${pb.player.monkey.alwaysraise}")
+    private final Boolean alwaysRaise = false;
+    @Value("${pb.player.monkey.alwaysfold}")
+    private final Boolean alwaysFold  = false;
+    @Value("${pb.player.monkey.alwayscall}")
+    private final Boolean alwaysCall  = false;
+    @Value("${pb.player.monkey.alwaysraisemin}")
+    private final Boolean alwaysRaiseMin = false;
 
     public GameOp play(Hand hand) {
         List<GameOp> ops = playOptions.getValidOps(hand);
         Double bblind = hand.latestSnapshot().getSymbols().get(Snapshot.SYMBOLS.BIG_BLIND);
         GameOp selected = randomGameOp(ops);
         if (selected.getOp().equals(GameOp.OP_RAISE().getOp())) {
-            if (allwaysRaisMin) {
+            if (alwaysRaiseMin) {
                 Double minRaise = playOptions.minRaiseVal(hand);
                 Double roundedUpBigblinds = Math.ceil(minRaise/bblind)*bblind;
                 return selected.amount(roundedUpBigblinds);
@@ -46,7 +51,7 @@ public class MonkeyPlayer {
             Double maxRaise = playOptions.maxRaiseVal(hand);
             Double minRaise = playOptions.minRaiseVal(hand);
             if (maxRaise < minRaise)
-                return null; // just to capture the event, should not be here
+                throw new IllegalStateException("max raise in smaller than min raise"); // just to capture the event, should not be here
             Integer range = (maxRaise.intValue() - minRaise.intValue())/bblind.intValue();
             Double raise;
             if (range == 0) {
@@ -65,25 +70,25 @@ public class MonkeyPlayer {
     }
 
     private GameOp randomGameOp(List<GameOp> ops) {
-        if (allwaysRais) {
+        if (alwaysRaise) {
             for (GameOp op : ops) {
                 if (op.getOp().equals(GameOp.OP_RAISE().getOp()))
                     return op;
             }
         }
-        if (allwaysCall || allwaysRais) {
+        if (alwaysCall || alwaysRaise) {
             for (GameOp op : ops) {
                 if (op.getOp().equals(GameOp.OP_CALL().getOp()))
                     return op;
             }
         }
-        if (allwaysCall || allwaysRais) {
+        if (alwaysCall || alwaysRaise) {
             for (GameOp op : ops) {
                 if (op.getOp().equals(GameOp.OP_CHECK().getOp()))
                     return op;
             }
         }
-        if ((allwaysFold) || (allwaysCall) || allwaysRais)
+        if ((alwaysFold) || (alwaysCall) || alwaysRaise)
             return GameOp.OP_ALLIN();
         return ops.get(randomizer.nextInt(ops.size()));
     }
