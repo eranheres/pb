@@ -1,34 +1,24 @@
-##2015-08-26 13:42:46##
+##2015-09-17 13:56:55##
 
 ##notes##
- 
 
 ##dll##
- 
 
 ##f$alli##
- 
 
 ##f$betpot_2_1##
  
-
 ##f$betpot_1_1##
- 
 
 ##f$betpot_3_4##
- 
 
 ##f$betpot_2_3##
- 
 
 ##f$betpot_1_2##
- 
 
 ##f$betpot_1_3##
- 
 
 ##f$betpot_1_4##
- 
 
 ##f$betsize##
 // Betsize in dollars, raise-to semantics.
@@ -38,14 +28,12 @@
 
 
 ##f$rais##
- 
 
 ##f$call##
- 
 
 ##f$check##
 // Check whenever it is free to call
-(call == 0) 
+//(call == 0) 
 
 ##f$fold##
 // f$fold should always evaluate to true per default
@@ -53,22 +41,16 @@
 1 
 
 ##f$sitin##
- 
 
 ##f$sitout##
- 
 
 ##f$leave##
- 
 
 ##f$rematch##
- 
 
 ##f$autopost##
- 
 
 ##f$close##
- 
 
 ##f$rebuy##
 // f$rebuy should evaluate to the target-amount in dollars.
@@ -77,35 +59,24 @@
 
 
 ##f$prefold##
-    Call
+dll$prefold
  
-##f$flop##
-​    Call
-
-
-##f$turn##
-​    Fold   
-
-
-
-##f$river##
-    WHEN dll$river Fold FORCE
-​
 
 ##f$chat##
+//dll$chat
  
 
 ##f$delay##
 // Autoplayer-delay in milli-seconds
-0
-
+1
 
 ##f$allin_on_betsize_balance_ratio##
+dll$allin_on_betsize_balance_ratio
 // Allin if betsize is more than X% of our total balance (including currentbet).
 // This affects f$betsize and all f$betpot_X_Y_ functions.
 //  0.00 =  0% = disabled
 //  0.50 = 50%
-0.00
+//0.00
 
 
 ##f$ini_function_on_startup##
@@ -127,30 +98,28 @@
  
 
 ##f$ini_function_on_heartbeat##
- 
+//0
 
 ##f$prwin_number_of_opponents##
+//dll$prwin_number_of_opponents
 // "Reasonable" default to get standard PrWin running for beginners,
 // Works even with "no opponents".
 nopponentsplaying + 1 
 
 ##f$prwin_number_of_iterations##
+//dll$prwin_number_of_iterations
 // "Reasonable" default to get PrWin running for beginners.
 // Large enough to get usable results,
 // small enough to save CPU-time.
 1000 
 
 ##f$prwin_topclip##
- 
 
 ##f$prwin_mustplay##
- 
 
 ##f$prwin_willplay##
- 
 
 ##f$prwin_wontplay##
- 
 
 ##f$icm_prize1##
 // f$icm_prizeX functions are used to configure the payout-structure in tournaments.
@@ -160,25 +129,18 @@ nopponentsplaying + 1
 
 
 ##f$icm_prize2##
- 
 
 ##f$icm_prize3##
- 
 
 ##f$icm_prize4##
- 
 
 ##f$icm_prize5##
- 
 
 ##f$icm_prize6##
- 
 
 ##f$icm_prize7##
- 
 
 ##f$icm_prize8##
- 
 
 ##f$icm_prize9##
  
@@ -187,5 +149,78 @@ nopponentsplaying + 1
  
 
 ##f$debug##
+
+##f$betsize_enable_rounding##
+False
+
+//////////////////////////////////////
+// Debug loopback options
+
+// 1 if debug option is enabled
+##f$loopback_debug##
+0
+
+##f$preflop_raise_loopback##
+0
  
+##f$preflop_raise_to_loopback##
+0
+
+##f$preflop_call_loopback##
+0
+
+##f$preflop_fold_loopback##
+0
+
+##f$flop_raise_loopback##
+0
+ 
+##f$flop_raise_to_loopback##
+0
+
+##f$flop_call_loopback##
+0
+
+##f$flop_fold_loopback##
+0
+
+##f$turn_raise_loopback##
+0
+ 
+##f$turn_raise_to_loopback##
+0
+
+##f$turn_call_loopback##
+0
+
+##f$turn_fold_loopback##
+0
+
+##f$river_raise_loopback##
+0
+ 
+##f$river_raise_to_loopback##
+0
+
+##f$river_call_loopback##
+0
+
+##f$river_fold_loopback##
+0
+
+
+////////////////////////////////////
+// OpenPPL lifecycle methods
+////////////////////////////////////
+##f$preflop##
+WHEN (1) RaiseTo 10 FORCE
+​
+##f$flop##
+WHEN (1) RaiseTo 10 FORCE
+​
+##f$turn##
+WHEN (1) RaiseTo 10 FORCE
+​
+##f$river##
+WHEN (1) RaiseTo 10 FORCE
 

@@ -58,15 +58,16 @@ struct ext_holdem_player {
 struct ext_holdem_state {
 	const char* datatype;
 	int current;
-    int hand_count;
+  int hand_count;
 	int hand_error;
 	int first_hand;
+	int my_turn_count;
 	bool passed_preflop;           // true if the hand passed preflop betround 
 	int snapshot_count;
 	std::string hand_uuid;
-    int dll_listening_port;
+  int dll_listening_port;
 	std::string betround;
-    ext_holdem_player   player[10]        ;       //player records
+  ext_holdem_player   player[10]        ;       //player records
 	std::string current_query;
 
 	// player actions 
@@ -82,7 +83,6 @@ boost::uuids::random_generator uuid_generator;
 
 #define STATE_INDEX ((state_index-1)&0xFF)
 #define CURRENT_STATE (state[STATE_INDEX])
-#define EXT_STATE ext_state
 #define CARD_VALID(card) (card<0xFE)
 
 struct configuration_st {
@@ -106,7 +106,54 @@ void init_all_symbols_names() {
 	char *excluded[] = {
 			"f$debug", 
 			"dll",
-			"f"
+			"f",
+			"f$allin_on_betsize_balance_ratio",
+			"f$ini_function_on_startup",
+			"f$ini_function_on_connection",
+			"f$ini_function_on_handreset",
+			"f$ini_function_on_new_round",
+			"f$ini_function_on_my_turn",
+			"f$ini_function_on_heartbeat",
+			"f$test",
+			"f$preflop",
+			"f$flop",
+			"f$turn",
+			"f$river",
+			"log$",
+			"msgbox$",
+			"notes",
+			"HaveBackdoorstraightDraw",
+			"HaveBackdoorStraightDraw",
+
+			"icm_allilose1", // crashes ?!?
+			"icm_allilose2", // crashes ?!?
+			"icm_allilose3", // crashes ?!?
+			"icm_allilose4", // crashes ?!?
+			"icm_allilose5", // crashes ?!?
+			"icm_allilose6", // crashes ?!?
+			"icm_allilose7", // crashes ?!?
+			"icm_allilose8", // crashes ?!?
+			"icm_allilose9", // crashes ?!?
+			
+			// TODO - fix in OH and pull request
+			"icm_allilosCO", 
+			"icm_allilosD", 
+			"icm_allilosBB",
+			"icm_allilosSB",
+			"icm_allilosUTG",
+			"icm_allilosUTG1",
+			"icm_allilosUTG2", 
+			"icm_allilosUTG3",
+			"icm_allilosUTG4",
+			"icm_allilosUTG5",
+			"icm_allilosUTG6",
+			"nchairsdealt",
+			"pl_",
+			"vs",
+			"vs$",
+			"vs$list",
+			"vs$multiplex$",
+
 			""
 	};
   const char* all_symbols_string = GetAllSymbols();
@@ -117,6 +164,7 @@ void init_all_symbols_names() {
 	std::set_difference(all_symbols.begin(), all_symbols.end(), excluded_set.begin(), excluded_set.end(), 
 			            std::inserter(all_symbol_names, all_symbol_names.begin()));
 	all_symbol_names.erase("");
+	all_symbol_names.erase(all_symbol_names.lower_bound("pt_"), all_symbol_names.upper_bound("pt_z"));
 }
 
 string num_to_card(unsigned char num) 
@@ -148,7 +196,7 @@ string num_to_card(unsigned char num)
 string holdem_player_to_string(int num)
 {
 	holdem_player* player = &CURRENT_STATE.m_player[num];
-	ext_holdem_player* ext_player = &(EXT_STATE.player[num]);
+	ext_holdem_player* ext_player = &(ext_state.player[num]);
     ostringstream os;
 	os  
 		<< "#" << std::to_string((long double)num) 
@@ -168,7 +216,7 @@ string holdem_state_to_string()
 {
   ostringstream os;
   os << ext_state.hand_uuid 
-     << "|betround:" << EXT_STATE.betround
+     << "|betround:" << ext_state.betround
      << "|board:";
   for (int i=0; i<5; i++) {
     os << num_to_card(CURRENT_STATE.m_cards[i]);
@@ -183,7 +231,7 @@ string holdem_state_to_string()
      << (state->m_is_posting?"|post":"|not post") 
 	   << "|sttidx:" << std::to_string((long double)STATE_INDEX)
      << "|deal:" << (int)CURRENT_STATE.m_dealer_chair;
-	os << "|query:" << EXT_STATE.current_query;
+	os << "|query:" << ext_state.current_query;
   os << "\n";
   for (int i=0; i<10; i++) {
     if (state->m_player[i].m_name_known == 0)
@@ -200,7 +248,7 @@ json_t* json_holdem_player(holdem_player* player, ext_holdem_player* ext_player)
 	for (int i=0; i<2; i++)
 		json_array_append_new(cards, json_string(num_to_card(player->m_cards[i]).c_str()));
 	
-    // build main json
+  // build main json
 	json_t *main = json_object();
   json_object_set_new(main, "name", json_string(player->m_name));
 	json_object_set_new(main, "balance", json_real(player->m_balance));
@@ -245,6 +293,7 @@ json_t* holdem_state_to_json(holdem_state* state) {
 	json_object_set_new(jstate, "is_posting",	json_integer(state->m_is_posting));
 	json_object_set_new(jstate, "fillerbits",	json_integer(state->m_fillerbits));
 	json_object_set_new(jstate, "dealer_chair", json_integer(state->m_dealer_chair));
+	json_object_set_new(jstate, "my_turn_count", json_integer(ext_state.my_turn_count));
 
 	// build the pots array
 	json_t *pots = json_array();
@@ -274,15 +323,12 @@ json_t* holdem_state_to_json(holdem_state* state) {
 
 	idx = 0;
   double init = GetSymbol("TimeToInitMemorySymbols");
-	if (init != 0)
-		Log("Time to init memory symbols");
 	GetSymbol("InitMemorySymbols"); // Initialize OpenPPL memory symbols
 	const char* sym = 0;
 	while (*(sym = all_ppl_symbol_names[idx++]) != '\0') {
-		// exluded symbols (TODOs)
-		if (string(sym) == "HaveBackdoorStraightDraw") // crashes
-			continue;
-
+		if ((string(sym) == "HaveBackdoorstraightDraw") ||
+        (string(sym) == "HaveBackdoorStraightDraw"))
+				continue;
 		double val = GetSymbol(sym);
 		json_object_set_new(symbols, sym, json_real(val));
 	}
@@ -321,16 +367,16 @@ void write_error_to_captures(std::string file, int error_code, std::string error
 
 void send_table_state() {
 	if (ext_state.hand_error) {
-        Log("Hand in error state, avoid sending:%s, handnumber:%d, betround:%s\n", 
-			ext_state.datatype, 
-			ext_state.hand_count,
-			ext_state.betround.c_str());
+    Log("Hand in error state, avoid sending:%s, handnumber:%d, betround:%s\n", 
+				ext_state.datatype, 
+				ext_state.hand_count,
+				ext_state.betround.c_str());
 		return;
 	}
-    Log("sending:%s, handnumber:%d, betround:%s\n", 
-		ext_state.datatype, 
-		ext_state.hand_count,
-		ext_state.betround.c_str());
+  Log("sending:%s, handnumber:%d, betround:%s\n", 
+				ext_state.datatype, 
+				ext_state.hand_count,
+				ext_state.betround.c_str());
 	string data = holdem_state_to_json_string(&state[STATE_INDEX]);
 	string url = configuration.server_url
 					+ "/tablestate/" 
@@ -353,9 +399,9 @@ void send_table_state() {
 bool is_OH_betround_bug(const char* pquery) 
 {
 	// OH has a bug that it changes the betround before handreset is changed , happens on new_round and heartbeat events 
-	if ((EXT_STATE.passed_preflop) && 
+	if ((ext_state.passed_preflop) && 
 		((is_heartbeat(pquery) || is_new_round(pquery))) &&
-		(EXT_STATE.betround == "preflop"))
+		(ext_state.betround == "preflop"))
 		return true;
 	return false;
 }
@@ -363,7 +409,7 @@ bool is_OH_betround_bug(const char* pquery)
 int is_showdown() {
 	holdem_state* cstate = &state[STATE_INDEX];
 	// Check first if river
-    if (string(EXT_STATE.betround) != "river")
+    if (string(ext_state.betround) != "river")
 		return 0;
 
 	// Check that players other than me are showing cards
@@ -373,9 +419,9 @@ int is_showdown() {
 	for (int i=0; i<10; i++) {
 		if (i==user_chair)
 			continue;
-		if (!EXT_STATE.player[i].playing)
+		if (!ext_state.player[i].playing)
 			continue;
-		if (EXT_STATE.player[i].cards_shows)
+		if (ext_state.player[i].cards_shows)
 			continue;
 		return false;
 	}
@@ -385,8 +431,8 @@ int is_showdown() {
 int do_showdown() 
 {
 	ext_state.datatype = "showdown";
-	Log("showdown\n");
-    send_table_state();
+	//Log("showdown\n");
+  send_table_state();
 	return 0;
 }
 
@@ -400,9 +446,9 @@ int is_heartbeat(const char* pquery)
 int do_heartbeat(const char* pquery)
 {
 	ext_state.datatype = "heartbeat";
-	if (!is_OH_betround_bug(pquery)) {
-		send_table_state();
-	}
+//	if (!is_OH_betround_bug(pquery)) {
+//		send_table_state();
+//	}
 	return 0;
 }
 
@@ -414,7 +460,7 @@ int is_playing()
 
 void do_not_playing()
 {
-	Log("not playing\n");
+	//Log("not playing\n");
 }
 
 int is_hand_error() {
@@ -439,14 +485,17 @@ void init_new_hand()
 	ext_state.hand_uuid = boost::uuids::to_string(uuid_generator());
 	boost::filesystem::create_directory("captures//"+ext_state.hand_uuid);
 	ext_state.hand_count++;
-	ext_state.snapshot_count = 0;
-	ext_state.hand_error = false;
-	ext_state.passed_preflop = false;
-	ext_state.play_betround = "";
+	ext_state.snapshot_count	= 0;
+	ext_state.hand_error			= false;
+	ext_state.passed_preflop	= false;
+	ext_state.play_betround		= "";
+	ext_state.my_turn_count		= -1;
 }
 
 int do_hand_reset() 
 {
+  ext_state.datatype = "posthand";
+	send_table_state();
 	if (!is_hand_error())
 		clear_hand_images();
 	init_new_hand();
@@ -461,7 +510,7 @@ int is_new_round(const char* pquery)
 {
 	if (string(pquery) == "dll$ini_function_on_new_round")
 	{
-		Log("On new round : %s\n",ext_state.betround.c_str());
+		//Log("On new round : %s\n",ext_state.betround.c_str());
 		return 1;
 	}
 	return 0;
@@ -488,61 +537,62 @@ bool read_play_response(const char* response)
 	json = json_loadb(response, strlen(response), 0, &error);
 	if(!json) {
 		Log("failed to parse play response\n");
-	    return false;	
+    return false;	
 	}
 
 	json_t* jstatus = json_object_get(json, "status");
-    json_t* jaction = json_object_get(json,"action");
-    json_t* jraise  = json_object_get(json,"raise");
-	if ((!json_is_string(jstatus)) || (!json_is_string(jaction)) || (!json_is_integer(jraise)))  {
+  json_t* jaction = json_object_get(json,"action");
+  json_t* jraise  = json_object_get(json,"raise");
+	if ((!json_is_string(jstatus)) || (!json_is_string(jaction)) || (!json_is_real(jraise)))  {
 		Log("Invalid or missing value in play response : %s\n",response);
 		return false;
 	}
 	const char* status = json_string_value(jstatus);
 	const char* action = json_string_value(jaction);
-	json_int_t raise  = json_integer_value(jraise);
+	double raise  = json_real_value(jraise);
 	
+	ext_state.play_betround = ext_state.betround; 
+	ext_state.play_action   = action;
+	ext_state.play_raise    = (int)raise;
+
+	Log("playing: betround %s, action %s, raise %d\n",
+			ext_state.play_betround.c_str(), 
+			ext_state.play_action.c_str(),
+			ext_state.play_raise); 
 	if (string(status) != "ok") {
 		Log("Server returned failed status:%s\n",status);
 		return false;
 	}
 
-	EXT_STATE.play_action   = action;
-	EXT_STATE.play_raise    = (int)raise;
-	EXT_STATE.play_betround = EXT_STATE.betround; 
 	return true;
 }
 
 
-void read_play_action() 
+bool read_play_action() 
 {
-	char response[1024];
+	char response[1024*2];
 	string url = configuration.server_url
 					+ "/play/"
 					+ ext_state.hand_uuid
 					+ '/'
 					+ ext_state.betround;
 	if (configuration.offline == "yes")
-		return;
-	// Skip play request if already requested
-	if (ext_state.play_betround == ext_state.betround)
-		return;
+		return true;
 	int rescode = http_get(url.c_str(), (char*)response, 1024); 
 	std::string error = "play";
 	if (rescode/100 != 2) { // checks for status 2XX
 		ext_state.hand_error = true;
-	    error="-play-error";
+	  error="-play-error";
 	}
 	std::string filename = "captures\\"+ext_state.hand_uuid+"\\"+std::to_string((long double)ext_state.snapshot_count)+error+".txt";
 	write_error_to_captures(filename, rescode, response, url, "");
-	read_play_response(response);
+	if (ext_state.hand_error)
+			return false;
+	return read_play_response(response);
 }
 
 int do_my_turn()
 {
-	ext_state.datatype = "my_turn";
-	send_table_state();
-	read_play_action();
 	return 0;
 }
 
@@ -558,35 +608,53 @@ int is_openppl_command(const char* pquery) {
 int do_openppl_command(const char* pquery)
 {
 	string q = pquery;
-	if (EXT_STATE.hand_error)
+	if (ext_state.hand_error)
 		return 0; // fold on error 
 	if (configuration.offline == "yes") {
 			if ((q == "dll$player_call") || (q == "dll$player_check"))
 					return 1;
 			return 0;
 	}
-	EXT_STATE.play_betround = ""; // Reset play_betround to indicate values have been used
 
+	static bool action_executed = true;
+	// Skip play request if already requested for this betround
+	if (action_executed) {
+		ext_state.datatype = "my_turn";
+		ext_state.my_turn_count++;
+		send_table_state();
+		if (read_play_action())
+      action_executed = false;
+	}
 
-	if ((q == "dll$player_allin") && (EXT_STATE.play_action == "allin"))
+	if ((q == "dll$player_allin") && (ext_state.play_action == "allin")) {
+		action_executed = true;
+		return 1;
+	}
+
+	if ((q == "dll$player_raise") && (ext_state.play_action == "raise"))
 		return 1;
 
-	if ((q == "dll$player_raise") && (EXT_STATE.play_action == "raise"))
+	if ((q == "dll$player_call") && (ext_state.play_action == "call")) {
+		action_executed = true;
 		return 1;
+	}
 
-	if ((q == "dll$player_call") && (EXT_STATE.play_action == "call"))
+	if ((q == "dll$player_check") && (ext_state.play_action == "check")) {
+		action_executed = true;
 		return 1;
+  }
 
-	if ((q == "dll$player_check") && (EXT_STATE.play_action == "check"))
+	if ((q == "dll$player_fold") && (ext_state.play_action == "fold")) {
+		action_executed = true;
 		return 1;
+	}
 
-	if ((q == "dll$player_fold") && (EXT_STATE.play_action == "fold"))
-		return 1;
+	if ((q == "dll$player_raise_to") && (ext_state.play_action == "raise")) {
+		action_executed = true;
+	  int bblind = (int)GetSymbol("bblind");
+		return ext_state.play_raise / bblind;
+	}
 
-	if ((q == "dll$player_raise_to") && (EXT_STATE.play_action == "raise"))
-		return EXT_STATE.play_raise;
-
-	Log("Error - invalid state to play (pquery=%s, action=%s), folding unintentialy\n", q.c_str(), EXT_STATE.play_action.c_str());
 	return 0;
 }
 
@@ -597,10 +665,10 @@ void fill_extended_table_state(const char* pquery)
 	int activebits = (int)GetSymbol("playersactivebits"); 
 	int dealtbits = (int)GetSymbol("playersdealtbits");
 
-    holdem_state* cstate = &state[STATE_INDEX];
+  holdem_state* cstate = &state[STATE_INDEX];
 	ext_state.betround = get_current_betround();
 	if (ext_state.betround != "preflop")
-		ext_state.passed_preflop = true;
+    ext_state.passed_preflop = true;
 	ext_state.snapshot_count++;
 	ext_state.current_query = pquery;
 	for (int i=0; i<10; i++) {
@@ -617,7 +685,7 @@ void fill_extended_table_state(const char* pquery)
 }
 
 int is_table_found() {
-    holdem_state* cstate = &state[STATE_INDEX];
+  holdem_state* cstate = &state[STATE_INDEX];
 	return (strlen(cstate->m_title) !=0 );
 }
 
@@ -652,7 +720,7 @@ double process_query(const char* pquery)
 		return do_hand_reset();
 
 	if (is_hand_error()) 
-        return do_hand_error(pquery);
+    return do_hand_error(pquery);
 
 	if (is_new_round(pquery))
 		return do_new_round(pquery);
@@ -672,7 +740,7 @@ double process_query(const char* pquery)
 	if (is_openppl_command(pquery))
 		return do_openppl_command(pquery);
 
-    return 0;
+  return 0;
 }
 
 /*
